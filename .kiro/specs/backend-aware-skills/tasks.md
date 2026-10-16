@@ -333,7 +333,7 @@
     tables, and 89-109 and 923-964 were split at the `##` headings inside them (S6). The Engine
     serves `limit=-1` as its cap of 1000 rather than refusing it, so the Engine text says that; only
     a single-item delete answers 204 with no body.
-- [ ] 5.2 (P) Convert `add-files` (row 6, BP)
+- [x] 5.2 (P) Convert `add-files` (row 6, BP)
   - `SKILL.md` 26-28, 47, 53-67 and 136-166.
   - Engine content: ES-1, ES-11 and ES-15. The upload limit is `APP_MAX_UPLOAD_BYTES` (100 MiB),
     with no MIME allow list. Delete answers 204. The generated assets proxy targets a path the Engine
@@ -341,6 +341,11 @@
   - Done when: FD holds for `add-files`.
   - _Requirements: 1.2, 1.9, 2.1, 3.3, 3.11, 3.15_
   - _Boundary: add-files/, converted/add-files, supabase-view-changes/add-files.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. The Engine text keeps the module's hooks and steps, states that the generated assets proxy
+    forwards to a path the Engine does not serve (so `getAssetUrl` previews do not load), and shows a
+    file in a browser through `GET /api/files/signed-url`.
 - [ ] 5.3 (P) Convert `add-microapp` (row 8, BP)
   - `SKILL.md` 13-26, 72-86 (Step 0), 138-149, 151-213, 350-394, 585-596 and 626. Move the links at
     26 and 170 into sup. In references: `context-discovery` 32-48, 120-130 and 153-158;
