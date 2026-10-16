@@ -244,7 +244,7 @@
     three differs from `v1.0.0` by the Gate only (change file `[]`). Ranges widened beyond the plan:
     `SKILL.md` 57 to its fence 51-59, Step 7 from 125 to 123 (its "SQL mirrors" lead-in), and the
     checklist line 489 of `content-translations` (the SQL mirror item); line 40 stays shared.
-- [ ] 4.2 (P) Convert `create-collection` (row 16, BP)
+- [x] 4.2 (P) Convert `create-collection` (row 16, BP)
   - `SKILL.md` line 3: reword the description to "with its schema", with no marker (C4). Then lines
     15 (sup), 55-57, 75-84, 88-120, 217-227, 251-275 and 287-291. Move the link at 288 into sup; its
     eng counterpart links `create-api-route/SKILL.md`. In `references/standard-fields.instructions.md`:
@@ -256,6 +256,12 @@
     shows the link only inside a `supabase` passage.
   - _Requirements: 1.2, 1.9, 2.1, 2.4, 3.6, 3.9, 3.15_
   - _Boundary: create-collection/, converted/create-collection, supabase-view-changes/create-collection.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md` and
+    `standard-fields` reads as complete steps; the Supabase view differs from `v1.0.0` by the Gate and
+    the reworded description only (one `description` entry). The link at 288 lies inside a `supabase`
+    passage and its `engine` counterpart links `create-api-route/SKILL.md`; of 287-291 only 288
+    differs, so only 288 is marked. 88-120 is split at its two H2 headings (88-94, 96-106, 108-120).
+    Widened beyond the plan: `SKILL.md` line 9 and `standard-fields` line 9 (both name a migration).
 - [ ] 4.3 (P) Convert `create-rbac` (row 20, BP)
   - `SKILL.md` 22-26, 41-70, 112-152, 162-249 and 262-271. Line 288 is a recorded break and stays
     unchanged. `references/rbac-setup.instructions.md` 43, 90-95, 113-115, 132, 169-205, 243-271 and
