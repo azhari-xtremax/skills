@@ -632,13 +632,19 @@
     Gate; the tests and `check.mjs` exit 0 with `converted/subagent-delegation`. Read through:
     the persona table and the routing notes hold for both kinds of project (RLS named as a
     Supabase project's; the OAuth review not available on an Engine project, in plain words).
-- [ ] 6.18 (P) Reword `buildpad-steering` and add its Gate (row 43, RW+G)
+- [x] 6.18 (P) Reword `buildpad-steering` and add its Gate (row 43, RW+G)
   - `SKILL.md`: the Gate, and lines 53-56 reworded as in 6.8. The templates and `rules/` stay
     unchanged.
   - Done when: FD holds for `buildpad-steering`, and R8 reports nothing for its `settings-templates/`
     and `rules/`.
   - _Requirements: 1.2, 5.2, 5.6, 2.4_
   - _Boundary: buildpad-steering/, converted/buildpad-steering, supabase-view-changes/buildpad-steering.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`; the tests and
+    `check.mjs` exit 0 with `converted/buildpad-steering` (R3 holds the Gate after the H1; R8
+    reports nothing for `settings-templates/` and `rules/`, both unchanged). Read through: the
+    bootstrap tech analysis records the backend the Gate established and forbids inferring it
+    from dependency or variable names, as in 6.8; no marker. The change file has one `text`
+    entry.
 
 - [ ] 7. Convert the core Skills (design Group 2; after task 4)
 - [ ] 7.1 (P) Convert `add-external-oauth` (row 1, US)
