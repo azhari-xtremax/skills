@@ -416,7 +416,7 @@
     widened to whole fences, `SKILL.md` 46-73 and 256-268 were split around lines that hold for
     both backends, and the service-role block 51-61 is `supabase` text with ES-3's "add none" as
     its Engine counterpart. `project-creation` has no front matter, so its Gate stands before line 1.
-- [ ] 5.7 (P) Convert `create-tests` (row 22, BP)
+- [x] 5.7 (P) Convert `create-tests` (row 22, BP)
   - `SKILL.md` line 3 (description, C4), then 24-80, 110, 176-178, 227-266, 359-392, 428 and
     453-456. `references/playwright-testing.instructions.md` 59-75, 178-306, 355-374, 485-528,
     907-958, 1351-1367, 1453-1729, 2006-2064 and 2124-2127.
@@ -426,6 +426,14 @@
   - Done when: FD holds for `create-tests`.
   - _Requirements: 1.2, 1.9, 2.1, 3.7, 3.8, 3.12, 3.17, 3.15, 2.4_
   - _Boundary: create-tests/, converted/create-tests, supabase-view-changes/create-tests.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` and
+    `references/playwright-testing.instructions.md` from `check.mjs --render`; the Supabase view is
+    `v1.0.0` but for the Gates and the reworded description (the change file's one entry). Ranges
+    were widened to whole fences and tables and split at `##` headings (S6). Checked in the Engine:
+    `POST /api/auth/login` takes its tenant from the body's `tenant` (the header `X-Tenant-Id` is
+    what the Supabase client's password sign-in reads), so the text sends both; the account budget
+    is 30 creations per caller per 10 minutes and the request budget 20 per second per address,
+    both operator-adjustable; `isAdmin` sits beside `data` in `GET /api/permissions/me`.
 - [ ] 5.8 (P) Convert `daas-platform` (row 24, BP, kept in-file per Issue 9)
   - `SKILL.md` line 3 (description, C4), then 9-35, 51-85, 87-153, 164, 176-192 (including 189) and
     207-292. `references/daas-api.instructions.md` 11-97, 101-292, 339-362, 472-565 and 573 (link,
