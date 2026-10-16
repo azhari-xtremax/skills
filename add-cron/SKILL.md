@@ -6,6 +6,37 @@ argument-hint: "[--cwd path/to/project]"
 
 # Add the Cron Jobs Module
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 A ready-made cron administration surface installed via the Buildpad CLI (Copy & Own — the code is copied into your project). It manages two records of DaaS's built-in scheduler — **jobs** (`daas_cron_jobs`: a JavaScript snippet, a cron schedule read in a timezone, a timeout and a memory limit) and **runs** (`daas_cron_history`: one row per execution, with its outcome, trigger, duration, error and console output).
 
 Two screens ship together:
@@ -15,7 +46,12 @@ Two screens ship together:
 
 A row of either history opens the run log (`CronRunLogModal`).
 
+<!-- buildpad-backend: supabase -->
 This module is the admin UI. What a job is, how its code runs, and how to create one through the API or the MCP tool is [create-cron](../create-cron/SKILL.md).
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+This module is the admin UI. What a job is, how its code runs, and how to create one through the Studio's Cron module or the Engine's API is [create-cron](../create-cron/SKILL.md). On an Engine project there is no MCP tool for cron jobs.
+<!-- /buildpad-backend -->
 
 ## CRITICAL: Never Create These Manually
 
@@ -36,9 +72,18 @@ Requires Node.js v24 LTS and pnpm v10+ (see [add-buildpad](../add-buildpad/SKILL
 NEXT_PUBLIC_BUILDPAD_DAAS_URL=https://your-daas.example.com
 ```
 
+<!-- buildpad-backend: supabase -->
 **DaaS CORS must be configured first.** The calls are cross-origin and authenticated. DaaS's default `cors_origins: ["*"]` is **incompatible** with credentialed requests — the browser blocks every preflight, and the list shows its load-error state. Set explicit origins before mounting the module (see [daas-platform](../daas-platform/SKILL.md) "CORS must use explicit origins").
 
 The module works against both DaaS backends (the Supabase-backed DaaS and the Go engine); the hooks absorb their differences in list and error shapes.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+On an Engine project the data API's address is the Engine_URL, which both `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` hold. The Studio's address is an administration interface: send no data call to it.
+
+**Leave the cross-origin settings as they are.** On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere. The module's calls carry the signed-in user's access token as `Authorization: Bearer`, never a cookie, so nothing needs configuring before you mount it.
+
+The hooks absorb the Engine's list and error shapes. On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. In this module that means Run Now is the only way a job runs: Activate stores the job's status, but nothing fires on the job's schedule.
+<!-- /buildpad-backend -->
 
 ## Installation
 
@@ -168,7 +213,12 @@ The built-in editor is `InputCode`: a monospace textarea with line numbers and *
 
 A custom editor **must honour `readOnly`**: a user without update access gets the editor read-only, code included. The slot is not called when the caller's read grant withholds the `code` field; the editor shows a notice instead.
 
+<!-- buildpad-backend: supabase -->
 What a job's code can call through `services` differs per backend (see [create-cron](../create-cron/SKILL.md)). The default code and the default notice name only what both backends give; a host that knows its backend can pass a better `defaultCode` and `codeHelp`.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+On an Engine project a job's code runs in the Engine's runtime, which provides only what the Engine runtime table of [create-cron](../create-cron/SKILL.md) lists; for each interface it lacks, that table says what replaces it. The runtime has no Supabase service, no SQL and no `fetch`, `process`, `require` or timer globals: a job reads and writes data with `services.items(collection)` and reaches another host with `services.fetch`. The default code and the default notice name only what every backend gives; pass a `defaultCode` and a `codeHelp` that use `services.items` when you want a better starting point.
+<!-- /buildpad-backend -->
 
 ### Supporting components (reuse anywhere)
 
@@ -192,6 +242,10 @@ Three details matter when you call the hooks yourself:
 - `loading` is true while any request of that hook instance is in flight, a run included. Keep a pending flag per action where that matters.
 
 Every method rejects with a typed `DaaSRequestError` whose `kind` is `notFound | forbidden | mfaRequired | unauthenticated | invalid | failure` (`invalid`: a schedule that is not a cron expression, or code that does not compile — the `message` is the server's sentence). Branch on `kind`; never treat a rejected load as an empty list. Types (`CronJobRecord`, `CronRunRecord`, …) and the collection-name constant (`CRON_JOBS_COLLECTION`) come from `@/lib/buildpad/types`; the pure form logic (`cronJobToForm`, `changedCronJobFields`, `findCronJobFormProblem`, `cronTimezoneOptions`, `parseCronLogLine`, …) from `@/lib/buildpad/utils` — use it when you write a custom editor, so your saves send only what the user changed.
+<!-- buildpad-backend: engine -->
+
+`mfaRequired` is the Engine refusing a session that still needs its second factor. On an Engine project multi-factor enrolment, challenge and verification are not served through the Supabase client. The Engine's own routes, each called with the user's session, are `POST /api/auth/mfa/enroll`, `GET /api/auth/mfa/factors`, `POST /api/auth/mfa/verify` and `POST /api/auth/mfa/unenroll`; a session that still needs its second factor is accepted elsewhere only after `POST /api/auth/mfa/verify`. Send the user through that verification, then retry; do not show the refusal as an empty list.
+<!-- /buildpad-backend -->
 
 ## Access-Control Semantics (IMPORTANT)
 
@@ -200,7 +254,12 @@ Every method rejects with a typed `DaaSRequestError` whose `kind` is `notFound |
 - Until the permissions are known, no write control is drawn and the editor takes no edit. Do not "fix" that by rendering buttons optimistically.
 - The gates only hide controls. Grant the collection permissions through policies (see [create-rbac](../create-rbac/SKILL.md)); a hidden button is not the protection.
 - Gate your navigation link too, so a user without read access to `daas_cron_jobs` does not see Cron Jobs in the sidebar.
+<!-- buildpad-backend: supabase -->
 - A job's code runs on the server as the System Service user, with permission checks bypassed (see [create-cron](../create-cron/SKILL.md) "Background Process User Context") — not as the user who edited it. Treat `create` and `update` on `daas_cron_jobs` as the right to run code on the server, and grant them accordingly.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+- On an Engine project a job's code runs in the Engine as its system account, which holds the Administrator policy (see [create-cron](../create-cron/SKILL.md)) — not as the user who edited it or pressed Run Now. Treat `create` and `update` on `daas_cron_jobs` as the right to run code as an administrator, and grant them accordingly.
+<!-- /buildpad-backend -->
 
 ## Post-Install Validation
 
@@ -210,7 +269,12 @@ npx @buildpad/cli@latest validate --cwd /path/to/project
 cd /path/to/project && pnpm build
 ```
 
+<!-- buildpad-backend: supabase -->
 Then open `/cron` signed in as a user with read on `daas_cron_jobs`: the list loads (an empty DaaS shows the empty state, not a load error). A load error on the list means `NEXT_PUBLIC_BUILDPAD_DAAS_URL` or the DaaS CORS origins are wrong.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+Then open `/cron` signed in as a user with read on `daas_cron_jobs`: the list loads (an empty Engine shows the empty state, not a load error). A load error on the list means `NEXT_PUBLIC_BUILDPAD_DAAS_URL` does not hold the Engine_URL, or the session has expired (sign in again). Do not change a cross-origin setting to fix it. To see a run end to end, press Run Now on a job and open its History tab: on an Engine project no scheduled run will appear there yet.
+<!-- /buildpad-backend -->
 
 ## Related
 

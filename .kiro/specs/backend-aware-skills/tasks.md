@@ -708,7 +708,7 @@
   - _Boundary: create-migration/, converted/create-migration, supabase-view-changes/create-migration.json_
 
 - [ ] 8. Convert the automation Skills (design Group 4; after tasks 4 and 5)
-- [ ] 8.1 (P) Convert `add-cron` (row 5, BP)
+- [x] 8.1 (P) Convert `add-cron` (row 5, BP)
   - `SKILL.md` 32-41 (address, CORS), 171, 194 (an eng passage with ES-6 after the `mfaRequired`
     error kind), 203 and 213.
   - Engine content: ES-1, ES-15, ES-13n and ES-6, and a pointer to `create-cron/SKILL.md` for the
@@ -716,6 +716,12 @@
   - Done when: FD holds for `add-cron`.
   - _Requirements: 1.2, 1.9, 2.1, 3.14, 4.6, 4.7, 3.15_
   - _Boundary: add-cron/, converted/add-cron, supabase-view-changes/add-cron.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. Of 32-41 only 39-41 differ (32-37 hold for both); ES-1, ES-15 and ES-13n stand there, and
+    the `mfaRequired` passage after 194 is Engine-only. Widened beyond the plan: line 18 (the Engine
+    has no MCP tool for cron jobs). Checked in the Engine: a run executes as the system account,
+    which holds the Administrator policy, and a refused second factor is 403 `MFA_REQUIRED`.
 - [ ] 8.2 (P) Convert `add-workflows` (row 12, BP)
   - `SKILL.md` 34-43, 158, 176 (an eng passage with ES-6 after the `mfaRequired` error kind) and 198,
     read at `origin/main`, which holds commit `873f492`.
