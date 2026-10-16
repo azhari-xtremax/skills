@@ -537,12 +537,17 @@
     R8 reports nothing for `settings-templates/` and `rules/`, both unchanged). Read through:
     step 3 now records the backend the Gate established and forbids inferring it from
     dependency or variable names; no marker. The change file has one `text` entry.
-- [ ] 6.9 (P) Reword `context-engineering` (row 34, RW)
+- [x] 6.9 (P) Reword `context-engineering` (row 34, RW)
   - `SKILL.md` 42, 57-61, 73, 84 and 106. Qualified sentences: one Engine address for data and
     sign-in; the Engine MCP has no extensions tool.
   - Done when: FD holds for `context-engineering`.
   - _Requirements: 3.3, 5.2, 2.4_
   - _Boundary: context-engineering/, converted/context-engineering, supabase-view-changes/context-engineering.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/context-engineering`. Read through:
+    the file reads complete for both kinds of project (one Engine address for data and sign-in
+    in the architecture, the environment file and session start; the Engine's MCP has no
+    extensions tool, named in plain words). The change file has one `text` entry.
 - [ ] 6.10 (P) Reword `create-form-builder` (row 35, RW)
   - `SKILL.md` 20-34, 52-54 and 137-150. `references/form-builder.instructions.md` 78-106. Qualified
     sentences: the `limit` cap is 1000; delete answers 204; structure goes through
