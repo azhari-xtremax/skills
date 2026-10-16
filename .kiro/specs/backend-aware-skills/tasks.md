@@ -488,7 +488,7 @@
     allows), and the Engine copy repeats the lines of that range that hold for both. 56-90 holds
     ES-2, ES-5, ES-3 (the service-role lines stay `supabase` text) and ES-15; line 26 and the
     checklist say the Engine refuses caller-supplied SQL.
-- [ ] 5.11 (P) Convert `worker-messaging` (row 44, BP with an Engine passage only)
+- [x] 5.11 (P) Convert `worker-messaging` (row 44, BP with an Engine passage only)
   - `SKILL.md`: the Gate after the H1, and a new eng section "Reaching the data service from a
     worker" after Step 3b (line 136) holding ES-14n verbatim. There is no sup text. The Supabase view
     is the baseline apart from the Gate.
@@ -496,6 +496,11 @@
     `v1.0.0` once the Gate is removed, and the change file is `[]`.
   - _Requirements: 1.2, 1.6, 1.9, 2.1, 3.2, 4.7, 5.7, 5.9, 3.15_
   - _Boundary: worker-messaging/, converted/worker-messaging, supabase-view-changes/worker-messaging.json_
+  - Note 16 October 2026: read through the views from `check.mjs --render`: the Supabase view of
+    `SKILL.md` is byte-equal to `v1.0.0` once the Gate is removed, and the change file is `[]`. The
+    Engine section "Reaching the data service from a worker" holds ES-14n verbatim; it stands at the
+    end of Step 3b (before Step 4), after the consumer code whose handler calls the data service,
+    rather than inside the step after its line-136 introduction, so the step's code stays under it.
 
 - [ ] 6. Convert the Shared_Guidance and reword the wording-only Skills (design Group 6; after task 3; parallel with tasks 4 and 5)
 - [ ] 6.1 (P) Mark the agent personas (row 13, BP)
