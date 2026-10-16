@@ -603,12 +603,17 @@
     reports nothing at `SKILL.md:62` (the example path is gone). Read through: every data task
     defines the collection through `create-collection`, the access criterion names both kinds of
     project, and the dependency diagram keeps its alignment.
-- [ ] 6.15 (P) Reword `review-code` (row 40, RW)
+- [x] 6.15 (P) Reword `review-code` (row 40, RW)
   - `SKILL.md` 11, 24, 27 and 34-36. Qualified sentences: on an Engine project, any Supabase client
     call other than sign-in has no server, and any service-role key reference is a finding.
   - Done when: FD holds for `review-code`.
   - _Requirements: 3.4, 5.2, 2.4_
   - _Boundary: review-code/, converted/review-code, supabase-view-changes/review-code.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/review-code`. Read through: each
+    security and compliance check holds for both kinds of project (a service-role key reference
+    and any Supabase client call other than sign-in are findings on an Engine project; the proxy,
+    auth-proxy and backend-first checks name the Engine's counterparts).
 - [ ] 6.16 (P) Reword `spec-driven-development` (row 41, RW)
   - `SKILL.md` 47-53: the scope hierarchy sits beneath the tenant.
   - Done when: FD holds for `spec-driven-development`.
