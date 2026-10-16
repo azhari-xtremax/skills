@@ -213,10 +213,20 @@
     `tools/`, `.github/`, `README.md`, `CONTRIBUTING.md` and `CHANGELOG.md` (and `.kiro/` if the spec
     itself is committed). The pull request is merged.
   - _Requirements: 2.2, 7.7_
+  - Note 16 October 2026: run locally on Node 24 at the head of
+    `feat/backend-aware-skills-repo-check`, with no `converted/` file: the tests (215) pass,
+    `check.mjs` exits 0 with no finding, and the `baseline` job command exits 0.
+    `git diff --stat v1.0.0 HEAD` lists only `tools/`, `.github/`, `README.md`, `CONTRIBUTING.md`,
+    `CHANGELOG.md` and `.kiro/`. Left unticked: CI on the pull request and the merge are still to
+    come.
 - [ ] 3.4 Make `check` and `baseline` required status checks on `main` (maintainer, repository setting)
   - Done when: the branch-protection settings for `main` list both checks as required. The design's
     "T-0.3" is this task.
   - _Requirements: 7.1_
+  - Note 16 October 2026: not done here (a repository setting for the maintainer). The checks to
+    require are the two jobs of `.github/workflows/repo-check.yml`, named `check` and `baseline`
+    (shown in GitHub as `repo-check / check` and `repo-check / baseline`). They can be chosen
+    once they have run on the pull request of tasks 2 and 3.
 
 - [ ] 4. Convert the data and access Skills (design Group 3; after task 3; before tasks 7 and 8; parallel with tasks 5 and 6)
 - [ ] 4.1 (P) Convert `add-i18n` (row 7, BP)
