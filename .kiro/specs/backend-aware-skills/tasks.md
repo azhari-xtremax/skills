@@ -572,11 +572,15 @@
     validation line names "Next.js and the project's Buildpad backend", the scope row sits inside
     the tenant, and the cron row states that an Engine project runs cron jobs only by hand for
     now (ES-13n), so every row holds for both kinds of project.
-- [ ] 6.12 (P) Reword `incremental-implementation` (row 37, RW)
+- [x] 6.12 (P) Reword `incremental-implementation` (row 37, RW)
   - `SKILL.md` 45 and 133: the first step defines the collection (`create-collection`).
   - Done when: FD holds for `incremental-implementation`.
   - _Requirements: 3.6, 5.2, 2.4_
   - _Boundary: incremental-implementation/, converted/incremental-implementation, supabase-view-changes/incremental-implementation.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/incremental-implementation`. Read
+    through: the first data slice and the Data layer now define the collection through
+    `create-collection`, true for both kinds of project; nothing else in the file differs.
 - [ ] 6.13 (P) Reword `performance-optimization` (row 38, RW)
   - `SKILL.md` 56, 63-72, 106 and 126-128. Qualified sentences: indexing through an indexed field;
     `limit` capped at 1000.
