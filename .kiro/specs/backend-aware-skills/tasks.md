@@ -626,7 +626,7 @@
   - Not (P): it file-marks `api-routes.instructions.md`, which 4.2 links.
   - _Requirements: 1.2, 1.3, 1.9, 2.1, 3.3, 3.11, 5.3, 5.4, 3.15, 2.4_
   - _Depends: 4.2_
-- [ ] 7.3 (P) Convert `create-migration` (row 3, US)
+- [x] 7.3 (P) Convert `create-migration` (row 3, US)
   - `SKILL.md`: the Gate after the H1, then S7-B verbatim, before any step. The sup passage is the
     rest (9-101). The description is reworded (C4). `references/special-fields.instructions.md`
     becomes file:sup.
@@ -635,6 +635,11 @@
     `create-workflow` and `manage-scope`.
   - _Requirements: 1.2, 1.9, 2.1, 4.3, 4.4, 4.8, 3.15, 2.4_
   - _Boundary: create-migration/, converted/create-migration, supabase-view-changes/create-migration.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view holds only
+    `SKILL.md`, where S7-B is the first content after the Gate and names `create-collection`,
+    `create-rbac`, `relational-permissions`, `create-workflow` and `manage-scope`; the Supabase view
+    of both files differs from `v1.0.0` by the Gate and the reworded description only (one
+    `description` entry).
 
 - [ ] 8. Convert the automation Skills (design Group 4; after tasks 4 and 5)
 - [ ] 8.1 (P) Convert `add-cron` (row 5, BP)
