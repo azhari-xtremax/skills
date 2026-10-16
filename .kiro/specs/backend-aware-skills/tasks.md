@@ -348,7 +348,7 @@
     `[]`). Engine facts re-checked in `buildpad-daas-go`: type and item bodies, the three parent
     rules, refused deletes, the tenant node, `/api/scope/available`, `MISSING_SCOPE` without a
     header unless the user reaches every scope, and the `assignment` argument of the `scope` tool.
-- [ ] 4.7 (P) Convert `relational-permissions` (row 30, BP)
+- [x] 4.7 (P) Convert `relational-permissions` (row 30, BP)
   - `SKILL.md` 49-60, 76-91 and 142-198. Remove the dead link at 242; record it as a `removed-link`
     entry with its reason (Issue 3).
   - Engine content: enforcement is unconditional (no warn mode). The `relations` tool reads and the
@@ -358,6 +358,14 @@
     entry.
   - _Requirements: 1.2, 1.9, 2.1, 2.4, 3.6, 3.15_
   - _Boundary: relational-permissions/, converted/relational-permissions, supabase-view-changes/relational-permissions.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md`
+    reads as complete steps; the Supabase view differs from `v1.0.0` by the Gate and the removed dead
+    link only (one `removed-link` entry with its reason). Widened beyond the plan, because the
+    shared text taught presets, validation or the other relation format: the diagram 35-47, Step 1's
+    table and Step 2's payloads (68-140, one passage), and the common patterns 204-232. 142-198 is
+    split at its H2 headings (142-158, 162-185, 189-198). Engine facts re-checked in
+    `buildpad-daas-go`: every nested row checked as a direct write, three relations deep, 403 and
+    nothing written on a refused row.
 
 - [ ] 5. Convert the apps and platform Skills (design Group 5; after task 3; before task 8; parallel with tasks 4 and 6)
 - [ ] 5.1 (P) Convert `add-buildpad` (row 4, BP)
