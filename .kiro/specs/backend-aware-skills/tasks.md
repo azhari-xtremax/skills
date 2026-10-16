@@ -548,13 +548,19 @@
     the file reads complete for both kinds of project (one Engine address for data and sign-in
     in the architecture, the environment file and session start; the Engine's MCP has no
     extensions tool, named in plain words). The change file has one `text` entry.
-- [ ] 6.10 (P) Reword `create-form-builder` (row 35, RW)
+- [x] 6.10 (P) Reword `create-form-builder` (row 35, RW)
   - `SKILL.md` 20-34, 52-54 and 137-150. `references/form-builder.instructions.md` 78-106. Qualified
     sentences: the `limit` cap is 1000; delete answers 204; structure goes through
     `create-collection`, and `create-migration` applies on a Supabase project only.
   - Done when: FD holds for `create-form-builder`.
   - _Requirements: 3.6, 5.2, 2.4_
   - _Boundary: create-form-builder/, converted/create-form-builder, supabase-view-changes/create-form-builder.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/create-form-builder`. Read through:
+    both files read complete for both kinds of project (structure through `create-collection`,
+    `create-migration` for Supabase projects only; the cross-origin step qualified beside ES-15;
+    the 1000-item cap and the 204 delete checked against the Engine at `d893e3cd`; presets not
+    applied on an Engine project; "scope" for the override levels).
 - [ ] 6.11 (P) Reword `idea-refine` (row 36, RW)
   - `SKILL.md` 66 and 75-84 become "Next.js and the project's Buildpad backend"; scope sits inside
     the tenant.
