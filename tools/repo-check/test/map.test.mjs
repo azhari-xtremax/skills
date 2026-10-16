@@ -1,0 +1,55 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { mapIssues, validateSkillMap, PLANS } from '../lib/map.mjs';
+import { checkedSet, topFolders } from '../lib/checked-set.mjs';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(here, '..', '..', '..');
+const skillMap = JSON.parse(readFileSync(path.join(here, '..', 'skill-map.json'), 'utf8'));
+const show = (fs) => fs.map((f) => `${f.rule} ${f.path}:${f.line} ${f.code}`);
+const row = (folder, plan = 'BP', dependence = 'partial') => ({ folder, dependence, treatment: 'both paths, chosen by backend', size: 'small', plan });
+
+test('skill-map.json: 64 rows with the marking plan counts', () => {
+  assert.equal(skillMap.length, 64);
+  const counts = {};
+  for (const r of skillMap) counts[r.plan] = (counts[r.plan] ?? 0) + 1;
+  assert.deepEqual(counts, { BP: 21, EF: 3, US: 2, NY: 2, RW: 14, 'RW+G': 2, UC: 20 });
+  assert.deepEqual(validateSkillMap(skillMap), []);
+  assert.deepEqual(Object.keys(skillMap[0]), ['folder', 'dependence', 'treatment', 'size', 'plan']);
+});
+
+test('skill-map.json covers the checked set of this repository both ways', () => {
+  const folders = topFolders(checkedSet(repoRoot));
+  assert.equal(folders.length, 64);
+  assert.deepEqual(mapIssues(skillMap, folders, new Map()), []);
+});
+
+test('R4: a folder without a row and a row without a folder', () => {
+  const f = mapIssues([row('a'), row('gone')], ['a', 'new-skill'], new Map());
+  assert.deepEqual(show(f), [
+    'R4 new-skill/SKILL.md:1 folder-without-row',
+    'R4 tools/repo-check/skill-map.json:3 row-without-folder',
+  ]);
+  assert.match(f[1].message, /gone/);
+});
+
+test('R4: agents and references need rows too', () => {
+  const f = mapIssues([row('a')], ['a', 'agents', 'references'], new Map());
+  assert.deepEqual(show(f), ['R4 agents:1 folder-without-row', 'R4 references:1 folder-without-row']);
+});
+
+test('R4: a marker in a wording-only folder', () => {
+  const markers = new Map([['w', [{ path: 'w/SKILL.md', line: 12 }]], ['b', [{ path: 'b/SKILL.md', line: 3 }]]]);
+  const f = mapIssues([row('w', 'RW', 'wording only'), row('b')], ['w', 'b'], markers);
+  assert.deepEqual(show(f), ['R4 w/SKILL.md:12 marker-in-wording-only']);
+});
+
+test('R4: a malformed or duplicate row', () => {
+  const bad = [row('a'), row('a'), { folder: 'b', dependence: 'some', treatment: 't', size: 'huge', plan: 'XX' }];
+  const codes = validateSkillMap(bad).map((f) => f.code);
+  assert.deepEqual(codes, ['map-duplicate-row', 'map-invalid-row']);
+  assert.deepEqual(PLANS, ['BP', 'EF', 'US', 'NY', 'RW', 'RW+G', 'UC']);
+});

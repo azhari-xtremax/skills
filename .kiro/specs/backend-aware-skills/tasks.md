@@ -119,7 +119,7 @@
   - Done when: `node --test tools/repo-check/test/baseline.test.mjs` passes, including a UC folder
     with one changed byte (fails) and a moved-not-rewritten passage (passes).
   - _Requirements: 2.1, 2.2, 2.4, 2.5_
-- [ ] 2.7 Add the machine Skill_Map and the map, template and README rules (`skill-map.json`, `lib/map.mjs`)
+- [x] 2.7 Add the machine Skill_Map and the map, template and README rules (`skill-map.json`, `lib/map.mjs`)
   - `skill-map.json`: 64 rows, one per folder of the requirements' Skill map, with `dependence`,
     `treatment`, `size` as written there and `plan` from the marking plan (BP 21, EF 3, US 2, NY 2,
     RW 14, RW+G 2, UC 20).
