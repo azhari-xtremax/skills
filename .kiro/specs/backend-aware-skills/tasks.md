@@ -301,7 +301,7 @@
     higher headings (`workflow-schema` 903-985 and 989-1086, `workflow-versioning` 27-62 and
     64-91); 214-297 widened to its fence 184. Widened beyond the plan: `workflow-versioning` 93-102
     (`?version=` is ignored by the Engine). `workflow-components` holds nothing to mark.
-- [ ] 4.5 (P) Convert `grant-module-access` (row 26, BP)
+- [x] 4.5 (P) Convert `grant-module-access` (row 26, BP)
   - `SKILL.md` 26-63 (the `module_access_keys` tool, sup), 71, 126-154 (the remote procedure, sup),
     158-177 and 221. `references/module-access.instructions.md` 44-93, 134-149, 168-209 (extra
     column, sup), 213-384 (custom policies, sup) and 438-458.
@@ -313,6 +313,13 @@
     `SKILL.md:34,51,139` and `module-access.instructions.md:68,137`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 4.7, 3.15_
   - _Boundary: grant-module-access/, converted/grant-module-access, supabase-view-changes/grant-module-access.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md` and
+    `module-access` reads as complete steps; the Supabase view of both differs from `v1.0.0` by the
+    Gate only (change file `[]`). `check.mjs --only R1` reports nothing; `SKILL.md:34,51,139` and
+    `module-access.instructions.md:68,137` lie in `supabase` passages, and line 245 is unchanged.
+    `module-access` 44-93 is split at its H2 (44-58, 62-93); 168-209, 213-384 and 438-458 are one
+    `supabase` passage to the end of the file (168-479), because 388-435 and 462-479 also teach the
+    custom policy columns. Step 5 keeps its heading (158) shared.
 - [ ] 4.6 (P) Convert `manage-scope` into a separate Engine file set (row 28, EF)
   - `SKILL.md`: the Gate after the H1. The sup passage is body 9-760 verbatim. The eng passage is a
     new body linking the two new Engine files and the shared `scope-client`.
