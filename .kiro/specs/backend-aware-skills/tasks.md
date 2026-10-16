@@ -229,7 +229,7 @@
     once they have run on the pull request of tasks 2 and 3.
 
 - [ ] 4. Convert the data and access Skills (design Group 3; after task 3; before tasks 7 and 8; parallel with tasks 5 and 6)
-- [ ] 4.1 (P) Convert `add-i18n` (row 7, BP)
+- [x] 4.1 (P) Convert `add-i18n` (row 7, BP)
   - `SKILL.md` 39-42, 57, 69-70, 119, 125-131. `references/content-translations.instructions.md`
     11-13, 21-142 (SQL mirror 121-142 sup), 150-310 (SQL mirror 288-310 sup), 316-334, 397-468.
     `references/locale-routing.instructions.md` 9, 93-160. The Gate goes in all three files.
@@ -239,6 +239,11 @@
   - Done when: FD holds for `add-i18n`.
   - _Requirements: 1.2, 1.9, 2.1, 3.6, 3.9, 3.15_
   - _Boundary: add-i18n/, converted/add-i18n, supabase-view-changes/add-i18n.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md`,
+    `content-translations` and `locale-routing` reads as complete steps, and the Supabase view of all
+    three differs from `v1.0.0` by the Gate only (change file `[]`). Ranges widened beyond the plan:
+    `SKILL.md` 57 to its fence 51-59, Step 7 from 125 to 123 (its "SQL mirrors" lead-in), and the
+    checklist line 489 of `content-translations` (the SQL mirror item); line 40 stays shared.
 - [ ] 4.2 (P) Convert `create-collection` (row 16, BP)
   - `SKILL.md` line 3: reword the description to "with its schema", with no marker (C4). Then lines
     15 (sup), 55-57, 75-84, 88-120, 217-227, 251-275 and 287-291. Move the link at 288 into sup; its
