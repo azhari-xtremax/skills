@@ -485,12 +485,18 @@
     routes and the external OAuth section qualified as Supabase-project only, with the stop on an
     Engine project; ES-1, ES-2, ES-4, ES-5 and ES-6 verbatim in `SKILL.md`, ES-1, ES-3 and ES-5 in
     the reference with an Engine environment block). One `text` entry per changed file.
-- [ ] 6.5 (P) Reword `buildpad-reference` (row 15, RW)
+- [x] 6.5 (P) Reword `buildpad-reference` (row 15, RW)
   - `SKILL.md` 11, 43-52 (asset URL) and 109-126. `references/react-components.instructions.md`
     15-19, 373 and 404-422. Uses ES-2 (the DaaSProvider token is a session token) and ES-11.
   - Done when: FD holds for `buildpad-reference`.
   - _Requirements: 3.11, 5.2, 2.4_
   - _Boundary: buildpad-reference/, converted/buildpad-reference, supabase-view-changes/buildpad-reference.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/buildpad-reference`. Read through:
+    both files read complete for both kinds of project (ES-11 and the assets-proxy gap of Issue 6
+    beside the Files module row; the 204 delete answer beside `CollectionList`; the
+    `DaaSProvider` examples use `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and state the token rule with
+    ES-2). `SKILL.md` 11 and the reference's 15-19 needed no change: they hold for both as written.
 - [ ] 6.6 (P) Reword `create-feature` (row 18, RW)
   - `SKILL.md` 27, 41-45, 62 and 106-141. `references/vform-usage.instructions.md` 177-216. Qualified
     sentences: scope inside the tenant (ES-9), the module-access check through

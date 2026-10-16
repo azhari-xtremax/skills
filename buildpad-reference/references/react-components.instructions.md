@@ -370,7 +370,7 @@ function ProtectedForm({ articleId }: { articleId: string }) {
   const [values, setValues] = useState({});
 
   return (
-    <DaaSProvider config={{ url: 'https://xxx.buildpad-daas.xtremax.com', token: 'xxx' }}>
+    <DaaSProvider config={{ url: process.env.NEXT_PUBLIC_BUILDPAD_DAAS_URL!, token: accessToken /* the signed-in user's access token */ }}>
       <VForm
         collection="articles"
         primaryKey={articleId}
@@ -411,8 +411,8 @@ function StorybookWrapper({ children }) {
   return (
     <DaaSProvider
       config={{
-        url: "https://xxx.buildpad-daas.xtremax.com",
-        token: "static-token",
+        url: process.env.NEXT_PUBLIC_BUILDPAD_DAAS_URL!, // the data API's address
+        token: process.env.STORYBOOK_DAAS_TOKEN!, // see the token rule below
       }}
       onAuthenticated={(user) => console.log("Authenticated:", user)}
     >
@@ -426,6 +426,8 @@ function AppWrapper({ children }) {
   return <DaaSProvider>{children}</DaaSProvider>;
 }
 ```
+
+The token given to `DaaSProvider` is the data API's credential. On a Supabase project it may be a static token. On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API. So on an Engine project the Storybook token is a signed-in test user's access token, never a static token.
 
 ## Content Module Pattern (ContentLayout + ContentNavigation)
 
