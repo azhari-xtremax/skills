@@ -1,0 +1,14 @@
+[
+  {
+    "path": "create-feature/SKILL.md",
+    "kind": "text",
+    "reason": "Qualified sentences added so the planning guidance is true for both kinds of project: scopes sit below the project's tenant on an Engine project (ES-9), the server-side module-access check goes through /api/permissions/me there (ES-16), and a cron job's body and schedule there follow the Engine's runtime (ES-10, ES-13n); the Supabase guidance is unchanged.",
+    "release": "unreleased"
+  },
+  {
+    "path": "create-feature/references/vform-usage.instructions.md",
+    "kind": "text",
+    "reason": "Names where the collection schema is stored on each kind of project (the DaaS, or the Engine).",
+    "release": "unreleased"
+  }
+]

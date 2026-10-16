@@ -497,13 +497,19 @@
     beside the Files module row; the 204 delete answer beside `CollectionList`; the
     `DaaSProvider` examples use `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and state the token rule with
     ES-2). `SKILL.md` 11 and the reference's 15-19 needed no change: they hold for both as written.
-- [ ] 6.6 (P) Reword `create-feature` (row 18, RW)
+- [x] 6.6 (P) Reword `create-feature` (row 18, RW)
   - `SKILL.md` 27, 41-45, 62 and 106-141. `references/vform-usage.instructions.md` 177-216. Qualified
     sentences: scope inside the tenant (ES-9), the module-access check through
     `/api/permissions/me` (ES-16), and the cron body per ES-10.
   - Done when: FD holds for `create-feature`.
   - _Requirements: 3.9, 3.10, 5.2, 2.4_
   - _Boundary: create-feature/, converted/create-feature, supabase-view-changes/create-feature.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/create-feature`. Read through: both
+    files read complete for both kinds of project (ES-9 at the scope section and the
+    multi-tenancy item; ES-16 after the checklist and at the API guard points; the cron item
+    names the Engine runtime's limits and ES-13n, linking `create-cron/SKILL.md`, since ES-10's
+    table link has no target in this file).
 - [ ] 6.7 (P) Reword `add-multitenancy` (row 32, RW)
   - `SKILL.md` 9-13. `references/multitenancy.instructions.md` 4 and 9-13. Qualified ES-9; the scoped
     collection column has a foreign key to `daas_scope_items(uri_path)`.
