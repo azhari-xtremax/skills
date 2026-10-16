@@ -346,7 +346,7 @@
     `[]`. The Engine text keeps the module's hooks and steps, states that the generated assets proxy
     forwards to a path the Engine does not serve (so `getAssetUrl` previews do not load), and shows a
     file in a browser through `GET /api/files/signed-url`.
-- [ ] 5.3 (P) Convert `add-microapp` (row 8, BP)
+- [x] 5.3 (P) Convert `add-microapp` (row 8, BP)
   - `SKILL.md` 13-26, 72-86 (Step 0), 138-149, 151-213, 350-394, 585-596 and 626. Move the links at
     26 and 170 into sup. In references: `context-discovery` 32-48, 120-130 and 153-158;
     `app-urls-config` 8-16, 115 (link, sup) and 118-140; `deployment-topology` 5-63, 140-156, 203
@@ -358,6 +358,17 @@
     passages, and their eng counterparts link `add-microfrontend/SKILL.md`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.3, 3.4, 3.15_
   - _Boundary: add-microapp/, converted/add-microapp, supabase-view-changes/add-microapp.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` and the five
+    references from `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the
+    change file is `[]`. The three `auth-bridge` links lie inside `supabase` passages and their
+    Engine counterparts link `add-microfrontend/SKILL.md`. Because composition is not yet available
+    on an Engine project (rows 9 and 10), passages were added beyond the listed ranges where the
+    baseline gave iframe, bridge or Supabase steps: `SKILL.md` 9, 30-66, 131-136, 231-289, 421-453,
+    457-526, 530-540, 562-583; `context-discovery` 66-69, 164-171; `app-urls-config` 45-50,
+    68-91, 95-112; `deployment-topology` 67-77, 133-136, 181-188. In the Engine view each app
+    runs on its own address, the Main App only links to the micro-apps, and framing is stated as not
+    yet available. Adjacent ranges were joined (gap rule) and ranges widened to whole fences, tables
+    and lists. The `Engine runtime` table sits beside the event-hook body it governs.
 - [ ] 5.4 Convert `add-microfrontend` (row 9, NY)
   - `SKILL.md`: the Gate, then the eng passage "Sharing one session between a host and its frames is
     not available on an Engine project yet. Tell the developer so and stop.". The sup passage is the
