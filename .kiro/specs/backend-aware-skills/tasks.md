@@ -561,12 +561,17 @@
     `create-migration` for Supabase projects only; the cross-origin step qualified beside ES-15;
     the 1000-item cap and the 204 delete checked against the Engine at `d893e3cd`; presets not
     applied on an Engine project; "scope" for the override levels).
-- [ ] 6.11 (P) Reword `idea-refine` (row 36, RW)
+- [x] 6.11 (P) Reword `idea-refine` (row 36, RW)
   - `SKILL.md` 66 and 75-84 become "Next.js and the project's Buildpad backend"; scope sits inside
     the tenant.
   - Done when: FD holds for `idea-refine`.
   - _Requirements: 3.9, 5.2, 2.4_
   - _Boundary: idea-refine/, converted/idea-refine, supabase-view-changes/idea-refine.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/idea-refine`. Read through: the
+    validation line names "Next.js and the project's Buildpad backend", the scope row sits inside
+    the tenant, and the cron row states that an Engine project runs cron jobs only by hand for
+    now (ES-13n), so every row holds for both kinds of project.
 - [ ] 6.12 (P) Reword `incremental-implementation` (row 37, RW)
   - `SKILL.md` 45 and 133: the first step defines the collection (`create-collection`).
   - Done when: FD holds for `incremental-implementation`.
