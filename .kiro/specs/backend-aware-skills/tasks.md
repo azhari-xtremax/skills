@@ -426,7 +426,7 @@
   - _Boundary: worker-messaging/, converted/worker-messaging, supabase-view-changes/worker-messaging.json_
 
 - [ ] 6. Convert the Shared_Guidance and reword the wording-only Skills (design Group 6; after task 3; parallel with tasks 4 and 5)
-- [ ] 6.1 (P) Mark the agent personas (row 13, BP)
+- [x] 6.1 (P) Mark the agent personas (row 13, BP)
   - `security-auditor.md` 3 (description, C4), 39-43 and 48. `code-reviewer.md` 51.
     `test-engineer.md` 64-65. Each file gets the Gate after its front matter. `name` stays unchanged.
   - The Supabase checks go in sup: service-role key server-side, RLS, SQL functions, OAuth. The eng
@@ -437,6 +437,12 @@
   - Done when: FD holds for `agents`.
   - _Requirements: 1.2, 1.9, 3.13, 5.10, 7.9, 2.4_
   - _Boundary: agents/, converted/agents, supabase-view-changes/agents.json_
+  - Note 16 October 2026: converted on `feat/backend-aware-skills-task-6`; the tests and
+    `check.mjs` exit 0 with `converted/agents`. Read through `--render` output: the Engine view of
+    the three personas gives only Engine checks (no service-role key, the MCP and worker tokens,
+    provisioned cross-origin, roles/policies/permissions/scope, `{ elevated: true }`, ES-5's list,
+    ES-7 for test users), and the Supabase view differs from `v1.0.0` only by the Gate and the
+    `security-auditor` description (its change-file entry).
 - [ ] 6.2 (P) Mark the top-level reference checklists (row 29, BP)
   - `security-checklist.md` 11-18, 51-64 and 123-127: the Gate at the top, the service-role and RLS
     lines in sup, and the 3.13 replacements in eng. `module-access-checklist.md` 8-16: the Gate, and
