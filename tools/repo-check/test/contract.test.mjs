@@ -163,3 +163,29 @@ test('R12: cases.json has the Data Models shape', () => {
     assert.ok(cases.markerCases.some((c) => c.issues.some((i) => i.code === code)), `no case for ${code}`);
   }
 });
+
+// R12, second half (design S8 step 2): every shared case runs through the libraries.
+import { validateMarkers, validateMarkerPlacement } from '../lib/passages.mjs';
+import { scanLine } from '../lib/guard.mjs';
+import { extractLinks } from '../lib/links.mjs';
+
+const byLineCode = (a, b) => a.line - b.line || a.code.localeCompare(b.code);
+
+for (const c of cases.markerCases) {
+  test(`R12 marker case: ${c.name}`, () => {
+    const got = [...validateMarkers(c.text), ...validateMarkerPlacement(c.path, c.text)].sort(byLineCode);
+    assert.deepEqual(got.map(({ line, code }) => ({ line, code })), [...c.issues].sort(byLineCode));
+  });
+}
+
+for (const c of cases.guardCases) {
+  test(`R12 guard case: ${c.name}`, () => {
+    assert.deepEqual(scanLine(c.line, { local: false }), c.ids);
+  });
+}
+
+for (const c of cases.linkCases) {
+  test(`R12 link case: ${c.name}`, () => {
+    assert.deepEqual(extractLinks(c.text), c.links);
+  });
+}

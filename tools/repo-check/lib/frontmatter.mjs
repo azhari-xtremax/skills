@@ -1,5 +1,6 @@
 // Minimal YAML front-matter reading for `name` and `description` (R5, R7). Pure.
-import { frontMatterRange } from './markdown.mjs';
+import { frontMatterRange, lines } from './markdown.mjs';
+import { fileBackend, stripBackendPassages } from './passages.mjs';
 
 const KEY = /^([A-Za-z0-9_-]+):(?:\s+(.*)|\s*)$/;
 const BLOCK_SCALAR = /^[>|][+-]?\d*$/;
@@ -47,4 +48,48 @@ export function removeDescriptionValue(kept) {
     { line: kept[d.start].line, seg: `description:${cr}` },
     ...kept.slice(d.end + 1),
   ];
+}
+
+/** R5 applies to every Skill's SKILL.md and to the personas in agents/. */
+export function isNameBearing(p) {
+  return /^[^/]+\/SKILL\.md$/.test(p) || /^agents\/[^/]+\.md$/.test(p);
+}
+
+const R5_MESSAGES = {
+  'front-matter-missing': 'no YAML front matter on line 1',
+  'name-missing': 'the front matter has no `name`',
+  'description-missing': 'the front matter has no non-empty `description`',
+};
+
+/**
+ * R5's presence rule: `name` and a non-empty `description`, in the raw file and in each view that
+ * holds the file. One finding per problem, naming the places it occurs.
+ */
+export function frontMatterIssues(p, text) {
+  if (!isNameBearing(p)) return [];
+  const places = [['raw file', text]];
+  const kind = fileBackend(p, text);
+  for (const keep of ['engine', 'supabase']) {
+    if (kind === null || kind === keep) places.push([`${keep} view`, stripBackendPassages(text, keep).text]);
+  }
+  const found = new Map();
+  const note = (code, line, where) => {
+    if (!found.has(code)) found.set(code, { line, where: [] });
+    found.get(code).where.push(where);
+  };
+  for (const [where, t] of places) {
+    const ls = lines(t);
+    const fields = frontMatterFields(ls);
+    if (!fields) {
+      note('front-matter-missing', 1, where);
+      continue;
+    }
+    const name = fields.get('name');
+    if (!name || name.value === '') note('name-missing', name ? name.start + 1 : 1, where);
+    const description = fields.get('description');
+    if (!description || description.value === '') note('description-missing', description ? description.start + 1 : 1, where);
+  }
+  return [...found].map(([code, { line, where }]) => ({
+    rule: 'R5', path: p, line, code, message: `${R5_MESSAGES[code]} (${where.join(', ')})`,
+  }));
 }

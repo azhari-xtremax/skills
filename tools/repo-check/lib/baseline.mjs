@@ -4,7 +4,7 @@ import { git } from './checked-set.mjs';
 import { lines, decodeUtf8 } from './markdown.mjs';
 import { viewLines, fileBackend } from './passages.mjs';
 import { POINTER_LINE } from './gate.mjs';
-import { frontMatterFields, removeDescriptionValue } from './frontmatter.mjs';
+import { frontMatterFields, removeDescriptionValue, isNameBearing } from './frontmatter.mjs';
 
 export class BaselineError extends Error {}
 
@@ -137,13 +137,11 @@ export function supabaseViewFindings({ current, baseline, uc, converted, listed 
   return findings;
 }
 
-const nameBearing = (p) => /^[^/]+\/SKILL\.md$/.test(p) || /^agents\/[^/]+\.md$/.test(p);
-
 /** R5's baseline rule: a `name` that differs from `git show <baseline>:<path>`. */
 export function nameFindings({ current, baseline }) {
   const findings = [];
   for (const [p, cur] of current) {
-    if (!nameBearing(p)) continue;
+    if (!isNameBearing(p)) continue;
     const base = baseline.get(p);
     if (!base) continue;
     const curText = decodeUtf8(cur);

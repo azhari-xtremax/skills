@@ -143,7 +143,7 @@
   - Done when: these tests pass, including "an `unreleased` entry between releases passes",
     "the same entry on a tag push fails" and "R13 fails with one non-UC row unconverted".
   - _Requirements: 2.4, 6.2, 7.1, 7.2_
-- [ ] 2.9 Implement the CLI (`check.mjs`) and the front-matter and coverage tests
+- [x] 2.9 Implement the CLI (`check.mjs`) and the front-matter and coverage tests
   - `main(argv)` takes the options of Interface: `--root`, `--baseline-ref`, `--skill-map`, `--tag`,
     `--only`, `--render`. Exit codes are 0, 1 and 2. A finding line is
     `<rule> <path>:<line> <code> <message>`, plus `::error file=,line=::` under GitHub Actions. Every
@@ -162,6 +162,9 @@
     Handling message. `check.mjs --only R12` exits 0, and exits 1 after one character of a case's
     expected result is changed.
   - _Requirements: 7.4, 7.9_
+  - Note 16 October 2026: between 2.9 and 3.1, `check.mjs` on the tree reports only R11's two
+    findings (the README lacks the `#v1.0.0` command and `add-microfrontend-zones`); every other
+    rule exits 0 there. 3.1 clears them.
 - [ ] 2.10 Add the CI workflow `.github/workflows/repo-check.yml`
   - Triggers: `pull_request` to `main`, `push` to `main`, and `push` of tags `v*`. Uses
     `permissions: contents: read` and no secret, and does not use `pull_request_target`.
