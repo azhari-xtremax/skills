@@ -320,7 +320,7 @@
     `module-access` 44-93 is split at its H2 (44-58, 62-93); 168-209, 213-384 and 438-458 are one
     `supabase` passage to the end of the file (168-479), because 388-435 and 462-479 also teach the
     custom policy columns. Step 5 keeps its heading (158) shared.
-- [ ] 4.6 (P) Convert `manage-scope` into a separate Engine file set (row 28, EF)
+- [x] 4.6 (P) Convert `manage-scope` into a separate Engine file set (row 28, EF)
   - `SKILL.md`: the Gate after the H1. The sup passage is body 9-760 verbatim. The eng passage is a
     new body linking the two new Engine files and the shared `scope-client`.
   - `references/scope-management.instructions.md` and `references/scope-permissions.instructions.md`
@@ -340,6 +340,14 @@
     baseline apart from the Gate.
   - _Requirements: 1.2, 1.3, 1.9, 2.1, 3.8, 3.9, 5.3, 3.15_
   - _Boundary: manage-scope/, converted/manage-scope, supabase-view-changes/manage-scope.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view holds `SKILL.md`
+    (Gate, then the new body), `engine-scope-management`, `engine-scope-permissions` and
+    `scope-client`, every link resolving; it reads as complete steps through the API with an
+    administrator's session. The Supabase view holds `SKILL.md`, `scope-management`,
+    `scope-permissions` and `scope-client`, equal to `v1.0.0` apart from the Gate (change file
+    `[]`). Engine facts re-checked in `buildpad-daas-go`: type and item bodies, the three parent
+    rules, refused deletes, the tenant node, `/api/scope/available`, `MISSING_SCOPE` without a
+    header unless the user reaches every scope, and the `assignment` argument of the `scope` tool.
 - [ ] 4.7 (P) Convert `relational-permissions` (row 30, BP)
   - `SKILL.md` 49-60, 76-91 and 142-198. Remove the dead link at 242; record it as a `removed-link`
     entry with its reason (Issue 3).
