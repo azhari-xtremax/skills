@@ -107,7 +107,7 @@
   - Done when: `node --test tools/repo-check/test/gate.test.mjs` passes, and `scanView` over
     `gate.md` returns no finding and the file holds no `buildpad-backend` token.
   - _Requirements: 1.1, 1.2, 1.3, 1.5, 1.6, 1.7, 1.10, 1.11, 1.12, 4.8, 7.2_
-- [ ] 2.6 Implement the checked set and baseline parity (`lib/checked-set.mjs`, `lib/baseline.mjs`, R5, R7)
+- [x] 2.6 Implement the checked set and baseline parity (`lib/checked-set.mjs`, `lib/baseline.mjs`, R5, R7)
   - `checkedSet` uses `git ls-files` in a work tree. Otherwise it uses `git ls-tree -r --name-only <ref>`,
     or else a directory walk that skips `.git/`. The set is every folder with `SKILL.md`, plus
     `agents/` and `references/`. It excludes root files, `.github/`, `.kiro/` and `tools/`.

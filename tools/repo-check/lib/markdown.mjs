@@ -66,3 +66,13 @@ export function isTableRow(line) {
 export function isBlank(line) {
   return line !== undefined && line.trim() === '';
 }
+
+const UTF8 = new TextDecoder('utf-8', { fatal: true });
+/** The text of a file, or null when its bytes are not UTF-8 (Error Handling: skipped by R1-R3, R6). */
+export function decodeUtf8(buf) {
+  try {
+    return UTF8.decode(buf);
+  } catch {
+    return null;
+  }
+}

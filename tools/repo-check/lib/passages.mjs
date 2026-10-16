@@ -114,29 +114,38 @@ export function fileBackend(p, text) {
  * returned unchanged. `removed` counts the passages removed.
  */
 export function stripBackendPassages(text, keep) {
+  const { kept, removed, sawMarker } = viewLines(text, keep);
+  if (!sawMarker) return { text, removed: 0 };
+  return { text: kept.map((k) => k.seg).join('\n'), removed };
+}
+
+/**
+ * The lines `stripBackendPassages` keeps, each with its 1-based line number in the raw file and
+ * its raw segment (line ending `\r` kept, `\n` removed).
+ */
+export function viewLines(text, keep) {
   const segs = text.split('\n');
-  const out = [];
+  const kept = [];
   let removed = 0;
   let skipping = false;
   let sawMarker = false;
-  for (const seg of segs) {
+  segs.forEach((seg, i) => {
     const mk = parseMarker(seg);
     if (mk) sawMarker = true;
     if (skipping) {
       if (mk?.type === 'close') skipping = false;
-      continue;
+      return;
     }
     if (mk) {
       if (mk.type === 'open' && mk.kind !== keep) {
         skipping = true;
         removed++;
       }
-      continue;
+      return;
     }
-    out.push(seg);
-  }
-  if (!sawMarker) return { text, removed: 0 };
-  return { text: out.join('\n'), removed };
+    kept.push({ line: i + 1, seg });
+  });
+  return { kept, removed, sawMarker };
 }
 
 /**
