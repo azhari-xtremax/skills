@@ -175,6 +175,10 @@
     `check.mjs --root $RUNNER_TEMP/baseline --baseline-ref v1.0.0 --only R4,R5,R6a --skill-map tools/repo-check/skill-map.json`.
   - Done when: on the pull request of tasks 2 and 3, both jobs run and end green.
   - _Requirements: 7.7_
+  - Note 16 October 2026: the workflow and `test/workflow.test.mjs` are committed on
+    `feat/backend-aware-skills-repo-check`; both jobs' commands pass locally on Node 24 (the
+    `baseline` command exits 0). Left unticked: the Done-when needs the pull request's CI run on
+    Node 22, which no one has opened yet.
 
 - [ ] 3. Write the README, CONTRIBUTING and the first CHANGELOG, and land the check green on the unconverted tree (same pull request as task 2)
 - [ ] 3.1 Rewrite `README.md` for the two kinds of project
