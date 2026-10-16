@@ -525,13 +525,18 @@
     `related_field: uri_path`). The reference's line 4 (`applyTo`) holds for both and is
     unchanged; its file list is named as a Supabase project's, and it relies on 4.6 for the
     Engine references that `manage-scope/SKILL.md` will name.
-- [ ] 6.8 (P) Reword `buildpad-steering-custom` and add its Gate (row 33, RW+G)
+- [x] 6.8 (P) Reword `buildpad-steering-custom` and add its Gate (row 33, RW+G)
   - `SKILL.md`: the Gate placed by S4. Lines 43-51 become "record the backend the Gate established;
     never infer it from dependency or variable names". The templates and `rules/` stay unchanged.
   - Done when: FD holds for `buildpad-steering-custom`, and R8 reports nothing for its
     `settings-templates/` and `rules/`.
   - _Requirements: 1.2, 5.2, 5.6, 2.4_
   - _Boundary: buildpad-steering-custom/, converted/buildpad-steering-custom, supabase-view-changes/buildpad-steering-custom.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`; the tests and
+    `check.mjs` exit 0 with `converted/buildpad-steering-custom` (R3 holds the Gate after the H1;
+    R8 reports nothing for `settings-templates/` and `rules/`, both unchanged). Read through:
+    step 3 now records the backend the Gate established and forbids inferring it from
+    dependency or variable names; no marker. The change file has one `text` entry.
 - [ ] 6.9 (P) Reword `context-engineering` (row 34, RW)
   - `SKILL.md` 42, 57-61, 73, 84 and 106. Qualified sentences: one Engine address for data and
     sign-in; the Engine MCP has no extensions tool.
