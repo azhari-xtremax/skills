@@ -722,7 +722,7 @@
     the `mfaRequired` passage after 194 is Engine-only. Widened beyond the plan: line 18 (the Engine
     has no MCP tool for cron jobs). Checked in the Engine: a run executes as the system account,
     which holds the Administrator policy, and a refused second factor is 403 `MFA_REQUIRED`.
-- [ ] 8.2 (P) Convert `add-workflows` (row 12, BP)
+- [x] 8.2 (P) Convert `add-workflows` (row 12, BP)
   - `SKILL.md` 34-43, 158, 176 (an eng passage with ES-6 after the `mfaRequired` error kind) and 198,
     read at `origin/main`, which holds commit `873f492`.
   - Engine content: ES-1, ES-15 and ES-6. Instance writes go only through
@@ -730,6 +730,12 @@
   - Done when: FD holds for `add-workflows`.
   - _Requirements: 1.2, 1.9, 2.1, 4.6, 3.15_
   - _Boundary: add-workflows/, converted/add-workflows, supabase-view-changes/add-workflows.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. Of 34-43 only 41-43 differ; ES-1, ES-15 and the transition-only rule for instances stand
+    there. The plan's 198 is the blank line before the post-install sentence, so that sentence (199)
+    is marked. Line 158's Engine copy says what `GET /api/collections` lists for a non-administrator
+    on the Engine (the collections the user may read), checked in `buildpad-daas-go`.
 - [ ] 8.3 (P) Convert `create-cron` (row 17, BP)
   - `SKILL.md` 13, 28-83 (MCP `cron` calls, sup), 104-168, 212, 240-318 and 323 (link, sup).
     `references/cron-mcp.instructions.md` becomes file:sup (no `cron` tool, PP-29).
