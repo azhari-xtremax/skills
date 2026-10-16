@@ -760,7 +760,7 @@
     grant each needs, `201` on create, `200` with `{ success, message }` on delete, the run answer
     `{ historyId, message }`, descriptors such as `@hourly`, day of week 0-6, a read without
     `limit` returns 25 rows, and the stale-lock grace `CRON_STALE_LOCK_GRACE_MS`.
-- [ ] 8.4 (P) Convert `create-service` (row 21, BP)
+- [x] 8.4 (P) Convert `create-service` (row 21, BP)
   - `SKILL.md` 19, 28-79 (MCP `services`, sup), 97-111, 141-150 (link 145, sup), 199-302, 365 and 374
     (link, sup). `references/custom-services.instructions.md` 90-155, 157-237, 265-337 and 393-427.
     `references/stripe.instructions.md` 10-47.
@@ -771,6 +771,17 @@
     passages.
   - _Requirements: 1.2, 1.9, 2.1, 3.2, 3.10, 3.15_
   - _Boundary: create-service/, converted/create-service, supabase-view-changes/create-service.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md`,
+    `custom-services` and `stripe` from `check.mjs --render`; the Supabase view is `v1.0.0` but for
+    the Gates (change file `[]`). The links at 145 and 374 lie inside `supabase` passages; their
+    Engine counterparts link `hooks-extensions/SKILL.md`. Lines 19 and 365 are left shared: the
+    Engine holds the same name rule as a check constraint. `SKILL.md` 97-111 and 199 widen to their
+    fences; `stripe` is one four-backtick `instructions` fence, so it is a `supabase` passage and
+    an Engine copy, the Gate before line 1; `custom-services` 90-155 and 157-237 are joined (gap
+    rule). Widened beyond the plan: the Validator fence of `SKILL.md` 307-333 (`readOne` throws
+    `NOT_FOUND` on the Engine). Checked in `buildpad-daas-go`: the routes and grants, `draft` as the
+    default status, `409` for a taken name or a dependent service, the test summary under `data`,
+    no `URLSearchParams` and no `console` in a service body, and `services.env` empty unless named.
 - [ ] 8.5 Convert `hooks-extensions` into a separate Engine file set (row 27, EF)
   - `SKILL.md`: the Gate after the H1. The sup passage is body 9-225 verbatim. The eng passage is a
     new body linking the three Engine files. The three existing references become file:sup.
