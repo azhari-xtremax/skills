@@ -510,13 +510,21 @@
     multi-tenancy item; ES-16 after the checklist and at the API guard points; the cron item
     names the Engine runtime's limits and ES-13n, linking `create-cron/SKILL.md`, since ES-10's
     table link has no target in this file).
-- [ ] 6.7 (P) Reword `add-multitenancy` (row 32, RW)
+- [x] 6.7 (P) Reword `add-multitenancy` (row 32, RW)
   - `SKILL.md` 9-13. `references/multitenancy.instructions.md` 4 and 9-13. Qualified ES-9; the scoped
     collection column has a foreign key to `daas_scope_items(uri_path)`.
   - Done when: FD holds for `add-multitenancy`, and R4 reports no marker in this `wording only`
     folder.
   - _Requirements: 3.9, 5.2, 2.4_
   - _Boundary: add-multitenancy/, converted/add-multitenancy, supabase-view-changes/add-multitenancy.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/add-multitenancy`, and R4 reports no
+    marker in this `wording only` folder. Read through: both files read complete for both kinds
+    of project (ES-9 and the scope column's foreign key, checked against the Engine's m2o field
+    service at `d893e3cd`: the key exists when the field relates to `daas_scope_items` with
+    `related_field: uri_path`). The reference's line 4 (`applyTo`) holds for both and is
+    unchanged; its file list is named as a Supabase project's, and it relies on 4.6 for the
+    Engine references that `manage-scope/SKILL.md` will name.
 - [ ] 6.8 (P) Reword `buildpad-steering-custom` and add its Gate (row 33, RW+G)
   - `SKILL.md`: the Gate placed by S4. Lines 43-51 become "record the backend the Gate established;
     never infer it from dependency or variable names". The templates and `rules/` stay unchanged.
