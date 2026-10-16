@@ -611,7 +611,7 @@
     Engine facts re-checked in `buildpad-daas-go`: password sign-in only, no OAuth callback route,
     `/auth/v1/signup` registered only to refuse, and the handoff route takes only a Platform-signed
     assertion.
-- [ ] 7.2 Convert `create-api-route` into a separate Engine file set (row 2, EF)
+- [x] 7.2 Convert `create-api-route` into a separate Engine file set (row 2, EF)
   - `SKILL.md`: the Gate. The sup passage is body 9-115 verbatim. The eng passage is a new body with
     the forwarder template, linking the Engine file. Its description is reworded (C4).
     `references/api-routes.instructions.md` and `references/api-authorization.instructions.md`
@@ -626,6 +626,17 @@
   - Not (P): it file-marks `api-routes.instructions.md`, which 4.2 links.
   - _Requirements: 1.2, 1.3, 1.9, 2.1, 3.3, 3.11, 5.3, 5.4, 3.15, 2.4_
   - _Depends: 4.2_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view holds `SKILL.md`
+    (Gate, then the new body) and `engine-api-routes`, every link resolving, and R1 and R6b report
+    nothing for it; every data route goes through one helper, `forwardToEngine()`. The Supabase view
+    holds `SKILL.md` and the two references, equal to `v1.0.0` apart from the Gate and the reworded
+    description (one `description` entry). Added beyond the plan: a sign-in section (the login route
+    sends `X-Tenant-Id`; no callback route), and the users-me route drops `password` and
+    `current_password` (an administrator resets passwords). Engine facts re-checked in
+    `buildpad-daas-go`: create 200, single delete 204, batch delete 200; the transition body and its
+    `{ message }` answer; the users-me writable and restricted fields; the signed URL as an Engine
+    path or an S3 address; version create needs `update` and `create`; `/auth/v1/token` takes the
+    tenant from `X-Tenant-Id`, which the Engine's cross-origin settings do not allow.
 - [x] 7.3 (P) Convert `create-migration` (row 3, US)
   - `SKILL.md`: the Gate after the H1, then S7-B verbatim, before any step. The sup passage is the
     rest (9-101). The description is reworded (C4). `references/special-fields.instructions.md`
