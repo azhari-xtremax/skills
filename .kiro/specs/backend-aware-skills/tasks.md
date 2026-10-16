@@ -597,7 +597,7 @@
   - _Boundary: buildpad-steering/, converted/buildpad-steering, supabase-view-changes/buildpad-steering.json_
 
 - [ ] 7. Convert the core Skills (design Group 2; after task 4)
-- [ ] 7.1 (P) Convert `add-external-oauth` (row 1, US)
+- [x] 7.1 (P) Convert `add-external-oauth` (row 1, US)
   - `SKILL.md`: the Gate after the H1, then S7-A verbatim. The sup passage is the rest of the body
     (9-683). The description is reworded to "stops on an Engine project" (C4).
     `references/oauth-implementation.instructions.md` becomes file:sup.
@@ -605,6 +605,12 @@
     names `add-users`.
   - _Requirements: 1.2, 1.9, 2.1, 4.1, 4.2, 4.8, 3.15, 2.4_
   - _Boundary: add-external-oauth/, converted/add-external-oauth, supabase-view-changes/add-external-oauth.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view holds only
+    `SKILL.md`, made of the Gate and S7-A (which names `add-users`); the Supabase view of both files
+    differs from `v1.0.0` by the Gate and the reworded description only (one `description` entry).
+    Engine facts re-checked in `buildpad-daas-go`: password sign-in only, no OAuth callback route,
+    `/auth/v1/signup` registered only to refuse, and the handoff route takes only a Platform-signed
+    assertion.
 - [ ] 7.2 Convert `create-api-route` into a separate Engine file set (row 2, EF)
   - `SKILL.md`: the Gate. The sup passage is body 9-115 verbatim. The eng passage is a new body with
     the forwarder template, linking the Engine file. Its description is reworded (C4).
