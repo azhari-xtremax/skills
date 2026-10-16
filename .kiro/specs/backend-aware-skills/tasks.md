@@ -736,7 +736,7 @@
     there. The plan's 198 is the blank line before the post-install sentence, so that sentence (199)
     is marked. Line 158's Engine copy says what `GET /api/collections` lists for a non-administrator
     on the Engine (the collections the user may read), checked in `buildpad-daas-go`.
-- [ ] 8.3 (P) Convert `create-cron` (row 17, BP)
+- [x] 8.3 (P) Convert `create-cron` (row 17, BP)
   - `SKILL.md` 13, 28-83 (MCP `cron` calls, sup), 104-168, 212, 240-318 and 323 (link, sup).
     `references/cron-mcp.instructions.md` becomes file:sup (no `cron` tool, PP-29).
     `references/cron-sandbox.instructions.md` 18-128 and 234-312, with the link at 59 moved into sup.
@@ -749,6 +749,17 @@
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.2, 3.10, 3.14, 4.7, 3.15_
   - _Depends: 5.8_
   - _Boundary: create-cron/, converted/create-cron, supabase-view-changes/create-cron.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md`, `cron-sandbox`
+    and `cron-api` from `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gates and the
+    file marker (change file `[]`), and every `x-pp29-tool` hit lies in `supabase` text. Widened by
+    S6: `cron-sandbox` and `cron-api` are each one four-backtick `instructions` fence from line 1 to the end,
+    so each listed range widens to the whole file: a `supabase` passage holding the file and an
+    `engine` passage holding its Engine copy, the Gate before line 1; the link at 59 lies inside
+    the `supabase` passage. `SKILL.md` 212 widens to its fence 204-216. The `Engine runtime` table
+    stands in `SKILL.md`, which `add-cron` links. Checked in `buildpad-daas-go`: the routes and the
+    grant each needs, `201` on create, `200` with `{ success, message }` on delete, the run answer
+    `{ historyId, message }`, descriptors such as `@hourly`, day of week 0-6, a read without
+    `limit` returns 25 rows, and the stale-lock grace `CRON_STALE_LOCK_GRACE_MS`.
 - [ ] 8.4 (P) Convert `create-service` (row 21, BP)
   - `SKILL.md` 19, 28-79 (MCP `services`, sup), 97-111, 141-150 (link 145, sup), 199-302, 365 and 374
     (link, sup). `references/custom-services.instructions.md` 90-155, 157-237, 265-337 and 393-427.
