@@ -319,7 +319,7 @@
   - _Boundary: relational-permissions/, converted/relational-permissions, supabase-view-changes/relational-permissions.json_
 
 - [ ] 5. Convert the apps and platform Skills (design Group 5; after task 3; before task 8; parallel with tasks 4 and 6)
-- [ ] 5.1 (P) Convert `add-buildpad` (row 4, BP)
+- [x] 5.1 (P) Convert `add-buildpad` (row 4, BP)
   - `SKILL.md` 29-38, 45, 85 and 113. `references/buildpad.instructions.md` 89-109, 138, 157-166,
     399-416, 534-635, 665-710, 923-964, 1044-1069 and 1169-1199.
   - Engine content: ES-1, ES-2 (DaaSProvider and Storybook take a session token), ES-11 (asset path)
@@ -327,6 +327,12 @@
   - Done when: FD holds for `add-buildpad`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.3, 3.11, 3.15_
   - _Boundary: add-buildpad/, converted/add-buildpad, supabase-view-changes/add-buildpad.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` and
+    `references/buildpad.instructions.md` from `check.mjs --render`; the Supabase view is `v1.0.0`
+    but for the Gate, and the change file is `[]`. Ranges were widened to their whole fences and
+    tables, and 89-109 and 923-964 were split at the `##` headings inside them (S6). The Engine
+    serves `limit=-1` as its cap of 1000 rather than refusing it, so the Engine text says that; only
+    a single-item delete answers 204 with no body.
 - [ ] 5.2 (P) Convert `add-files` (row 6, BP)
   - `SKILL.md` 26-28, 47, 53-67 and 136-166.
   - Engine content: ES-1, ES-11 and ES-15. The upload limit is `APP_MAX_UPLOAD_BYTES` (100 MiB),
