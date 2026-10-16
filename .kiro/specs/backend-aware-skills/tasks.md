@@ -193,7 +193,7 @@
   - Done when: `node tools/repo-check/check.mjs --only R11` exits 0, and the catalogue lists each of
     the 62 Skill folders once.
   - _Requirements: 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
-- [ ] 3.2 Write `CONTRIBUTING.md` and start `CHANGELOG.md`
+- [x] 3.2 Write `CONTRIBUTING.md` and start `CHANGELOG.md`
   - Create `CHANGELOG.md` at the root (design Group 1) with one section, `v1.0.0`, naming it the
     Baseline_Revision (`7ed910f`), so the README's link from 3.1 resolves. No folder task edits it;
     9.2 and 10.8 add the later sections.
