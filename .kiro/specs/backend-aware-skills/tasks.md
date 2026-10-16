@@ -52,7 +52,7 @@
   - _Requirements: 6.1_
 
 - [ ] 2. Build the Repository_Check in `tools/repo-check/` (design Group 1, with task 3)
-- [ ] 2.1 Write the shared contract data and its pinning test
+- [x] 2.1 Write the shared contract data and its pinning test
   - Add `tools/repo-check/contract/backend-contract.json` exactly as printed in S8: marker regex,
     token, kinds, `onlyDirs`, `steeringToken`, the nine issue codes, the 13 guard patterns
     (alternation unescaped), path rule, fenced-block rule, `fencedLinksAreLinks: false`, and the
