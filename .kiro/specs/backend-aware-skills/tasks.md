@@ -434,7 +434,7 @@
     what the Supabase client's password sign-in reads), so the text sends both; the account budget
     is 30 creations per caller per 10 minutes and the request budget 20 per second per address,
     both operator-adjustable; `isAdmin` sits beside `data` in `GET /api/permissions/me`.
-- [ ] 5.8 (P) Convert `daas-platform` (row 24, BP, kept in-file per Issue 9)
+- [x] 5.8 (P) Convert `daas-platform` (row 24, BP, kept in-file per Issue 9)
   - `SKILL.md` line 3 (description, C4), then 9-35, 51-85, 87-153, 164, 176-192 (including 189) and
     207-292. `references/daas-api.instructions.md` 11-97, 101-292, 339-362, 472-565 and 573 (link,
     sup). `references/daas-mcp-tools.instructions.md` 101-169, 305, 636, 685, 1156-1481 (tools the
@@ -449,6 +449,18 @@
     `create-cron/SKILL.md`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.3, 3.5, 3.8, 3.10, 3.11, 4.6, 5.5, 3.15, 2.4_
   - _Boundary: daas-platform/, converted/daas-platform, supabase-view-changes/daas-platform.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` and the four
+    references from `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gates and the
+    reworded description (the change file's one entry). The links 573, 1158, 1271 and 1718 lie
+    inside `supabase` passages, and their Engine counterparts link `hooks-extensions/SKILL.md` or
+    `create-cron/SKILL.md`. Ranges were widened to whole fences and tables and joined where the gap
+    rule required. Passages were added beyond the listed ranges where the baseline was wrong for the
+    Engine: `SKILL.md` 157-160; `builtin-features` 19-27, 39-46, 167, 177-180, 190-194, 202-209;
+    `daas-mcp-tools` 61-73, 89-99, 196-207, 259-272, 295-303, 383-450, 619-632, 853-883, 1500-1532
+    (field, item and collection calls take `keys`; there is no `assets` tool; deletes follow the
+    `mcp_allow_deletes` project setting; tool errors are results with `isError`). ES-13n is added
+    where the text sends the reader to cron jobs. The `Engine runtime` table sits in
+    `builtin-features`, beside the ES-10 sentence that links it.
 - [ ] 5.9 (P) Convert `debugging-and-error-recovery` (row 25, BP)
   - `SKILL.md` 57-60, 87-88 (the MCP cross-origin fix, sup) and 112-117.
   - Engine content: Engine causes (`TOKEN_INVALID`, `FORBIDDEN_SCOPE`, `MISSING_SCOPE`, sign-in
