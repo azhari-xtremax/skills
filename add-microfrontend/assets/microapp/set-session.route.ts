@@ -1,3 +1,5 @@
+// buildpad-backend-file: supabase
+// Backend: before using this file, establish the backend as "Establish the backend first" in this skill's SKILL.md says, keep only the parts for that backend, and copy no marker line into the application.
 // set-session/route.ts — accept an access token from the host and store it locally.
 //
 // Copy to: app/api/auth/set-session/route.ts  (a NEW file — no CLI collision).

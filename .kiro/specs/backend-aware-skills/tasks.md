@@ -369,7 +369,7 @@
     runs on its own address, the Main App only links to the micro-apps, and framing is stated as not
     yet available. Adjacent ranges were joined (gap rule) and ranges widened to whole fences, tables
     and lists. The `Engine runtime` table sits beside the event-hook body it governs.
-- [ ] 5.4 Convert `add-microfrontend` (row 9, NY)
+- [x] 5.4 Convert `add-microfrontend` (row 9, NY)
   - `SKILL.md`: the Gate, then the eng passage "Sharing one session between a host and its frames is
     not available on an Engine project yet. Tell the developer so and stop.". The sup passage is the
     rest of the body. Its description is reworded to name the kind (C4).
@@ -380,6 +380,11 @@
   - Not (P): it file-marks `auth-bridge.instructions.md`, which 5.3 links.
   - _Requirements: 1.2, 1.6, 1.9, 2.1, 3.5, 4.7, 4.8, 3.15, 2.4_
   - _Depends: 5.3_
+  - Note 16 October 2026: read through the views from `check.mjs --render`: the Engine view of
+    `add-microfrontend` is `SKILL.md` alone, the Gate and the stop text; the Supabase view is
+    `v1.0.0` but for the Gates, the Pointer lines and the description, whose rewording ("Supabase
+    projects only for now: not yet available on an Engine project") is the change file's one entry.
+    The five references are file:sup, and the 14 assets carry the file marker and the Pointer.
 - [ ] 5.5 (P) Convert `add-microfrontend-zones` (row 10, NY)
   - `SKILL.md`: the Gate, the NY stop text as in 5.4, and the sup passage for the rest. Its
     description is reworded (C4). `references/pinned-edits.instructions.md` becomes file:sup. Each
