@@ -614,11 +614,15 @@
     security and compliance check holds for both kinds of project (a service-role key reference
     and any Supabase client call other than sign-in are findings on an Engine project; the proxy,
     auth-proxy and backend-first checks name the Engine's counterparts).
-- [ ] 6.16 (P) Reword `spec-driven-development` (row 41, RW)
+- [x] 6.16 (P) Reword `spec-driven-development` (row 41, RW)
   - `SKILL.md` 47-53: the scope hierarchy sits beneath the tenant.
   - Done when: FD holds for `spec-driven-development`.
   - _Requirements: 3.9, 5.2, 2.4_
   - _Boundary: spec-driven-development/, converted/spec-driven-development, supabase-view-changes/spec-driven-development.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/spec-driven-development`. Read
+    through: lines 47-52 hold for both kinds of project as written; the scope item now places
+    the hierarchy beneath the tenant on an Engine project (ES-9).
 - [ ] 6.17 (P) Reword `subagent-delegation` (row 42, RW)
   - `SKILL.md` 18, 30 and 58: the OAuth review is not available on an Engine project.
   - Done when: FD holds for `subagent-delegation`.
