@@ -85,7 +85,7 @@
     entry gives its expected ids.
   - _Requirements: 3.1, 3.2, 7.1_
   - _Boundary: tools/repo-check/lib/guard.mjs, test/guard.test.mjs_
-- [ ] 2.4 Implement link extraction and resolution (`lib/links.mjs`, R6a, R6b)
+- [x] 2.4 Implement link extraction and resolution (`lib/links.mjs`, R6a, R6b)
   - `extractLinks` skips CommonMark fences. `resolves` works per view. `isRecordedBreak` matches by
     file and target.
   - Add `test/links.test.mjs`: inline and reference-style links, anchors, the nested four-backtick
