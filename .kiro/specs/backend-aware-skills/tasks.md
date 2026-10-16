@@ -782,7 +782,7 @@
     `NOT_FOUND` on the Engine). Checked in `buildpad-daas-go`: the routes and grants, `draft` as the
     default status, `409` for a taken name or a dependent service, the test summary under `data`,
     no `URLSearchParams` and no `console` in a service body, and `services.env` empty unless named.
-- [ ] 8.5 Convert `hooks-extensions` into a separate Engine file set (row 27, EF)
+- [x] 8.5 Convert `hooks-extensions` into a separate Engine file set (row 27, EF)
   - `SKILL.md`: the Gate after the H1. The sup passage is body 9-225 verbatim. The eng passage is a
     new body linking the three Engine files. The three existing references become file:sup.
   - New `references/engine-hooks.instructions.md`, `references/engine-services-api.instructions.md`
@@ -798,6 +798,17 @@
   - Not (P): it file-marks targets linked from 4.4, 5.8, 8.3 and 8.4.
   - _Requirements: 1.2, 1.3, 1.9, 2.1, 3.1, 3.10, 5.3, 3.15_
   - _Depends: 4.4, 5.8, 8.3, 8.4_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view holds `SKILL.md`
+    (Gate, then the new body with the `Engine runtime` table) and the three Engine files, every
+    link resolving; the Supabase view holds `SKILL.md` and the three file:sup references, equal to
+    `v1.0.0` apart from the Gate (change file `[]`). R6b reports no broken link into the
+    references. Checked in `buildpad-daas-go`: the `/api/extensions` routes (writes administrator
+    only, `inactive` by default, no test route), events only from item operations through the
+    Items API, the MCP `items` tool and `services.items` (no administration-route or sign-in
+    events), `HookError` and its answers, `services.cron.trigger` answering a history id string,
+    mail options limited to `to`, `subject`, `text`, `html`, `replyTo`, and the utility routes'
+    gates (hash generate and random string for any signed-in user, the rest administrator only
+    except the stored export).
 
 - [ ] 9. Release `v2.0.0` (design "Last"; after tasks 4 to 8)
 - [ ] 9.1 Run the release read-through and the install check on the candidate
