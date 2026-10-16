@@ -400,7 +400,7 @@
     Pointer lines and the description, whose rewording is the change file's one entry. The
     `platform-supabase` lines 126, 138, 344, 345, 349 and 504 lie inside the `supabase` passage,
     so R1 reports nothing.
-- [ ] 5.6 (P) Convert `create-project` (row 19, BP)
+- [x] 5.6 (P) Convert `create-project` (row 19, BP)
   - `SKILL.md` line 3 (description, C4), then 15-19, 46-73, 88-143, 165-192 (the MCP cross-origin
     step, sup) and 256-268. `references/environment.instructions.md` 19-106, with the service-role
     block 51-61 as sup. `references/project-creation.instructions.md` 59-67, 95 and 110.
@@ -410,6 +410,12 @@
   - Done when: FD holds for `create-project`.
   - _Requirements: 1.2, 1.9, 2.1, 3.3, 3.4, 3.5, 3.8, 3.16, 3.15, 2.4_
   - _Boundary: create-project/, converted/create-project, supabase-view-changes/create-project.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md`,
+    `environment` and `project-creation` from `check.mjs --render`; the Supabase view is `v1.0.0`
+    but for the Gates and the reworded description (the change file's one entry). Ranges were
+    widened to whole fences, `SKILL.md` 46-73 and 256-268 were split around lines that hold for
+    both backends, and the service-role block 51-61 is `supabase` text with ES-3's "add none" as
+    its Engine counterpart. `project-creation` has no front matter, so its Gate stands before line 1.
 - [ ] 5.7 (P) Convert `create-tests` (row 22, BP)
   - `SKILL.md` line 3 (description, C4), then 24-80, 110, 176-178, 227-266, 359-392, 428 and
     453-456. `references/playwright-testing.instructions.md` 59-75, 178-306, 355-374, 485-528,
