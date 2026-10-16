@@ -95,7 +95,7 @@
   - Done when: `node --test tools/repo-check/test/links.test.mjs` passes, and every `linkCases`
     entry gives its expected links.
   - _Requirements: 2.3, 3.15, 7.5_
-- [ ] 2.5 Write the canonical Gate and its rule (`gate.md`, `lib/gate.mjs`, R3)
+- [x] 2.5 Write the canonical Gate and its rule (`gate.md`, `lib/gate.mjs`, R3)
   - Add `tools/repo-check/gate.md` with the S3 block byte for byte: the sentinels, steps 1 to 4,
     the no-secrets paragraph, the definition of a part, and the stop sentence.
   - `gateIssues` reports: Gate absent, misplaced by S4, or not byte-identical (line endings
