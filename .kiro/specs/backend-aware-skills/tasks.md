@@ -592,12 +592,17 @@
     through: the file reads complete for both kinds of project (an index through
     `schema.add_index` on field create, `fields` expansion with `deep` ignored, and the 1000-item
     `limit` cap, each checked against the Engine at `d893e3cd`).
-- [ ] 6.14 (P) Reword `planning-and-task-breakdown` (row 39, RW)
+- [x] 6.14 (P) Reword `planning-and-task-breakdown` (row 39, RW)
   - `SKILL.md` 29, 43, 60-67, 71-75 and 85-127: "define the collection through `create-collection`".
     Reword the line-62 example path, the one R1 hit outside a planned `supabase` range.
   - Done when: FD holds for `planning-and-task-breakdown`, and R1 reports nothing at `SKILL.md:62`.
   - _Requirements: 3.1, 3.6, 5.2, 2.4_
   - _Boundary: planning-and-task-breakdown/, converted/planning-and-task-breakdown, supabase-view-changes/planning-and-task-breakdown.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/planning-and-task-breakdown`, and R1
+    reports nothing at `SKILL.md:62` (the example path is gone). Read through: every data task
+    defines the collection through `create-collection`, the access criterion names both kinds of
+    project, and the dependency diagram keeps its alignment.
 - [ ] 6.15 (P) Reword `review-code` (row 40, RW)
   - `SKILL.md` 11, 24, 27 and 34-36. Qualified sentences: on an Engine project, any Supabase client
     call other than sign-in has no server, and any service-role key reference is a finding.
