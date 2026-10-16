@@ -64,7 +64,7 @@
   - Done when: `node --test tools/repo-check/test/contract.test.mjs` passes, and fails after one
     character of any regex in the JSON is changed.
   - _Requirements: 7.1, 7.8_
-- [ ] 2.2 Implement passages and views (`lib/passages.mjs`, R2)
+- [x] 2.2 Implement passages and views (`lib/passages.mjs`, R2)
   - Implement `validateMarkers`, `validateMarkerPlacement`, `fileBackend` and
     `stripBackendPassages` from S8's data, and `authoringIssues`, which reports `straddles-fence`,
     `marker-in-table` and `gap-between-passages` (S6).
