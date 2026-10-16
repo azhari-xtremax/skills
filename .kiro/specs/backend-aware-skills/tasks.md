@@ -181,7 +181,7 @@
     Node 22, which no one has opened yet.
 
 - [ ] 3. Write the README, CONTRIBUTING and the first CHANGELOG, and land the check green on the unconverted tree (same pull request as task 2)
-- [ ] 3.1 Rewrite `README.md` for the two kinds of project
+- [x] 3.1 Rewrite `README.md` for the two kinds of project
   - Add the sections from Distribution and README: **Two kinds of project** (6.6), and **Install**
     with `#v2.0.0`, `--all`, `#v2.0.0@create-project` and the tree URL, with no hard-coded `main`
     (6.3). Add **Stay on the skills as they were before Engine support**, with
