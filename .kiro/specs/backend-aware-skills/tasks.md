@@ -472,13 +472,19 @@
     reads complete for both kinds of project (cross-origin setup qualified as a Supabase-project
     step beside ES-15; static tokens as MCP credentials; ES-7 with the role in the tenant;
     "scope" for the levels inside the project). The change file has one `text` entry.
-- [ ] 6.4 (P) Reword `authentication-proxy` (row 14, RW)
+- [x] 6.4 (P) Reword `authentication-proxy` (row 14, RW)
   - `SKILL.md` 11-26 and 64-115. `references/authentication-proxy.instructions.md` 16-49, 126-141
     and 290-303. All become qualified sentences, with the address `NEXT_PUBLIC_BUILDPAD_DAAS_URL`.
     Uses ES-1, ES-3, ES-4, ES-5 and ES-6 in their "On an Engine project" form.
   - Done when: FD holds for `authentication-proxy`, with one `text` entry per changed file.
   - _Requirements: 3.3, 3.5, 3.8, 3.16, 4.5, 4.6, 5.2, 2.4_
   - _Boundary: authentication-proxy/, converted/authentication-proxy, supabase-view-changes/authentication-proxy.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/authentication-proxy`. Read through:
+    both files read complete for both kinds of project (the proxy rule kept for both; the OAuth
+    routes and the external OAuth section qualified as Supabase-project only, with the stop on an
+    Engine project; ES-1, ES-2, ES-4, ES-5 and ES-6 verbatim in `SKILL.md`, ES-1, ES-3 and ES-5 in
+    the reference with an Engine environment block). One `text` entry per changed file.
 - [ ] 6.5 (P) Reword `buildpad-reference` (row 15, RW)
   - `SKILL.md` 11, 43-52 (asset URL) and 109-126. `references/react-components.instructions.md`
     15-19, 373 and 404-422. Uses ES-2 (the DaaSProvider token is a session token) and ES-11.
