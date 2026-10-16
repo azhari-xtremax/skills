@@ -581,12 +581,17 @@
     Gate; the tests and `check.mjs` exit 0 with `converted/incremental-implementation`. Read
     through: the first data slice and the Data layer now define the collection through
     `create-collection`, true for both kinds of project; nothing else in the file differs.
-- [ ] 6.13 (P) Reword `performance-optimization` (row 38, RW)
+- [x] 6.13 (P) Reword `performance-optimization` (row 38, RW)
   - `SKILL.md` 56, 63-72, 106 and 126-128. Qualified sentences: indexing through an indexed field;
     `limit` capped at 1000.
   - Done when: FD holds for `performance-optimization`.
   - _Requirements: 5.2, 2.4_
   - _Boundary: performance-optimization/, converted/performance-optimization, supabase-view-changes/performance-optimization.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/performance-optimization`. Read
+    through: the file reads complete for both kinds of project (an index through
+    `schema.add_index` on field create, `fields` expansion with `deep` ignored, and the 1000-item
+    `limit` cap, each checked against the Engine at `d893e3cd`).
 - [ ] 6.14 (P) Reword `planning-and-task-breakdown` (row 39, RW)
   - `SKILL.md` 29, 43, 60-67, 71-75 and 85-127: "define the collection through `create-collection`".
     Reword the line-62 example path, the one R1 hit outside a planned `supabase` range.
