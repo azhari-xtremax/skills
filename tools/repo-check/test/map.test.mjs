@@ -53,3 +53,19 @@ test('R4: a malformed or duplicate row', () => {
   assert.deepEqual(codes, ['map-duplicate-row', 'map-invalid-row']);
   assert.deepEqual(PLANS, ['BP', 'EF', 'US', 'NY', 'RW', 'RW+G', 'UC']);
 });
+
+// R13 (release rule, lib/release.mjs): on a tag push, every non-UC row must be converted.
+import { unconverted, convertedFindings } from '../lib/release.mjs';
+
+test('R13: a release fails with one non-UC row unconverted', () => {
+  const rows = [row('a', 'BP'), row('b', 'RW', 'wording only'), row('u', 'UC', 'none')];
+  assert.deepEqual(unconverted(rows, new Set(['a', 'b'])), []);
+  assert.deepEqual(unconverted(rows, new Set(['a'])), ['b']);
+  assert.deepEqual(show(convertedFindings(rows, new Set(['a']))), ['R13 tools/repo-check/converted/b:1 folder-not-converted']);
+});
+
+test('R13: UC rows never need a converted file, and this repository has none converted yet', () => {
+  const rows = [row('u', 'UC', 'none')];
+  assert.deepEqual(convertedFindings(rows, new Set()), []);
+  assert.equal(unconverted(skillMap, new Set()).length, 44);
+});

@@ -204,3 +204,70 @@ test('R7: an unconverted folder that is not UC fails nothing', () => {
   });
   assert.deepEqual(r7(root), []);
 });
+
+// R10 (release rule, lib/release.mjs).
+import { releaseIssues, changelogSections, parseChangeFile } from '../lib/release.mjs';
+
+const CHANGELOG = L(
+  '# Changelog',
+  '',
+  '## v2.0.0',
+  '',
+  '### Supabase projects',
+  '',
+  '- `rw-skill/SKILL.md`: reworded to be true for both kinds.',
+  '',
+  '## v1.0.0',
+  '',
+  'Baseline_Revision.',
+);
+const entry = (p, release, kind = 'text') => ({ path: p, kind, reason: 'Reworded to be true for both kinds.', release });
+const cf = (folder, entries) => ({ file: `tools/repo-check/supabase-view-changes/${folder}.json`, entries });
+
+test('R10: CHANGELOG sections by tag', () => {
+  const s = changelogSections(CHANGELOG);
+  assert.deepEqual([...s.keys()], ['v2.0.0', 'v1.0.0']);
+  assert.equal(s.get('v2.0.0').line, 3);
+  assert.match(s.get('v2.0.0').body, /rw-skill\/SKILL\.md/);
+  assert.equal(changelogSections(null).size, 0);
+});
+
+test('R10: a released entry named in its tag section passes; one missing from it fails', () => {
+  assert.deepEqual(releaseIssues([cf('rw-skill', [entry('rw-skill/SKILL.md', 'v2.0.0')])], CHANGELOG, null), []);
+  const f = releaseIssues([cf('bp-skill', [entry('bp-skill/SKILL.md', 'v2.0.0', 'description')])], CHANGELOG, null);
+  assert.deepEqual(show(f), ['R10 tools/repo-check/supabase-view-changes/bp-skill.json:1 entry-not-in-changelog']);
+  const noSection = releaseIssues([cf('rw-skill', [entry('rw-skill/SKILL.md', 'v2.1.0')])], CHANGELOG, null);
+  assert.deepEqual(show(noSection), ['R10 tools/repo-check/supabase-view-changes/rw-skill.json:1 entry-not-in-changelog']);
+});
+
+test('R10: a missing CHANGELOG.md counts as having no sections', () => {
+  assert.deepEqual(releaseIssues([cf('rw-skill', [entry('rw-skill/SKILL.md', 'unreleased')])], null, null), []);
+  assert.equal(releaseIssues([cf('rw-skill', [entry('rw-skill/SKILL.md', 'v2.0.0')])], null, null).length, 1);
+});
+
+test('R10: an unreleased entry between releases passes', () => {
+  assert.deepEqual(releaseIssues([cf('rw-skill', [entry('rw-skill/SKILL.md', 'unreleased')])], CHANGELOG, null), []);
+});
+
+test('R10: the same entry on a tag push fails', () => {
+  const f = releaseIssues([cf('rw-skill', [entry('rw-skill/SKILL.md', 'unreleased')])], CHANGELOG, 'v2.0.0');
+  assert.deepEqual(show(f), ['R10 tools/repo-check/supabase-view-changes/rw-skill.json:1 entry-unreleased-on-tag']);
+});
+
+test('R10: a tag push with no CHANGELOG section for the tag fails', () => {
+  assert.deepEqual(show(releaseIssues([], CHANGELOG, 'v2.1.0')), ['R10 CHANGELOG.md:1 changelog-missing-tag-section']);
+  assert.deepEqual(releaseIssues([], CHANGELOG, 'v2.0.0'), []);
+});
+
+test('R10: change files are read and checked for shape and folder', () => {
+  const ok = parseChangeFile('tools/repo-check/supabase-view-changes/rw-skill.json', JSON.stringify([entry('rw-skill/SKILL.md', 'unreleased')]));
+  assert.deepEqual(ok.issues, []);
+  assert.equal(ok.entries.length, 1);
+  assert.deepEqual(parseChangeFile('tools/repo-check/supabase-view-changes/rw-skill.json', '[]').entries, []);
+  const bad = parseChangeFile('tools/repo-check/supabase-view-changes/rw-skill.json', JSON.stringify([
+    entry('other-skill/SKILL.md', 'unreleased'),
+    { path: 'rw-skill/SKILL.md', kind: 'rewrite', reason: '', release: 'next' },
+  ]));
+  assert.deepEqual(bad.issues.map((i) => i.code), ['change-entry-wrong-folder', 'change-entry-invalid']);
+  assert.deepEqual(parseChangeFile('tools/repo-check/supabase-view-changes/x.json', '{').issues.map((i) => i.code), ['change-file-invalid']);
+});

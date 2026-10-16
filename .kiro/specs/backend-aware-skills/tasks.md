@@ -132,7 +132,7 @@
   - Done when: these three tests pass, and a script comparing `skill-map.json` with the
     requirements' Skill map table finds 64 equal rows and the plan counts above.
   - _Requirements: 5.1, 5.2, 5.6, 5.8, 6.4, 6.7, 7.3_
-- [ ] 2.8 Implement the release rules (`lib/release.mjs`, R10, R13)
+- [x] 2.8 Implement the release rules (`lib/release.mjs`, R10, R13)
   - R10 runs on every run: a change-file entry whose `release` is a tag but whose path is missing
     from that tag's `CHANGELOG.md` section fails. A missing `CHANGELOG.md` counts as having no
     sections (the file is created in 3.2, after this rule). With `--tag`, it also fails when the tag has no
