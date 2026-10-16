@@ -443,7 +443,7 @@
     provisioned cross-origin, roles/policies/permissions/scope, `{ elevated: true }`, ES-5's list,
     ES-7 for test users), and the Supabase view differs from `v1.0.0` only by the Gate and the
     `security-auditor` description (its change-file entry).
-- [ ] 6.2 (P) Mark the top-level reference checklists (row 29, BP)
+- [x] 6.2 (P) Mark the top-level reference checklists (row 29, BP)
   - `security-checklist.md` 11-18, 51-64 and 123-127: the Gate at the top, the service-role and RLS
     lines in sup, and the 3.13 replacements in eng. `module-access-checklist.md` 8-16: the Gate, and
     sup/eng for the server check (ES-16). The other three files stay unchanged. No subfolder is
@@ -452,6 +452,14 @@
     `security-checklist.md:125`.
   - _Requirements: 1.2, 1.9, 3.13, 5.10, 7.9_
   - _Boundary: references/, converted/references, supabase-view-changes/references.json_
+  - Note 16 October 2026: converted on `feat/backend-aware-skills-task-6`; the tests and
+    `check.mjs` exit 0 with `converted/references`, and R1 reports nothing at the former hit
+    `security-checklist.md:125` (now `supabase` text). Read through `--render` output: the
+    Engine view states the 3.13 replacements (no service-role key or Supabase secret, provisioned
+    cross-origin, roles/policies/permissions, ES-15, ES-16), and the Supabase view differs from
+    `v1.0.0` only by the Gate (change file `[]`). In `module-access-checklist.md` only the server
+    check (line 15) differs: lines 8, 9 and 16 hold on the Engine too (`daas_module_access_keys`,
+    policy `module_access`, workflow `module_access_keys`), so they stay shared.
 - [ ] 6.3 (P) Reword `add-users` (row 11, RW)
   - `SKILL.md` 9-18, 30-32, 44, 125, 135-143 and 159 become qualified sentences: ES-7 (a role in the
     tenant on create); on an Engine project a static token is an MCP credential; "scope", not
