@@ -461,7 +461,7 @@
     `mcp_allow_deletes` project setting; tool errors are results with `isError`). ES-13n is added
     where the text sends the reader to cron jobs. The `Engine runtime` table sits in
     `builtin-features`, beside the ES-10 sentence that links it.
-- [ ] 5.9 (P) Convert `debugging-and-error-recovery` (row 25, BP)
+- [x] 5.9 (P) Convert `debugging-and-error-recovery` (row 25, BP)
   - `SKILL.md` 57-60, 87-88 (the MCP cross-origin fix, sup) and 112-117.
   - Engine content: Engine causes (`TOKEN_INVALID`, `FORBIDDEN_SCOPE`, `MISSING_SCOPE`, sign-in
     naming a foreign tenant, `ReferenceError` from `fetch`/`process`/`require`, and the Supabase
@@ -469,6 +469,13 @@
   - Done when: FD holds for `debugging-and-error-recovery`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.15_
   - _Boundary: debugging-and-error-recovery/, converted/debugging-and-error-recovery, supabase-view-changes/debugging-and-error-recovery.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. The three ranges lie inside fences, so each passage takes its whole fence (53-62, 80-89,
+    110-118). The Engine fences name `TOKEN_INVALID`/`TOKEN_EXPIRED`, a sign-in refused for an
+    account with no role in the tenant, `FORBIDDEN_SCOPE` and `MISSING_SCOPE` (both 403, checked in
+    the Engine), `ReferenceError` from `fetch`/`process`/`require`, and the 501 refusal of the
+    Supabase service; the log is `GET /api/logs` (administrator or `system:logs`), with ES-15.
 - [ ] 5.10 (P) Convert `security-and-hardening` (row 31, BP)
   - `SKILL.md` 26, 29-36, 56-90, 119-132 and 161. The service-role lines are sup.
   - Engine content: ES-2, ES-3, ES-5 and ES-15. The Engine refuses caller-supplied SQL.
