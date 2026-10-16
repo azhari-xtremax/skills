@@ -6,11 +6,49 @@ applyTo: "**/*.{ts,tsx,json,sql}"
 
 # Content Translations on DaaS
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 Content that editors author per language lives in DaaS, not in dictionaries. The model is the Directus one — a `languages` collection and one `<collection>_translations` junction per translated collection — built from the pieces DaaS already implements.
 
+<!-- buildpad-backend: supabase -->
 > **Why `special: ["o2m"]` and not `["translations"]`.** DaaS reserves the Directus `translations` special: the relation resolver treats it as a virtual relation (reads work) and `filterAliasFields` strips it from column writes — but `extractRelationalData` in `lib/services/items/relation-writer.ts` only dispatches nested writes for `m2m`, `o2m`, and `files`. A `translations`-special field therefore has its nested rows stripped and never written, with no error. `o2m` takes the full read **and** write path. Switch only when DaaS ships the `translations` interface, junction wizard, and writer branch together.
 
 All payloads below use the DaaS MCP tool names (`collections`, `fields`, `items`, `permissions`); skills refer to them as `mcp_daas_*`. Formats are documented in [daas-mcp-tools](../../daas-platform/references/daas-mcp-tools.instructions.md). Verify field names with the `schema` tool before writing any filter — a wrong name is a silent 500.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+> **Why `special: ["o2m"]` and not `["translations"]`.** On an Engine project the `translations` special is an alias relation that a collection create refuses, and the recipe below needs no special interface: a plain one-to-many alias (`special: ["o2m"]`) takes the full read **and** write path, with each nested row checked as if the user wrote it directly. Switch only when the Engine and the Studio ship the `translations` interface together.
+
+On an Engine project the payloads below go to the Engine: the MCP tools `collections`, `fields`, `items` and `permissions`, or the Engine's REST routes with an administrator's session where a payload carries a `schema` block (the MCP tools do not keep it). Tool formats are in [daas-platform](../../daas-platform/SKILL.md). Verify field names with the `schema` tool before writing any filter.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -18,6 +56,7 @@ All payloads below use the DaaS MCP tool names (`collections`, `fields`, `items`
 
 `code` must equal the values in `lib/i18n/config.ts`. Languages are global — do **not** add Group C (`resource_uri`).
 
+<!-- buildpad-backend: supabase -->
 ### MCP payload
 
 ```json
@@ -140,6 +179,130 @@ on conflict (code) do nothing;
 ```
 
 After creation, read the collection back with the `fields` tool and confirm `code` carries the unique constraint; if the MCP schema dropped `is_unique`, the migration above is the safety net.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### REST payload — `POST /api/collections`, with an administrator's session
+
+`code` needs its unique flag and `date_created` its default, and the MCP `collections` tool keeps neither, so create `languages` through the Engine's API. The Engine fills `date-created` from the column default only, so the default must be set here. The two relation fields of Group A (`user_created`, `user_updated`) are added in the next call.
+
+```json
+{
+  "collection": "languages",
+  "meta": {
+    "icon": "translate",
+    "note": "Content languages. `code` must match lib/i18n/config.ts exactly.",
+    "sort_field": "sort"
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "uuid",
+      "meta": { "hidden": true, "readonly": true },
+      "schema": { "is_primary_key": true }
+    },
+    {
+      "field": "code",
+      "type": "string",
+      "meta": { "interface": "input", "required": true, "width": "half", "note": "BCP 47 tag: en, id, ar" },
+      "schema": { "max_length": 10, "is_nullable": false, "is_unique": true }
+    },
+    {
+      "field": "name",
+      "type": "string",
+      "meta": { "interface": "input", "required": true, "width": "half" },
+      "schema": { "max_length": 100, "is_nullable": false }
+    },
+    {
+      "field": "direction",
+      "type": "string",
+      "meta": {
+        "interface": "select-dropdown",
+        "width": "half",
+        "options": {
+          "choices": [
+            { "text": "Left to right", "value": "ltr" },
+            { "text": "Right to left", "value": "rtl" }
+          ]
+        }
+      },
+      "schema": { "max_length": 3, "default_value": "ltr" }
+    },
+    {
+      "field": "sort",
+      "type": "integer",
+      "meta": { "interface": "input", "hidden": true }
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp",
+      "meta": { "interface": "datetime", "special": ["date-created"], "readonly": true, "width": "half", "display": "datetime" },
+      "schema": { "default_value": "NOW()" }
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp",
+      "meta": { "interface": "datetime", "special": ["date-updated"], "readonly": true, "width": "half", "display": "datetime" }
+    }
+  ]
+}
+```
+
+### Audit relations — `fields` tool
+
+```json
+{
+  "name": "fields",
+  "arguments": {
+    "action": "create",
+    "collection": "languages",
+    "data": [
+      {
+        "field": "user_created",
+        "type": "uuid",
+        "meta": {
+          "interface": "select-dropdown-m2o",
+          "special": ["user-created", "m2o"],
+          "readonly": true,
+          "hidden": true,
+          "width": "half",
+          "options": { "related_collection": "daas_users", "related_field": "id", "on_delete": "SET NULL" }
+        }
+      },
+      {
+        "field": "user_updated",
+        "type": "uuid",
+        "meta": {
+          "interface": "select-dropdown-m2o",
+          "special": ["user-updated", "m2o"],
+          "readonly": true,
+          "hidden": true,
+          "width": "half",
+          "options": { "related_collection": "daas_users", "related_field": "id", "on_delete": "SET NULL" }
+        }
+      }
+    ]
+  }
+}
+```
+
+### Seed rows
+
+```json
+{
+  "name": "items",
+  "arguments": {
+    "action": "create",
+    "collection": "languages",
+    "data": [
+      { "code": "en", "name": "English", "direction": "ltr", "sort": 1 },
+      { "code": "id", "name": "Bahasa Indonesia", "direction": "ltr", "sort": 2 }
+    ]
+  }
+}
+```
+
+After creation, read the fields back (`GET /api/fields/languages`, or the `fields` tool) and confirm `code` reports `is_unique: true`. There is no SQL file on an Engine project: the Engine's API is the only place the structure is defined.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -147,6 +310,7 @@ After creation, read the collection back with the `fields` tool and confirm `cod
 
 Worked example: `articles` with translatable `title` and `body`. Locale-independent fields (`slug`, `published_at`, `author`, images) stay on `articles`; translatable ones move to the junction.
 
+<!-- buildpad-backend: supabase -->
 ### Step 2a — create the junction with its own fields
 
 ```json
@@ -308,11 +472,147 @@ create index if not exists idx_articles_translations_languages_code on public.ar
 ```
 
 If `title`/`body` previously lived on `articles`, add a data-migration step that copies them into a default-locale translation row before dropping the parent columns.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Step 2a — create the junction with its own fields (`POST /api/collections`, administrator's session)
+
+```json
+{
+  "collection": "articles_translations",
+  "meta": {
+    "icon": "translate",
+    "hidden": true,
+    "note": "Per-language fields of articles. One row per (article, language)."
+  },
+  "fields": [
+    {
+      "field": "id",
+      "type": "uuid",
+      "meta": { "hidden": true, "readonly": true },
+      "schema": { "is_primary_key": true }
+    },
+    {
+      "field": "title",
+      "type": "string",
+      "meta": { "interface": "input", "required": true },
+      "schema": { "max_length": 255 }
+    },
+    {
+      "field": "body",
+      "type": "text",
+      "meta": { "interface": "input-rich-text-html" }
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp",
+      "meta": { "interface": "datetime", "special": ["date-created"], "readonly": true, "width": "half", "display": "datetime" },
+      "schema": { "default_value": "NOW()" }
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp",
+      "meta": { "interface": "datetime", "special": ["date-updated"], "readonly": true, "width": "half", "display": "datetime" }
+    }
+  ]
+}
+```
+
+Then add `user_created` and `user_updated` with the `fields` tool, exactly as for `languages` above, with `"collection": "articles_translations"`.
+
+### Step 2b — the parent link, which creates the `translations` alias
+
+Creating an M2O through the `fields` tool creates the foreign key and the relation, and — because of `corresponding_field` — inserts the O2M alias field on the parent (`interface: "list-o2m"`, `special: ["o2m"]`) with `one_field` set. One call, sequential (not batched with 2c). The `fields` tool reads the field's name from `data.field`.
+
+```json
+{
+  "name": "fields",
+  "arguments": {
+    "action": "create",
+    "collection": "articles_translations",
+    "data": {
+      "field": "articles_id",
+      "type": "uuid",
+      "meta": {
+        "interface": "list-m2o",
+        "special": ["m2o"],
+        "required": true,
+        "hidden": true,
+        "options": {
+          "related_collection": "articles",
+          "corresponding_field": "translations",
+          "on_delete": "CASCADE"
+        }
+      }
+    }
+  }
+}
+```
+
+### Step 2c — the language link (FK to the non-PK `languages.code`)
+
+`related_field` names the column the foreign key points at; `code` qualifies because it is unique.
+
+```json
+{
+  "name": "fields",
+  "arguments": {
+    "action": "create",
+    "collection": "articles_translations",
+    "data": {
+      "field": "languages_code",
+      "type": "string",
+      "meta": {
+        "interface": "list-m2o",
+        "special": ["m2o"],
+        "required": true,
+        "width": "half",
+        "options": {
+          "related_collection": "languages",
+          "related_field": "code",
+          "on_delete": "CASCADE",
+          "template": "{{name}}"
+        }
+      }
+    }
+  }
+}
+```
+
+### Step 2d — polish the alias on the parent (optional)
+
+Use the `fields` tool's update action on `articles.translations` (`"collection": "articles"`, and `"field": "translations"` inside `data`) to set:
+
+```json
+{
+  "meta": {
+    "interface": "list-o2m",
+    "special": ["o2m"],
+    "width": "full",
+    "note": "One row per language",
+    "options": { "template": "{{languages_code}} — {{title}}", "enableCreate": true, "enableSelect": false }
+  }
+}
+```
+
+Editors now see a related list on the article form and add one row per language; `CollectionForm collection="articles"` renders it through `ListO2M` with no extra code.
+
+### Step 2e — one row per (article, language)
+
+A field's `is_unique` covers one column only, so the pair `(articles_id, languages_code)` is made unique through the Engine's schema migration routes, each with an administrator's session:
+
+1. `GET /api/schema/snapshot` answers the current schema as `data`.
+2. In that snapshot, find `articles_translations` under `collections` and add `"unique_constraints": [["articles_id", "languages_code"]]` to its `schema` object.
+3. `POST /api/schema/diff` with the edited snapshot as the body answers the difference as `data`, with a `hash`.
+4. `POST /api/schema/apply` with that `data` as the body answers 204 when the constraint is in place, and 409 when the schema changed after step 1: start again from step 1.
+
+If `title`/`body` previously lived on `articles`, copy them into a default-locale translation row (with the `items` tool) before deleting the parent fields.
+<!-- /buildpad-backend -->
 
 ---
 
 ## 3. Permissions
 
+<!-- buildpad-backend: supabase -->
 `apply_rls_to_collection` runs automatically when a collection is created through DaaS, so RLS is in place. **Policy permissions are not** — without them every read returns empty and every nested write is a silent no-op.
 
 ```json
@@ -332,6 +632,28 @@ If `title`/`body` previously lived on `articles`, add a data-migration step that
 ```
 
 A **translator** role is just `update` (and optionally `create`) on `articles_translations` with no write permission on `articles`. Nested writes through `articles.translations` are gated on the junction exactly like top-level writes — finish with [relational-permissions](../../relational-permissions/SKILL.md). Public front ends that read published content only get `read` with `permissions: { "workflow_state": { "_eq": "Published" } }` (see §5).
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+On an Engine project nothing is granted when a collection is created: access is roles, policies and permissions on every request. Without permissions every read and every nested write through the alias is refused.
+
+```json
+{
+  "name": "permissions",
+  "arguments": {
+    "action": "create",
+    "data": [
+      { "policy": "<app-policy-uuid>", "collection": "languages", "action": "read", "fields": ["*"], "permissions": null },
+      { "policy": "<app-policy-uuid>", "collection": "articles_translations", "action": "read", "fields": ["*"], "permissions": null },
+      { "policy": "<editor-policy-uuid>", "collection": "articles_translations", "action": "create", "fields": ["*"], "permissions": null },
+      { "policy": "<editor-policy-uuid>", "collection": "articles_translations", "action": "update", "fields": ["*"], "permissions": null },
+      { "policy": "<editor-policy-uuid>", "collection": "articles_translations", "action": "delete", "fields": ["*"], "permissions": null }
+    ]
+  }
+}
+```
+
+The Engine keeps one rule per policy, collection and action, so create each rule once and update it afterwards. A **translator** role is just `update` (and optionally `create`) on `articles_translations` with no write permission on `articles`. Nested writes through `articles.translations` are gated on the junction exactly like top-level writes — finish with [relational-permissions](../../relational-permissions/SKILL.md). Public front ends that read published content only get `read` with `permissions: { "workflow_state": { "_eq": "Published" } }` (see §5).
+<!-- /buildpad-backend -->
 
 ---
 
@@ -394,6 +716,7 @@ Column names above (`articles_id`, `languages_code`, `date_created`) are the one
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## 5. Per-locale workflow (publish languages independently)
 
 The workflow engine creates one `daas_wf_instance` per row of any collection that has an assignment, keyed by `(collection, item_id)`. Put Group B on the **junction** and each translation row gets its own draft/review/published lifecycle — no DaaS changes.
@@ -466,6 +789,75 @@ If the parent is scoped (`resource_uri`, Group C), the junction must be scoped t
 ```
 
 Register the junction in scope config with [manage-scope](../../manage-scope/SKILL.md) (same `inheritance_mode` as the parent). `languages` stays unscoped.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## 5. Per-locale workflow (publish languages independently)
+
+The workflow engine creates one `daas_wf_instance` per row of any collection that has an assignment, keyed by `(collection, item_id)`. Put Group B on the **junction** and each translation row gets its own draft/review/published lifecycle.
+
+```json
+{
+  "name": "fields",
+  "arguments": {
+    "action": "create",
+    "data": [
+      {
+        "collection": "articles_translations",
+        "field": "workflow_instance",
+        "type": "uuid",
+        "meta": { "interface": "select-dropdown-m2o", "special": ["m2o"], "readonly": true, "hidden": true, "options": { "related_collection": "daas_wf_instance", "related_field": "id", "on_delete": "SET NULL" } }
+      },
+      {
+        "collection": "articles_translations",
+        "field": "workflow_state",
+        "type": "string",
+        "meta": { "interface": "xtr-interface-workflow", "readonly": true }
+      }
+    ]
+  }
+}
+```
+
+Then, per [create-workflow](../../create-workflow/SKILL.md): a definition (`POST /api/workflows`), and an assignment through `POST /api/workflow-assignments`: `{ "workflow": "<definition-uuid>", "collection": "articles_translations", "filter_rule": {} }`. There is no SQL file to add.
+
+Rules:
+
+- **Do not rely on parent-level Group B for per-language publishing.** One `workflow_state` on `articles` means "publish English" publishes every language. Keep parent Group B only when the locale-independent fields have their own lifecycle; then both collections carry Group B, each with its own assignment.
+- **Parent-level versions cannot draft translation rows.** A version (`/api/versions`) holds one delta for one item of one collection; per-locale drafts are versions whose `collection` is the junction.
+- **Treat one draft per locale as a convention.** Reuse an existing draft for a translation row instead of creating another.
+- Published-only reads add `"workflow_state": { "_eq": "Published" }` to the filters in §4.
+
+---
+
+## 6. Scope (multi-tenancy)
+
+On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool only assigns a role to a user at a scope (`assign_user_role`).
+
+If the parent is scoped (`resource_uri`, Group C), the junction must be scoped too or users of one scope will read another scope's translations through the alias:
+
+```json
+{
+  "name": "fields",
+  "arguments": {
+    "action": "create",
+    "collection": "articles_translations",
+    "data": {
+      "field": "resource_uri",
+      "type": "string",
+      "meta": {
+        "interface": "list-m2o",
+        "special": ["m2o"],
+        "readonly": true,
+        "hidden": true,
+        "options": { "related_collection": "daas_scope_items", "related_field": "uri_path", "on_delete": "RESTRICT" }
+      }
+    }
+  }
+}
+```
+
+Register the junction in the scope collection settings (`/api/scope/collection-config`) with [manage-scope](../../manage-scope/SKILL.md), with the same `inheritance_mode` as the parent. `languages` stays unscoped.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -486,7 +878,12 @@ DaaS already stores translated display names in `daas_fields.translations` and `
 - [ ] `languages` exists, seeded, `code` values equal `lib/i18n/config.ts`
 - [ ] Junction created with Group A; parent link created with `corresponding_field: "translations"`; language link with `related_field: "code"`
 - [ ] `articles.translations` shows `special: ["o2m"]` (not `translations`) in the `fields` tool
+<!-- buildpad-backend: supabase -->
 - [ ] SQL mirror with `unique (<parent>_id, languages_code)` committed
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+- [ ] The pair `(<parent>_id, languages_code)` made unique through the schema migration routes (Step 2e)
+<!-- /buildpad-backend -->
 - [ ] Permissions granted; relational-permissions checked for nested writes
 - [ ] Group B on the junction (+ assignment) if languages publish independently
 - [ ] Group C on the junction if the parent is scoped

@@ -6,6 +6,37 @@ applyTo: "**/*.{ts,tsx,json}"
 
 # Workflow JSON Schema
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 Complete reference for defining workflow state machines in DaaS.
 
 ## Overview
@@ -470,6 +501,7 @@ interface WorkflowAction {
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Built-in Actions
 
 Only the two events listed below ship as built-in handlers in DaaS (`lib/hooks/workflow-actions.ts` registers `xtr.item.promote` and `xtr.event_test.write_log`). Any other `event_name` you reference (e.g. an email-notify event) must be registered as a custom action handler — referencing an unregistered event silently no-ops.
@@ -588,6 +620,117 @@ Link workflow to a collection with filter rules:
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Built-in Actions
+
+Two events are handled by the Engine itself: `xtr.item.promote` and `xtr.event_test.write_log`. Any other `event_name` a command lists is only emitted, for a stored hook that subscribes to it (see [hooks-extensions](../../hooks-extensions/SKILL.md)); with no such hook, nothing happens and nothing is reported.
+
+### xtr.item.promote
+
+Promotes a content version to the main item.
+
+```json
+{
+  "name": "Promote Version",
+  "event_name": "xtr.item.promote",
+  "parameters": {
+    "reason": "Approved by reviewer"
+  }
+}
+```
+
+**Behavior:**
+
+- Only acts if the workflow instance has `version_key` (is for a version)
+- Applies the version's delta to the main item
+- Does nothing, and reports success, if the workflow is for the main item (no version)
+
+### xtr.event_test.write_log
+
+Test/debug action that logs transition details.
+
+```json
+{
+  "name": "Debug Log",
+  "event_name": "xtr.event_test.write_log",
+  "parameters": {
+    "message": "Transition completed"
+  }
+}
+```
+
+---
+
+## Creating Workflows on an Engine Project
+
+Definitions and assignments are created through the Engine's workflow routes, each with an administrator's session. The definition route checks the document's shape (`initial_state` set, `states` an array).
+
+### Step 1: Create Workflow Definition — `POST /api/workflows`
+
+```json
+{
+  "name": "Article Approval",
+  "description": "Standard article review workflow",
+  "workflow_json": {
+    "initial_state": "Draft",
+    "states": [
+      {
+        "name": "Draft",
+        "commands": [
+          {
+            "name": "Submit",
+            "next_state": "Review",
+            "policies": [],
+            "actions": []
+          }
+        ],
+        "isEndState": false
+      },
+      {
+        "name": "Review",
+        "commands": [
+          {
+            "name": "Approve",
+            "next_state": "Published",
+            "policies": ["reviewer-policy-uuid"],
+            "actions": []
+          },
+          {
+            "name": "Reject",
+            "next_state": "Draft",
+            "policies": ["reviewer-policy-uuid"],
+            "actions": []
+          }
+        ],
+        "isEndState": false
+      },
+      {
+        "name": "Published",
+        "commands": [],
+        "isEndState": true
+      }
+    ]
+  }
+}
+```
+
+It answers 201 with the new definition's id. Change it later with `PATCH /api/workflows/:id`.
+
+### Step 2: Create Workflow Assignment — `POST /api/workflow-assignments`
+
+Link workflow to a collection with filter rules:
+
+```json
+{
+  "workflow": "workflow-definition-uuid",
+  "collection": "articles",
+  "filter_rule": {
+    "status": { "_neq": "archived" }
+  }
+}
+```
+<!-- /buildpad-backend -->
 
 **Filter rule examples:**
 
@@ -706,6 +849,7 @@ Each article matches **exactly one** assignment based on its category.
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Executing Transitions
 
 ### API Endpoint
@@ -755,6 +899,58 @@ MCP is for finding the instance to transition:
 | 404 | `{ "error": "Workflow instance not found" }` | Unknown instance id |
 
 The endpoint runs its writes with elevated permissions, so the command's gate is the **only** authorization: the caller's permissions on the collection are not consulted. A command with no `policies` and no `module_access_keys` can therefore be run by any authenticated user who has the instance id.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Executing Transitions
+
+### API Endpoint
+
+```bash
+POST /api/workflow/transition
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "workflowInstanceId": "instance-uuid",
+  "commandName": "Approve"
+}
+```
+
+### From an agent (MCP)
+
+Do not run a transition through MCP. A transition is always the REST call above, made with the session of the user who is transitioning: that user is who the command's gate is checked against and who the history records, and the project's MCP token is an administrator's.
+
+Use MCP, or `GET /api/workflow-instances`, to find the instance to transition:
+
+```json
+{
+  "name": "items",
+  "arguments": {
+    "action": "read",
+    "collection": "daas_wf_instance",
+    "query": {
+      "filter": {
+        "collection": { "_eq": "articles" },
+        "item_id": { "_eq": "article-uuid" }
+      },
+      "fields": ["id", "current_state", "workflow", "terminated"]
+    }
+  }
+}
+```
+
+### What the endpoint answers
+
+| Status | Body | Meaning |
+| ------ | ---- | ------- |
+| 200 | `{ "message": "Successfully transitioned workflow state" }` | Instance moved, history written, item's state field updated |
+| 400 | `{ "message": "...", "errors": [...] }`, code `INVALID_PAYLOAD` | A parameter is missing, the command is not one of the current state, or the definition no longer has the state this instance is in |
+| 403 | `{ "message": "You are not authorized to perform this transition", "errors": [...] }` | The caller holds none of the command's policies or module access keys (an administrator always passes) |
+| 404 | `{ "message": "Workflow instance not found", "errors": [...] }` | Unknown instance id |
+| 500 | `{ "message": "Workflow definition not found for this instance", "errors": [...] }` | The instance's definition is gone |
+
+The endpoint runs its writes with the Engine's own authority, so the command's gate is the **only** authorization: the caller's permissions on the collection are not consulted. A command with no `policies` and no `module_access_keys` can therefore be run by any authenticated user who has the instance id.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -900,6 +1096,7 @@ Add your regular fields (title, content, status, etc.)
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### Step 4: Create Workflow Definition
 
 ```json
@@ -983,9 +1180,86 @@ Create a test item and verify:
 
 1. `workflow_instance` is populated with a UUID
 2. `workflow_state` is set to the initial state
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Step 4: Create Workflow Definition
+
+`POST /api/workflows`, with an administrator's session:
+
+```json
+{
+  "name": "Your Workflow Name",
+  "description": "Description of the workflow",
+  "workflow_json": {
+    "initial_state": "Draft",
+    "states": [
+      {
+        "name": "Draft",
+        "commands": [
+          {
+            "name": "Submit",
+            "next_state": "Review",
+            "policies": [],
+            "actions": []
+          }
+        ],
+        "isEndState": false
+      },
+      {
+        "name": "Review",
+        "commands": [
+          {
+            "name": "Approve",
+            "next_state": "Published",
+            "policies": [],
+            "actions": []
+          },
+          {
+            "name": "Reject",
+            "next_state": "Draft",
+            "policies": [],
+            "actions": []
+          }
+        ],
+        "isEndState": false
+      },
+      {
+        "name": "Published",
+        "commands": [],
+        "isEndState": true
+      }
+    ]
+  }
+}
+```
+
+It answers 201 with the definition's id.
+
+### Step 5: Create Workflow Assignment
+
+Links the workflow definition to the collection — `POST /api/workflow-assignments`, with an administrator's session:
+
+```json
+{
+  "workflow": "<ID from Step 4>",
+  "collection": "your_collection",
+  "filter_rule": {}
+}
+```
+
+> **The FK column is `workflow`, not `workflow_definition`.** The assignment has exactly `workflow`, `collection` and `filter_rule`; this section is the canonical write payload.
+
+### Step 6: Verify Setup
+
+Create a test item and verify:
+
+1. `workflow_instance` is populated with a UUID
+2. `workflow_state` is set to the initial state
+<!-- /buildpad-backend -->
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Troubleshooting
 
 ### Items Created Without a Linked workflow_instance
@@ -1084,6 +1358,106 @@ Compare `daas_wf_instance.current_state` with the item's `workflow_state` to see
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Troubleshooting
+
+### Items Created Without a Linked workflow_instance
+
+**Symptoms:** New items have `workflow_instance: null`, or a UUID that matches no row in `daas_wf_instance`, while `workflow_state` is set correctly.
+
+**Cause:** The field is not a real relation to `daas_wf_instance`: it was created without `meta.options.related_collection`, so there is no foreign key and no relation.
+
+**Check:** `relations` tool, `action: "read"`, `collection: "your_collection"` — a correctly created field has a row with `field: "workflow_instance"`, `related_collection: "daas_wf_instance"`.
+
+**Fix:** Updating the field's `meta` does not create the relation. Delete the field (`fields` tool, `action: "delete"`) and create it again with the `fields` tool and `meta.options.related_collection` (see [Field Definitions](#field-definitions-mcp)). On a collection that already has rows, clear stray values in the column (with the `items` tool) before the field is created again.
+
+The workflow itself is unaffected: instances exist and transitions work, because the instance is found through `collection` + `item_id`.
+
+### Items Created Without Any Instance
+
+**Symptoms:** No row in `daas_wf_instance` for the item; `workflow_state` stays null.
+
+**Causes:**
+
+1. No assignment for the collection, or the item matches no assignment's `filter_rule`.
+2. More than one assignment matches. The Engine refuses to choose and creates nothing; its logs (`/api/logs`) show `workflow.instance.multiple_bindings`.
+3. You read the create response. Read the item again.
+
+### Workflow Won't Open / Display
+
+**Symptoms:** Clicking on workflow shows nothing or errors
+
+**Cause:** The `workflow_json` format is incorrect.
+
+**Wrong format (DO NOT USE):**
+
+```json
+{
+  "initialState": "Draft",
+  "states": {
+    "Draft": { "transitions": [...] }
+  }
+}
+```
+
+**Correct format:**
+
+```json
+{
+  "initial_state": "Draft",
+  "states": [
+    {
+      "name": "Draft",
+      "commands": [...],
+      "isEndState": false
+    }
+  ]
+}
+```
+
+### Transitions Don't Execute
+
+**Symptoms:** Clicking transition buttons has no effect
+
+**Causes & Fixes:**
+
+1. **No instance** - see "Items Created Without Any Instance" above; the button shows no state
+2. **The button is inert** - on Buildpad UI 3.0.0 a `readonly` state field disables the button inside a form; render it outside the form (see the create-workflow skill, step 5)
+3. **404 on the transition** - the app has no route for `POST /api/workflow/transition`; on Buildpad UI 3.0.0 the button posts to the app's own origin, which needs a route that forwards to the Engine
+4. **403 "not authorized"** - the user holds none of the command's `policies` (policy ids, not access-row ids) or `module_access_keys`
+5. **403 on load** - the user has no read permission on `daas_wf_instance` / `daas_wf_definition`
+
+### Workflow State Not Updating After Transition
+
+**Symptoms:** Transition succeeds but `workflow_state` doesn't change
+
+**Causes** (the endpoint answers 200 in each of them, because a failure to write the item's state field is logged as `workflow.writeback.failed`, not returned):
+
+1. The `workflow_state` field is missing the `xtr-interface-workflow` interface (fix below).
+2. A filter hook on `<collection>.items.update` threw while the Engine wrote the state.
+
+Compare `daas_wf_instance.current_state` with the item's `workflow_state` to see whether they have drifted.
+
+**Fix** (the `fields` tool reads the field's name from `data.field`):
+
+```json
+{
+  "name": "mcp_daas_fields",
+  "arguments": {
+    "action": "update",
+    "collection": "your_collection",
+    "data": {
+      "field": "workflow_state",
+      "meta": {
+        "interface": "xtr-interface-workflow",
+        "readonly": true
+      }
+    }
+  }
+}
+```
+<!-- /buildpad-backend -->
 
 ### Workflow JSON Schema Validation Errors
 
@@ -1115,18 +1489,33 @@ Compare `daas_wf_instance.current_state` with the item's `workflow_state` to see
 | "Command not found"  | Wrong state    | Check current_state matches |
 | "Instance not found" | Invalid UUID   | Verify workflowInstanceId   |
 
+<!-- buildpad-backend: supabase -->
 ### Actions not executing
 
 | Symptom         | Cause                  | Solution                          |
 | --------------- | ---------------------- | --------------------------------- |
 | Action skipped  | No handler registered  | Register event handler            |
 | Promote skipped | Main item (no version) | Only works with version workflows |
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Actions not executing
+
+| Symptom         | Cause                                  | Solution                                                  |
+| --------------- | -------------------------------------- | --------------------------------------------------------- |
+| Action skipped  | No stored hook subscribes to the event | Create a hook for the event (`hooks-extensions` skill)    |
+| Promote skipped | Main item (no version)                 | Only works with version workflows                         |
+<!-- /buildpad-backend -->
 
 ---
 
 ## Related Instructions
 
 - See [permissions-filtering.instructions.md](../../create-rbac/references/permissions-filtering.instructions.md) for policy setup
+<!-- buildpad-backend: supabase -->
 - See [hooks-extensions.instructions.md](../../hooks-extensions/references/hooks-extensions.instructions.md) for custom action handlers
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+- See [hooks-extensions](../../hooks-extensions/SKILL.md) for the stored hooks that handle custom actions
+<!-- /buildpad-backend -->
 - See [daas-mcp-tools.instructions.md](../../daas-platform/references/daas-mcp-tools.instructions.md) for MCP workflow operations
 - See [workflow-versioning.instructions.md](./workflow-versioning.instructions.md) for version integration patterns
