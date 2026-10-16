@@ -6,6 +6,37 @@ applyTo: "**/*.{ts,tsx}"
 
 # Permissions and Filtering
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 This guide covers the DaaS permission system including item-level filtering and field-level permissions.
 
 ## Overview
@@ -109,6 +140,7 @@ Item-level filters restrict which records a user can access within a collection.
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### Multiple Permissions = OR Logic
 
 If a user has multiple permissions for the same collection/action:
@@ -188,6 +220,77 @@ $CURRENT_USER.role.name     →  JOIN daas_user_roles ON user_roles.user_id = <u
                                JOIN daas_roles ON roles.id = user_roles.role_id → roles.name
                                (resolves via the daas_user_roles junction table, primary role = lowest sort)
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Multiple Permissions = OR Logic
+
+The Engine keeps one rule per policy, collection and action. When a user's policies hold several rules for the same collection/action, they combine with OR:
+
+```json
+// Policy 1 — permission: can read published articles
+{ "status": { "_eq": "published" } }
+
+// Policy 2 — permission: can read own drafts
+{ "_and": [
+  { "status": { "_eq": "draft" } },
+  { "author": { "_eq": "$CURRENT_USER" } }
+]}
+
+// Combined (automatically by system):
+{
+  "_or": [
+    { "status": { "_eq": "published" } },
+    { "_and": [
+      { "status": { "_eq": "draft" } },
+      { "author": { "_eq": "$CURRENT_USER" } }
+    ]}
+  ]
+}
+```
+
+**Result**: User can see published articles OR their own drafts.
+
+### Full Access (`null` filter) Always Wins
+
+A permission with `permissions: null` means unrestricted access to all items. When merging:
+
+- If **any** of the user's permissions for an action has `null` filter → the result is `null` (full access)
+- A restrictive filter from one role **cannot** override a full-access grant from another role
+
+```json
+// Role A — full read (null filter)
+{ "action": "read", "permissions": null }
+
+// Role B — filtered read
+{ "action": "read", "permissions": { "status": { "_eq": "published" } } }
+
+// Combined result → null (full access wins)
+```
+
+> This is consistent with OR semantics: `true OR (condition)` = `true`.
+
+### Dynamic Variables
+
+Use these variables in permission filters:
+
+| Variable                | Type        | Resolves To                                                       |
+| ----------------------- | ----------- | ----------------------------------------------------------------- |
+| `$CURRENT_USER`         | `string`    | Current user's UUID                                               |
+| `$CURRENT_USER.<field>` | `any`       | One column of the current user's own record (e.g., `$CURRENT_USER.organization`) |
+| `$CURRENT_ROLE`         | `string`    | One role UUID of the user                                         |
+| `$NOW`                  | `timestamp` | Current timestamp (ISO 8601)                                      |
+
+> **Refused on an Engine project**: `$CURRENT_ROLES`, `$CURRENT_POLICIES`, `$CURRENT_ROLE.<field>`, an adjusted `$NOW(...)`, and a path through a relation such as `$CURRENT_USER.<relation>.<field>`. The Engine refuses a rule that holds one when it applies the rule.
+
+#### Variable Resolution
+
+The Engine resolves the variables of a rule on every request:
+
+- **Scalar variables** (`$CURRENT_USER`, `$CURRENT_ROLE`, `$NOW`) resolve to a single value
+- **`$CURRENT_USER.<field>`** is read from the caller's own `daas_users` row by the statement that applies the rule, so it is always current; it names one column, never a relation
+
+Presets and validation are not applied on write, so a variable in `presets` or `validation` has no effect.
+<!-- /buildpad-backend -->
 
 **Example: Users can only see their own records**
 
@@ -207,6 +310,7 @@ $CURRENT_USER.role.name     →  JOIN daas_user_roles ON user_roles.user_id = <u
 
 **Note on tenant/org isolation:** Do not implement tenant isolation through permission filters. Use the DaaS scope system (`/manage-scope`) — it handles isolation at the platform level without permission filter workarounds.
 
+<!-- buildpad-backend: supabase -->
 **Example: Filter by any of user's roles**
 
 ```json
@@ -214,6 +318,7 @@ $CURRENT_USER.role.name     →  JOIN daas_user_roles ON user_roles.user_id = <u
   "target_role": { "_in": "$CURRENT_ROLES" }
 }
 ```
+<!-- /buildpad-backend -->
 
 **Example: Time-based access (published before now)**
 
@@ -246,6 +351,7 @@ $CURRENT_USER.role.name     →  JOIN daas_user_roles ON user_roles.user_id = <u
 | `_and`         | Logical AND                 | `{ "_and": [filter1, filter2] }`                |
 | `_or`          | Logical OR                  | `{ "_or": [filter1, filter2] }`                 |
 
+<!-- buildpad-backend: supabase -->
 ### Relational Filters
 
 Filter by related record fields:
@@ -265,6 +371,25 @@ Filter by related record fields:
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Relational Filters
+
+Filter by a field of a related record, one relation deep, with a dot-notation key, or test whether related rows exist with `_has`:
+
+```json
+// Products in category 'electronics'
+{ "category.name": { "_eq": "electronics" } }
+
+// Articles whose author is active
+{ "author.status": { "_eq": "active" } }
+
+// Articles that have at least one comment
+{ "comments": { "_has": true } }
+```
+
+On an Engine project a path through more than one relation is refused, and so are the nested-object form (`{ "category": { "name": { ... } } }`), `_some` and `_none`. The caller must also be allowed to read the related collection.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -412,6 +537,7 @@ Users can see published content, authors see their drafts:
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### 3. Team/Organization Scoping
 
 Users can only see records from their organization:
@@ -429,6 +555,24 @@ Users can only see records from their organization:
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### 3. Team/Organization Scoping
+
+Users can only see records from their organization. On an Engine project a rule reaches one relation deep at most, so membership two relations away cannot be checked in a rule. Compare one column of the user's own record:
+
+```json
+{
+  "collection": "projects",
+  "action": "read",
+  "permissions": {
+    "organization": { "_eq": "$CURRENT_USER.organization" }
+  }
+}
+```
+
+To separate whole organizations or teams, use the scope system (`/manage-scope`) rather than permission filters.
+<!-- /buildpad-backend -->
 
 ### 4. Read-Only Sensitive Fields
 
@@ -449,6 +593,7 @@ Full read access, but limited write access:
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### 5. Admin Full Access
 
 Admin policy with no restrictions:
@@ -461,9 +606,27 @@ Admin policy with no restrictions:
   "fields": ["*"] // All fields
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### 5. Admin Full Access
+
+A rule with no item filter and all fields gives full access to one collection and action:
+
+```json
+{
+  "collection": "articles",
+  "action": "read",
+  "permissions": null, // No item filter
+  "fields": ["*"] // All fields
+}
+```
+
+An administrator is a user whose policy has `admin_access: true`; that policy passes every check without any rule.
+<!-- /buildpad-backend -->
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Creating Permissions via API
 
 ### Create a Policy
@@ -518,6 +681,67 @@ curl -X POST http://localhost:3000/api/access \
     "policy": "policy-uuid"
   }'
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Creating Permissions via API
+
+Each call goes to the Engine (`<Engine_URL>`; a local Engine listens on `http://localhost:8080`) with an administrator's session token.
+
+### Create a Policy
+
+```bash
+curl -X POST <Engine_URL>/api/policies \
+  -H "Authorization: Bearer <admin_access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Article Viewer",
+    "description": "Can view published articles"
+  }'
+```
+
+### Add Permission to Policy
+
+```bash
+curl -X POST <Engine_URL>/api/permissions \
+  -H "Authorization: Bearer <admin_access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "policy": "policy-uuid",
+    "collection": "articles",
+    "action": "read",
+    "permissions": {
+      "status": { "_eq": "published" }
+    },
+    "fields": ["id", "title", "content", "author", "published_at"]
+  }'
+```
+
+### Assign Policy to Role
+
+```bash
+curl -X POST <Engine_URL>/api/access \
+  -H "Authorization: Bearer <admin_access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "role-uuid",
+    "policy": "policy-uuid"
+  }'
+```
+
+### Assign Policy to User (Direct)
+
+```bash
+curl -X POST <Engine_URL>/api/access \
+  -H "Authorization: Bearer <admin_access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user": "user-uuid",
+    "policy": "policy-uuid"
+  }'
+```
+
+Each answers 201. An access entry may also carry `resource_uri`, which limits the policy to that scope node and its descendants (`/manage-scope`).
+<!-- /buildpad-backend -->
 
 ---
 

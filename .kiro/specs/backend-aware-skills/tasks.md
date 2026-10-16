@@ -262,7 +262,7 @@
     passage and its `engine` counterpart links `create-api-route/SKILL.md`; of 287-291 only 288
     differs, so only 288 is marked. 88-120 is split at its two H2 headings (88-94, 96-106, 108-120).
     Widened beyond the plan: `SKILL.md` line 9 and `standard-fields` line 9 (both name a migration).
-- [ ] 4.3 (P) Convert `create-rbac` (row 20, BP)
+- [x] 4.3 (P) Convert `create-rbac` (row 20, BP)
   - `SKILL.md` 22-26, 41-70, 112-152, 162-249 and 262-271. Line 288 is a recorded break and stays
     unchanged. `references/rbac-setup.instructions.md` 43, 90-95, 113-115, 132, 169-205, 243-271 and
     341-373, with ES-6 beside `enforce_tfa` at line 94. `references/permissions-filtering.instructions.md`
@@ -275,6 +275,14 @@
   - Done when: FD holds for `create-rbac`.
   - _Requirements: 1.2, 1.9, 2.1, 3.6, 4.6, 3.15_
   - _Boundary: create-rbac/, converted/create-rbac, supabase-view-changes/create-rbac.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md`,
+    `rbac-setup` and `permissions-filtering` reads as complete steps; the Supabase view of all three
+    differs from `v1.0.0` by the Gate only (change file `[]`). Line 288 is unchanged. Within the
+    planned ranges only the lines that differ are marked (for example `SKILL.md` 114-125 and 131-140
+    of 112-152, 162-194, 202-212 and 269 of 162-271; `rbac-setup` 365-373 stays shared). Widened
+    beyond the plan: `rbac-setup` 39 (public policies) and `permissions-filtering` 210-216 (a
+    `$CURRENT_ROLES` example, `supabase` only). Engine facts re-checked in `buildpad-daas-go`: one
+    relation deep by dot key or `_has`; `$CURRENT_ROLES`/`$CURRENT_POLICIES` refused.
 - [ ] 4.4 (P) Convert `create-workflow` (row 23, BP)
   - `SKILL.md` 21-35, 97-171 (SQL migration 158-171 sup), 195 and 208-298.
     `references/workflow-schema.instructions.md` 473-590, 709-757, 903-1085 and 1118-1123. Move the
