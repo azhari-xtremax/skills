@@ -15,7 +15,7 @@ Subagents are Markdown files in `.kiro/agents/` (workspace) or `~/.kiro/agents/`
 |---|---|
 | `code-reviewer` | Five-axis review (correctness, readability, architecture, security, performance) + Buildpad/DaaS compliance, after writing or changing code |
 | `test-engineer` | Test-suite design, coverage-gap analysis, or writing Playwright/Vitest tests |
-| `security-auditor` | Security review of auth, CORS/RLS, input handling, secrets |
+| `security-auditor` | Security review of auth, CORS, access rules (RLS on a Supabase project), input handling, secrets |
 
 ## When to Delegate
 
@@ -27,7 +27,7 @@ Subagents are Markdown files in `.kiro/agents/` (workspace) or `~/.kiro/agents/`
 ## When NOT to Delegate
 
 - The task is trivial or you need tight, iterative back-and-forth.
-- Steps share mutable state or must run in strict order (DB migrations, a single edit sequence).
+- Steps share mutable state or must run in strict order (collection definitions or DB migrations, a single edit sequence).
 - The subagent would need most of your current context to make progress — the hand-off cost outweighs the benefit.
 
 Delegation adds coordination overhead. If a task is small and sequential, just do it on the main thread.
@@ -55,7 +55,7 @@ Map (review at scale):  one code-reviewer subagent per changed module, in parall
 ## DaaS / Buildpad Notes
 
 - Route Buildpad-First and proxy-pattern compliance checks to `code-reviewer`.
-- Route CORS/RLS/OAuth and secret-handling checks to `security-auditor`.
+- Route CORS, access-rule (RLS on a Supabase project) and secret-handling checks to `security-auditor`, and OAuth checks on a Supabase project; OAuth sign-in is not available on an Engine project, so there is no OAuth review there.
 - Route Playwright coverage and RBAC test design to `test-engineer`.
 - Give research subagents the MCP context they need (project detail, collection schemas) in the brief — they start with a clean context.
 

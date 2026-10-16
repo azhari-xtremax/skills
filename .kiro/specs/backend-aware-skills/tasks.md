@@ -623,11 +623,15 @@
     Gate; the tests and `check.mjs` exit 0 with `converted/spec-driven-development`. Read
     through: lines 47-52 hold for both kinds of project as written; the scope item now places
     the hierarchy beneath the tenant on an Engine project (ES-9).
-- [ ] 6.17 (P) Reword `subagent-delegation` (row 42, RW)
+- [x] 6.17 (P) Reword `subagent-delegation` (row 42, RW)
   - `SKILL.md` 18, 30 and 58: the OAuth review is not available on an Engine project.
   - Done when: FD holds for `subagent-delegation`.
   - _Requirements: 4.1, 5.2, 2.4_
   - _Boundary: subagent-delegation/, converted/subagent-delegation, supabase-view-changes/subagent-delegation.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/subagent-delegation`. Read through:
+    the persona table and the routing notes hold for both kinds of project (RLS named as a
+    Supabase project's; the OAuth review not available on an Engine project, in plain words).
 - [ ] 6.18 (P) Reword `buildpad-steering` and add its Gate (row 43, RW+G)
   - `SKILL.md`: the Gate, and lines 53-56 reworded as in 6.8. The templates and `rules/` stay
     unchanged.
