@@ -74,7 +74,7 @@
   - Done when: `node --test tools/repo-check/test/passages.test.mjs` passes and every `markerCases`
     entry of `cases.json` gives its expected issues.
   - _Requirements: 1.8, 1.9, 7.8_
-- [ ] 2.3 (P) Implement the guard (`lib/guard.mjs`, R1)
+- [x] 2.3 (P) Implement the guard (`lib/guard.mjs`, R1)
   - `scanView(path, text)` applies the 13 §C20 patterns per line, the path rule, the fenced-block
     rule, and this repository's `x-pp29-tool` patterns (never written to the contract file).
   - Add `test/guard.test.mjs`: a positive and a negative for each pattern. The negatives include
