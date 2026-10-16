@@ -460,13 +460,18 @@
     `v1.0.0` only by the Gate (change file `[]`). In `module-access-checklist.md` only the server
     check (line 15) differs: lines 8, 9 and 16 hold on the Engine too (`daas_module_access_keys`,
     policy `module_access`, workflow `module_access_keys`), so they stay shared.
-- [ ] 6.3 (P) Reword `add-users` (row 11, RW)
+- [x] 6.3 (P) Reword `add-users` (row 11, RW)
   - `SKILL.md` 9-18, 30-32, 44, 125, 135-143 and 159 become qualified sentences: ES-7 (a role in the
     tenant on create); on an Engine project a static token is an MCP credential; "scope", not
     "tenant". There is no marker and no Gate.
   - Done when: FD holds for `add-users`, and its change file has one `text` entry with a reason.
   - _Requirements: 3.7, 3.17, 5.2, 2.4_
   - _Boundary: add-users/, converted/add-users, supabase-view-changes/add-users.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/add-users`. Read through: the file
+    reads complete for both kinds of project (cross-origin setup qualified as a Supabase-project
+    step beside ES-15; static tokens as MCP credentials; ES-7 with the role in the tenant;
+    "scope" for the levels inside the project). The change file has one `text` entry.
 - [ ] 6.4 (P) Reword `authentication-proxy` (row 14, RW)
   - `SKILL.md` 11-26 and 64-115. `references/authentication-proxy.instructions.md` 16-49, 126-141
     and 290-303. All become qualified sentences, with the address `NEXT_PUBLIC_BUILDPAD_DAAS_URL`.
