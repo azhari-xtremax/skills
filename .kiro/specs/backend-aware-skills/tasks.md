@@ -283,7 +283,7 @@
     beyond the plan: `rbac-setup` 39 (public policies) and `permissions-filtering` 210-216 (a
     `$CURRENT_ROLES` example, `supabase` only). Engine facts re-checked in `buildpad-daas-go`: one
     relation deep by dot key or `_has`; `$CURRENT_ROLES`/`$CURRENT_POLICIES` refused.
-- [ ] 4.4 (P) Convert `create-workflow` (row 23, BP)
+- [x] 4.4 (P) Convert `create-workflow` (row 23, BP)
   - `SKILL.md` 21-35, 97-171 (SQL migration 158-171 sup), 195 and 208-298.
     `references/workflow-schema.instructions.md` 473-590, 709-757, 903-1085 and 1118-1123. Move the
     link at 1130 into sup; its eng counterpart links `hooks-extensions/SKILL.md`.
@@ -294,6 +294,13 @@
   - Done when: FD holds for `create-workflow`, and the 1130 link lies inside a `supabase` passage.
   - _Requirements: 1.2, 1.9, 2.1, 3.6, 3.15_
   - _Boundary: create-workflow/, converted/create-workflow, supabase-view-changes/create-workflow.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md`,
+    `workflow-schema` and `workflow-versioning` reads as complete steps; the Supabase view of all
+    three differs from `v1.0.0` by the Gate only (change file `[]`). The 1130 link lies inside a
+    `supabase` passage; its `engine` counterpart links `hooks-extensions/SKILL.md`. Ranges split at
+    higher headings (`workflow-schema` 903-985 and 989-1086, `workflow-versioning` 27-62 and
+    64-91); 214-297 widened to its fence 184. Widened beyond the plan: `workflow-versioning` 93-102
+    (`?version=` is ignored by the Engine). `workflow-components` holds nothing to mark.
 - [ ] 4.5 (P) Convert `grant-module-access` (row 26, BP)
   - `SKILL.md` 26-63 (the `module_access_keys` tool, sup), 71, 126-154 (the remote procedure, sup),
     158-177 and 221. `references/module-access.instructions.md` 44-93, 134-149, 168-209 (extra
