@@ -476,12 +476,18 @@
     account with no role in the tenant, `FORBIDDEN_SCOPE` and `MISSING_SCOPE` (both 403, checked in
     the Engine), `ReferenceError` from `fetch`/`process`/`require`, and the 501 refusal of the
     Supabase service; the log is `GET /api/logs` (administrator or `system:logs`), with ES-15.
-- [ ] 5.10 (P) Convert `security-and-hardening` (row 31, BP)
+- [x] 5.10 (P) Convert `security-and-hardening` (row 31, BP)
   - `SKILL.md` 26, 29-36, 56-90, 119-132 and 161. The service-role lines are sup.
   - Engine content: ES-2, ES-3, ES-5 and ES-15. The Engine refuses caller-supplied SQL.
   - Done when: FD holds for `security-and-hardening`.
   - _Requirements: 1.2, 1.9, 2.1, 3.2, 3.4, 3.5, 3.15_
   - _Boundary: security-and-hardening/, converted/security-and-hardening, supabase-view-changes/security-and-hardening.json_
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. 29-36 is one passage (it spans the `### Ask First` heading of the same level, which S6
+    allows), and the Engine copy repeats the lines of that range that hold for both. 56-90 holds
+    ES-2, ES-5, ES-3 (the service-role lines stay `supabase` text) and ES-15; line 26 and the
+    checklist say the Engine refuses caller-supplied SQL.
 - [ ] 5.11 (P) Convert `worker-messaging` (row 44, BP with an Engine passage only)
   - `SKILL.md`: the Gate after the H1, and a new eng section "Reaching the data service from a
     worker" after Step 3b (line 136) holding ES-14n verbatim. There is no sup text. The Supabase view
