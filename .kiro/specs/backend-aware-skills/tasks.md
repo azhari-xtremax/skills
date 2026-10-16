@@ -385,7 +385,7 @@
     `v1.0.0` but for the Gates, the Pointer lines and the description, whose rewording ("Supabase
     projects only for now: not yet available on an Engine project") is the change file's one entry.
     The five references are file:sup, and the 14 assets carry the file marker and the Pointer.
-- [ ] 5.5 (P) Convert `add-microfrontend-zones` (row 10, NY)
+- [x] 5.5 (P) Convert `add-microfrontend-zones` (row 10, NY)
   - `SKILL.md`: the Gate, the NY stop text as in 5.4, and the sup passage for the rest. Its
     description is reworded (C4). `references/pinned-edits.instructions.md` becomes file:sup. Each
     `assets/**/*.ts(x)` (9 files) gets the file marker and the Pointer. `assets/shared/zones.json`
@@ -394,6 +394,12 @@
     lines 126, 138, 344, 345, 349 and 504.
   - _Requirements: 1.2, 1.6, 1.9, 2.1, 4.7, 3.15, 2.4_
   - _Boundary: add-microfrontend-zones/, converted/add-microfrontend-zones, supabase-view-changes/add-microfrontend-zones.json_
+  - Note 16 October 2026: read through the views from `check.mjs --render`: the Engine view of
+    `add-microfrontend-zones` is `SKILL.md` (the Gate and the stop text of 5.4, word for word) and
+    the unchanged `assets/shared/zones.json`; the Supabase view is `v1.0.0` but for the Gates, the
+    Pointer lines and the description, whose rewording is the change file's one entry. The
+    `platform-supabase` lines 126, 138, 344, 345, 349 and 504 lie inside the `supabase` passage,
+    so R1 reports nothing.
 - [ ] 5.6 (P) Convert `create-project` (row 19, BP)
   - `SKILL.md` line 3 (description, C4), then 15-19, 46-73, 88-143, 165-192 (the MCP cross-origin
     step, sup) and 256-268. `references/environment.instructions.md` 19-106, with the service-role
