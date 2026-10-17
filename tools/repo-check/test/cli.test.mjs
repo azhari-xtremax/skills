@@ -187,6 +187,15 @@ test('--render writes both views and the Supabase-against-baseline diff', () => 
   assert.ok(!existsSync(path.join(out, '.baseline')));
 });
 
+test('R14: front matter that is not YAML fails; R5 alone does not see it', () => {
+  const root = makeRepo(FIXTURE);
+  change(root, { 'skill-a/SKILL.md': L('---', 'name: skill-a', 'description: The skill-a skill.', 'argument-hint: [name] [prefix, e.g. /iam]', '---', '', '# A', '', 'Shared.') });
+  const r = run(root, []);
+  assert.equal(r.code, 1);
+  assert.deepEqual(findingLines(r.stdout).map((l) => l.split(' ').slice(0, 3).join(' ')), ['R14 skill-a/SKILL.md:4 front-matter-not-yaml']);
+  assert.equal(run(root, ['--only', 'R5']).code, 0);
+});
+
 test('the baseline job: a git archive of v1.0.0 checked with R4, R5 and R6a', () => {
   const root = makeRepo(FIXTURE);
   const archive = tempDir();

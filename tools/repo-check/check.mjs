@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Repository_Check (design, Requirement 7): runs R1 to R13 over the checked set.
+// Repository_Check (design, Requirement 7): runs R1 to R14 over the checked set.
 //
 //   node tools/repo-check/check.mjs [--root DIR] [--baseline-ref v1.0.0] [--skill-map FILE]
 //                                   [--tag TAG] [--only R1,R2,...] [--render OUT_DIR]
@@ -21,11 +21,11 @@ import { extractLinks, resolveTarget, makeView, isRecordedBreak } from './lib/li
 import { gateFindings } from './lib/gate.mjs';
 import { checkedSet, checkedSetAtRef, topFolders, isWorkTreeRoot, GitError } from './lib/checked-set.mjs';
 import { BaselineError, assertRef, readAtRef, supabaseViewFindings, nameFindings } from './lib/baseline.mjs';
-import { frontMatterIssues } from './lib/frontmatter.mjs';
+import { frontMatterIssues, frontMatterYamlIssues } from './lib/frontmatter.mjs';
 import { mapIssues, validateSkillMap, templateIssues, readmeIssues, SKILL_MAP_PATH } from './lib/map.mjs';
 import { parseChangeFile, releaseIssues, convertedFindings, CHANGE_DIR, CONVERTED_DIR } from './lib/release.mjs';
 
-export const RULES = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6a', 'R6b', 'R7', 'R8', 'R9', 'R10', 'R11', 'R12', 'R13'];
+export const RULES = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6a', 'R6b', 'R7', 'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14'];
 const USAGE = 'usage: node tools/repo-check/check.mjs [--root DIR] [--baseline-ref v1.0.0] [--skill-map FILE] [--tag TAG] [--only R1,R2,...] [--render OUT_DIR]';
 
 class UsageError extends Error {}
@@ -263,6 +263,10 @@ function runCheck(opts, { stdout, env }) {
   if (want('R5')) {
     for (const f of textFiles) add(frontMatterIssues(f.path, f.text));
     add(nameFindings({ current: new Map(paths.map((p) => [p, files.get(p).buf])), baseline }));
+  }
+
+  if (want('R14')) {
+    for (const f of textFiles) add(frontMatterYamlIssues(f.path, f.text));
   }
 
   // R6a: Skill to another Skill, every folder. R6b: every relative link, converted folders.
