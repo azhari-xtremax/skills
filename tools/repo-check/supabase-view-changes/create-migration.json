@@ -3,6 +3,6 @@
     "path": "create-migration/SKILL.md",
     "kind": "description",
     "reason": "The description names the kind of project: it says the Skill is for Supabase projects only, and that on an Engine project it writes no file, stops, and names the skills that change structure and access there.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

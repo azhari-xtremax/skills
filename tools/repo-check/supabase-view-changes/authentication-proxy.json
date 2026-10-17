@@ -3,12 +3,12 @@
     "path": "authentication-proxy/SKILL.md",
     "kind": "text",
     "reason": "Reworded so every statement is true for both kinds of project: the OAuth routes and the external OAuth section are qualified as Supabase-project only, and the Engine-project address, sign-in, tenant, token and multi-factor sentences (ES-1, ES-2, ES-4, ES-5, ES-6) are added; the Supabase steps are unchanged.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   },
   {
     "path": "authentication-proxy/references/authentication-proxy.instructions.md",
     "kind": "text",
     "reason": "Reworded so every statement is true for both kinds of project: the diagram and the environment block are named as a Supabase project's, and the Engine-project address, cross-origin, sign-in and environment sentences (ES-1, ES-3, ES-5) are added with an Engine environment block; the Supabase steps are unchanged.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

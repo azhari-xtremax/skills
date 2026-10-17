@@ -3,6 +3,6 @@
     "path": "daas-platform/SKILL.md",
     "kind": "description",
     "reason": "The front-matter description now names both kinds of project (Engine projects and Supabase projects) instead of describing a Supabase integration only.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

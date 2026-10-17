@@ -3,6 +3,6 @@
     "path": "create-project/SKILL.md",
     "kind": "description",
     "reason": "The description now says the skill initializes a Buildpad application on the Buildpad Engine or on Supabase, instead of naming Supabase only.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

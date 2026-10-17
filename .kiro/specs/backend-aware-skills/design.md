@@ -1,6 +1,7 @@
 # Design Document: Backend-Aware Skills (skills repository part)
 
 > **Approved 16 October 2026** (with all three repositories' designs; see `spec.json`, `design_approval_note`). The status note below records how the document was written.
+> **Engine-fact corrections, 17 October 2026.** Ten Engine facts that tasks 4 to 8 found while converting differ from this design or extend it. They are recorded in [Engine-fact corrections, 17 October 2026](#engine-fact-corrections-17-october-2026); the rest of the document is unchanged.
 > **Status.** Not approved. Phase 2 of a gated spec, written against the **approved** requirements
 > of this folder (7 requirements, 68 criteria, 66 live, 2 withdrawn; SD-1 and SD-2 settled; Skill
 > map amended 16 October 2026 with the maintainer's approval). Revised 16 October 2026 to close
@@ -1037,6 +1038,65 @@ the maintainer for a dated note on the Skill map and changes no criterion.
    all three "both paths, chosen by backend". **Proposed:** a dated note on the Skill map recording
    rows 27 and 28 as a separate Engine file set, so the map and `skill-map.json` agree; no criterion
    changes, and the marking plan follows 5.3 meanwhile.
+
+## Engine-fact corrections, 17 October 2026
+
+Written on 17 October 2026, before the `v2.0.0` tag, at the maintainer's request. Tasks 4 to 8
+re-checked each Engine fact they wrote in `buildpad-daas-go` `d893e3cd` and recorded what they
+found in the dated notes of `tasks.md`. The skills follow those notes. Where a note differs from
+this design, the note is right, and this section records the difference. The text above is left as
+it was approved. No criterion is added, reworded, withdrawn or renumbered, and the approval stands.
+
+**Corrections** (the design says something the Engine does not do):
+
+- **C1. Relation paths in filters** (row 20; `tasks.md` 4.3). The design says relation paths in
+  permission filters are refused. A filter may go one relation deep, by dot key or `_has`. Refused:
+  a path through more than one relation, the nested-object form, `_some`/`_none`, a relation path
+  inside a variable (`$CURRENT_USER.<relation>.<field>`), `$CURRENT_ROLE.<field>`, an adjusted
+  `$NOW(...)`, and `$CURRENT_ROLES`/`$CURRENT_POLICIES`. Skills: `create-rbac`,
+  `relational-permissions`.
+- **C2. `limit=-1`** (row 4; `tasks.md` 5.1). The design says `limit=-1` is refused. The Engine
+  serves it as its cap of 1000. Skill: `add-buildpad`.
+- **C3. Delete answers** (rows 4, 6, 16, 22, 35; Issue 6, EP-24; task 10.7; `tasks.md` 5.1, 7.2).
+  The design says a delete answers 204 with no body. Only a delete of one item does; a delete of
+  several items answers 200 with a body, and a cron job delete answers 200 with
+  `{ success, message }`. Skills: `add-buildpad`, `create-api-route`, `create-collection`,
+  `create-tests`. Not re-checked: whether `deleteFiles` (`add-files`, row 6) answers 204 or 200.
+- **C4. The tenant of a password sign-in** (ES-4, row 22; `tasks.md` 5.7, 7.2). ES-4 says the
+  password sign-in takes its tenant from `X-Tenant-Id`. That holds for `/auth/v1/token`, which the
+  Supabase client's sign-in calls. The Engine's `POST /api/auth/login` takes it from the body's
+  `tenant`, so the skills send both. Skills: `create-tests`, `create-api-route`.
+
+**Narrowings and additions** (the design is true but not complete):
+
+- **C5. The ES-10 runtime table** lists what the runtime provides as if complete. Add: `URLSearchParams`
+  is not a global; `readOne` throws `NOT_FOUND`; `services.cron.trigger` exists and answers a
+  history id string; a read without `limit` returns 25 rows, and `limit` is capped at 1000; a
+  filter goes one relation deep (C1); `memory_limit_mb` is not enforced; `NODE_ENV` and
+  `NEXT_PUBLIC_SITE_URL` are not exposed; `services.mail` answers a wrong option with
+  `400 INVALID_PAYLOAD`; `services.fetch` allows subdomains of a listed host and refuses an answer
+  over 8 MiB. `services.env` is also filled from prefixed variables (`CRON_PUBLIC_<KEY>`,
+  `RUNTIME_PUBLIC_<KEY>`) (`create-cron` only, no note). Skills: `create-service`, `create-cron`,
+  `hooks-extensions`. The verbatim copies of the table in `daas-platform`, `add-microapp` and
+  `CONTRIBUTING.md` do not carry these rows.
+- **C6. Where ES-13n stands.** Besides rows 5 and 17, ES-13n (cron runs by hand only) is in rows 18
+  (`create-feature`), 24 (`daas-platform`), 27 (`hooks-extensions`) and 36 (`idea-refine`, as a
+  paraphrase). The Revalidation Trigger "Decision P's scheduler running" and task 10.1 apply to
+  these folders too, not only `add-cron` and `create-cron`.
+- **C7. `add-microapp` depends on PP-35** (row 8; `tasks.md` 5.3). Its Engine text states
+  composition as not yet available, because rows 9 and 10 are. The PP-35 Revalidation Trigger and
+  task 10.3 apply to `add-microapp` too.
+- **C8. Hook events and utility gates** (row 27; `tasks.md` 8.5). Events come only from item
+  operations through the Items API, the MCP `items` tool and `services.items`; no administration
+  route or sign-in raises one. An extension is `inactive` until activated. Hash generate and
+  random string are open to any signed-in user; the other utilities are administrator only, except
+  the stored export.
+- **C9. Scope deletes** (ES-9, row 28; `tasks.md` 4.6). The design says a delete does not cascade.
+  A delete of a scope type or item that is referenced is refused, and the tenant node is never
+  deleted. `MISSING_SCOPE` is answered when the header is missing, unless the user reaches every
+  scope.
+- **C10. The scope foreign key** (row 32; `tasks.md` 6.7). The key to `daas_scope_items(uri_path)`
+  exists when the field relates to `daas_scope_items` with `related_field: uri_path`.
 
 ## Design review gate
 Run on the revision of 16 October 2026; the second pass found nothing to repair.

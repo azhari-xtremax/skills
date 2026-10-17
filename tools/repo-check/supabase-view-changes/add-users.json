@@ -3,6 +3,6 @@
     "path": "add-users/SKILL.md",
     "kind": "text",
     "reason": "Reworded so every statement is true for both kinds of project: the cross-origin setup is qualified as a Supabase-project step, and Engine-project sentences on static tokens, cross-origin and creating users with a role in the tenant are added; the Supabase steps are unchanged.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

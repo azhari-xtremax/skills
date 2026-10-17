@@ -3,12 +3,12 @@
     "path": "add-multitenancy/SKILL.md",
     "kind": "text",
     "reason": "Engine-project sentences added: the project is one tenant with every scope below its tenant node (ES-9), and the scope column's foreign key to daas_scope_items(uri_path); the delegation to manage-scope is unchanged.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   },
   {
     "path": "add-multitenancy/references/multitenancy.instructions.md",
     "kind": "text",
     "reason": "The same Engine-project sentences added, and the listed manage-scope references named as a Supabase project's, since manage-scope's SKILL.md names the references for each kind of project.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

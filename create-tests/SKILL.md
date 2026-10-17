@@ -295,7 +295,7 @@ test.describe("[Feature] API", () => {
 });
 ```
 
-On an Engine project `/api/items` answers a create with `200` and a delete with `204` and no body, and a route that passes the Engine's answer through answers the same. A create on `/api/users`, `/api/roles`, `/api/policies` or `/api/permissions` answers `201`.
+On an Engine project `/api/items` answers a create with `200`, a delete of one item with `204` and no body, and a delete of several with `200` and a body, and a route that passes the Engine's answer through answers the same. A create on `/api/users`, `/api/roles`, `/api/policies` or `/api/permissions` answers `201`.
 <!-- /buildpad-backend -->
 
 ## DaaS Query Parameters Test Pattern

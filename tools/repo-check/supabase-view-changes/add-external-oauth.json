@@ -3,6 +3,6 @@
     "path": "add-external-oauth/SKILL.md",
     "kind": "description",
     "reason": "The description names the kind of project: it says the Skill is for Supabase projects only and stops on an Engine project, where OAuth sign-in is not available.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]
