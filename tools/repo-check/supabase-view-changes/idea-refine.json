@@ -3,6 +3,6 @@
     "path": "idea-refine/SKILL.md",
     "kind": "text",
     "reason": "The stack is named as Next.js and the project's Buildpad backend (DaaS and Supabase, or the Buildpad Engine), and the cron and scope rows say how they differ on an Engine project.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

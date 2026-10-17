@@ -3,12 +3,12 @@
     "path": "buildpad-reference/SKILL.md",
     "kind": "text",
     "reason": "Sentences added so the file is true for both kinds of project: where an Engine project serves file content and how a browser shows a file there (ES-11), and that the Engine answers a delete with 204 and no body; the Supabase guidance is unchanged.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   },
   {
     "path": "buildpad-reference/references/react-components.instructions.md",
     "kind": "text",
     "reason": "The DaaSProvider examples take the address from NEXT_PUBLIC_BUILDPAD_DAAS_URL instead of a sample host, and the token rule is stated for both kinds of project (a static token on a Supabase project, a signed-in user's access token on an Engine project, ES-2).",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

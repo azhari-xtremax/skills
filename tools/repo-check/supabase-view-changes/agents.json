@@ -3,6 +3,6 @@
     "path": "agents/security-auditor.md",
     "kind": "description",
     "reason": "The description now names access rules in a way true for both kinds of project (RLS on a Supabase project) and says the persona serves either kind.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

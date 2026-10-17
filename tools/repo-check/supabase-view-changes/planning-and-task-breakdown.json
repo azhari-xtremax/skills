@@ -3,6 +3,6 @@
     "path": "planning-and-task-breakdown/SKILL.md",
     "kind": "text",
     "reason": "The data tasks define the collection through create-collection (a migration on a Supabase project, the Engine's API on an Engine project) instead of naming a migration file path, and the access criterion names RLS for Supabase projects and roles, policies and permissions for Engine projects.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

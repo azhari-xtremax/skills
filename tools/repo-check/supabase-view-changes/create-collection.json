@@ -3,6 +3,6 @@
     "path": "create-collection/SKILL.md",
     "kind": "description",
     "reason": "The description says \"with its schema\" instead of \"with database migration\", so it is true for both kinds of project.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

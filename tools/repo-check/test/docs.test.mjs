@@ -10,10 +10,10 @@ import { GATE_TEXT, POINTER_LINE } from '../lib/gate.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const read = (p) => readFileSync(path.join(root, p), 'utf8');
 
-test('CHANGELOG.md holds the v1.0.0 section, naming the Baseline_Revision, and no other', () => {
+test('CHANGELOG.md holds the v1.0.0 section last, naming the Baseline_Revision', () => {
   const changelog = read('CHANGELOG.md');
   const sections = changelogSections(changelog);
-  assert.deepEqual([...sections.keys()], ['v1.0.0']);
+  assert.equal([...sections.keys()].at(-1), 'v1.0.0');
   assert.match(sections.get('v1.0.0').body, /Baseline_Revision/);
   assert.match(sections.get('v1.0.0').body, /7ed910f/);
   assert.match(changelog, /Supabase projects/);

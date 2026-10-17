@@ -3,6 +3,6 @@
     "path": "relational-permissions/SKILL.md",
     "kind": "removed-link",
     "reason": "The link to RELATIONAL_PERMISSIONS.md under References pointed outside this repository and resolved in no install, so it is removed.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

@@ -3,6 +3,6 @@
     "path": "buildpad-steering-custom/SKILL.md",
     "kind": "text",
     "reason": "The skill carries the Gate and now records in custom steering the backend the Gate established, never inferred from dependency or variable names; the templates and rules are unchanged.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

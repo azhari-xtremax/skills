@@ -3,6 +3,6 @@
     "path": "subagent-delegation/SKILL.md",
     "kind": "text",
     "reason": "Qualified for both kinds of project: RLS is named as a Supabase project's access rule, OAuth review as a Supabase-project check (OAuth sign-in is not available on an Engine project), and strict ordering covers collection definitions as well as migrations.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

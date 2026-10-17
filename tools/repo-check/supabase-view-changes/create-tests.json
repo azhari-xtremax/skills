@@ -3,6 +3,6 @@
     "path": "create-tests/SKILL.md",
     "kind": "description",
     "reason": "The description now names RLS tests as a Supabase-project case, so it holds for Engine and Supabase projects alike.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]

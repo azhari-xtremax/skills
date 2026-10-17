@@ -3,6 +3,6 @@
     "path": "add-microfrontend/SKILL.md",
     "kind": "description",
     "reason": "The description now says the skill is for Supabase projects only for now and not yet available on an Engine project.",
-    "release": "unreleased"
+    "release": "v2.0.0"
   }
 ]
