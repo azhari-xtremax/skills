@@ -229,7 +229,7 @@
     once they have run on the pull request of tasks 2 and 3.
 
 - [ ] 4. Convert the data and access Skills (design Group 3; after task 3; before tasks 7 and 8; parallel with tasks 5 and 6)
-- [ ] 4.1 (P) Convert `add-i18n` (row 7, BP)
+- [x] 4.1 (P) Convert `add-i18n` (row 7, BP)
   - `SKILL.md` 39-42, 57, 69-70, 119, 125-131. `references/content-translations.instructions.md`
     11-13, 21-142 (SQL mirror 121-142 sup), 150-310 (SQL mirror 288-310 sup), 316-334, 397-468.
     `references/locale-routing.instructions.md` 9, 93-160. The Gate goes in all three files.
@@ -239,7 +239,12 @@
   - Done when: FD holds for `add-i18n`.
   - _Requirements: 1.2, 1.9, 2.1, 3.6, 3.9, 3.15_
   - _Boundary: add-i18n/, converted/add-i18n, supabase-view-changes/add-i18n.json_
-- [ ] 4.2 (P) Convert `create-collection` (row 16, BP)
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md`,
+    `content-translations` and `locale-routing` reads as complete steps, and the Supabase view of all
+    three differs from `v1.0.0` by the Gate only (change file `[]`). Ranges widened beyond the plan:
+    `SKILL.md` 57 to its fence 51-59, Step 7 from 125 to 123 (its "SQL mirrors" lead-in), and the
+    checklist line 489 of `content-translations` (the SQL mirror item); line 40 stays shared.
+- [x] 4.2 (P) Convert `create-collection` (row 16, BP)
   - `SKILL.md` line 3: reword the description to "with its schema", with no marker (C4). Then lines
     15 (sup), 55-57, 75-84, 88-120, 217-227, 251-275 and 287-291. Move the link at 288 into sup; its
     eng counterpart links `create-api-route/SKILL.md`. In `references/standard-fields.instructions.md`:
@@ -251,7 +256,13 @@
     shows the link only inside a `supabase` passage.
   - _Requirements: 1.2, 1.9, 2.1, 2.4, 3.6, 3.9, 3.15_
   - _Boundary: create-collection/, converted/create-collection, supabase-view-changes/create-collection.json_
-- [ ] 4.3 (P) Convert `create-rbac` (row 20, BP)
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md` and
+    `standard-fields` reads as complete steps; the Supabase view differs from `v1.0.0` by the Gate and
+    the reworded description only (one `description` entry). The link at 288 lies inside a `supabase`
+    passage and its `engine` counterpart links `create-api-route/SKILL.md`; of 287-291 only 288
+    differs, so only 288 is marked. 88-120 is split at its two H2 headings (88-94, 96-106, 108-120).
+    Widened beyond the plan: `SKILL.md` line 9 and `standard-fields` line 9 (both name a migration).
+- [x] 4.3 (P) Convert `create-rbac` (row 20, BP)
   - `SKILL.md` 22-26, 41-70, 112-152, 162-249 and 262-271. Line 288 is a recorded break and stays
     unchanged. `references/rbac-setup.instructions.md` 43, 90-95, 113-115, 132, 169-205, 243-271 and
     341-373, with ES-6 beside `enforce_tfa` at line 94. `references/permissions-filtering.instructions.md`
@@ -264,7 +275,15 @@
   - Done when: FD holds for `create-rbac`.
   - _Requirements: 1.2, 1.9, 2.1, 3.6, 4.6, 3.15_
   - _Boundary: create-rbac/, converted/create-rbac, supabase-view-changes/create-rbac.json_
-- [ ] 4.4 (P) Convert `create-workflow` (row 23, BP)
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md`,
+    `rbac-setup` and `permissions-filtering` reads as complete steps; the Supabase view of all three
+    differs from `v1.0.0` by the Gate only (change file `[]`). Line 288 is unchanged. Within the
+    planned ranges only the lines that differ are marked (for example `SKILL.md` 114-125 and 131-140
+    of 112-152, 162-194, 202-212 and 269 of 162-271; `rbac-setup` 365-373 stays shared). Widened
+    beyond the plan: `rbac-setup` 39 (public policies) and `permissions-filtering` 210-216 (a
+    `$CURRENT_ROLES` example, `supabase` only). Engine facts re-checked in `buildpad-daas-go`: one
+    relation deep by dot key or `_has`; `$CURRENT_ROLES`/`$CURRENT_POLICIES` refused.
+- [x] 4.4 (P) Convert `create-workflow` (row 23, BP)
   - `SKILL.md` 21-35, 97-171 (SQL migration 158-171 sup), 195 and 208-298.
     `references/workflow-schema.instructions.md` 473-590, 709-757, 903-1085 and 1118-1123. Move the
     link at 1130 into sup; its eng counterpart links `hooks-extensions/SKILL.md`.
@@ -275,7 +294,14 @@
   - Done when: FD holds for `create-workflow`, and the 1130 link lies inside a `supabase` passage.
   - _Requirements: 1.2, 1.9, 2.1, 3.6, 3.15_
   - _Boundary: create-workflow/, converted/create-workflow, supabase-view-changes/create-workflow.json_
-- [ ] 4.5 (P) Convert `grant-module-access` (row 26, BP)
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md`,
+    `workflow-schema` and `workflow-versioning` reads as complete steps; the Supabase view of all
+    three differs from `v1.0.0` by the Gate only (change file `[]`). The 1130 link lies inside a
+    `supabase` passage; its `engine` counterpart links `hooks-extensions/SKILL.md`. Ranges split at
+    higher headings (`workflow-schema` 903-985 and 989-1086, `workflow-versioning` 27-62 and
+    64-91); 214-297 widened to its fence 184. Widened beyond the plan: `workflow-versioning` 93-102
+    (`?version=` is ignored by the Engine). `workflow-components` holds nothing to mark.
+- [x] 4.5 (P) Convert `grant-module-access` (row 26, BP)
   - `SKILL.md` 26-63 (the `module_access_keys` tool, sup), 71, 126-154 (the remote procedure, sup),
     158-177 and 221. `references/module-access.instructions.md` 44-93, 134-149, 168-209 (extra
     column, sup), 213-384 (custom policies, sup) and 438-458.
@@ -287,7 +313,14 @@
     `SKILL.md:34,51,139` and `module-access.instructions.md:68,137`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 4.7, 3.15_
   - _Boundary: grant-module-access/, converted/grant-module-access, supabase-view-changes/grant-module-access.json_
-- [ ] 4.6 (P) Convert `manage-scope` into a separate Engine file set (row 28, EF)
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md` and
+    `module-access` reads as complete steps; the Supabase view of both differs from `v1.0.0` by the
+    Gate only (change file `[]`). `check.mjs --only R1` reports nothing; `SKILL.md:34,51,139` and
+    `module-access.instructions.md:68,137` lie in `supabase` passages, and line 245 is unchanged.
+    `module-access` 44-93 is split at its H2 (44-58, 62-93); 168-209, 213-384 and 438-458 are one
+    `supabase` passage to the end of the file (168-479), because 388-435 and 462-479 also teach the
+    custom policy columns. Step 5 keeps its heading (158) shared.
+- [x] 4.6 (P) Convert `manage-scope` into a separate Engine file set (row 28, EF)
   - `SKILL.md`: the Gate after the H1. The sup passage is body 9-760 verbatim. The eng passage is a
     new body linking the two new Engine files and the shared `scope-client`.
   - `references/scope-management.instructions.md` and `references/scope-permissions.instructions.md`
@@ -307,7 +340,15 @@
     baseline apart from the Gate.
   - _Requirements: 1.2, 1.3, 1.9, 2.1, 3.8, 3.9, 5.3, 3.15_
   - _Boundary: manage-scope/, converted/manage-scope, supabase-view-changes/manage-scope.json_
-- [ ] 4.7 (P) Convert `relational-permissions` (row 30, BP)
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view holds `SKILL.md`
+    (Gate, then the new body), `engine-scope-management`, `engine-scope-permissions` and
+    `scope-client`, every link resolving; it reads as complete steps through the API with an
+    administrator's session. The Supabase view holds `SKILL.md`, `scope-management`,
+    `scope-permissions` and `scope-client`, equal to `v1.0.0` apart from the Gate (change file
+    `[]`). Engine facts re-checked in `buildpad-daas-go`: type and item bodies, the three parent
+    rules, refused deletes, the tenant node, `/api/scope/available`, `MISSING_SCOPE` without a
+    header unless the user reaches every scope, and the `assignment` argument of the `scope` tool.
+- [x] 4.7 (P) Convert `relational-permissions` (row 30, BP)
   - `SKILL.md` 49-60, 76-91 and 142-198. Remove the dead link at 242; record it as a `removed-link`
     entry with its reason (Issue 3).
   - Engine content: enforcement is unconditional (no warn mode). The `relations` tool reads and the
@@ -317,6 +358,14 @@
     entry.
   - _Requirements: 1.2, 1.9, 2.1, 2.4, 3.6, 3.15_
   - _Boundary: relational-permissions/, converted/relational-permissions, supabase-view-changes/relational-permissions.json_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view of `SKILL.md`
+    reads as complete steps; the Supabase view differs from `v1.0.0` by the Gate and the removed dead
+    link only (one `removed-link` entry with its reason). Widened beyond the plan, because the
+    shared text taught presets, validation or the other relation format: the diagram 35-47, Step 1's
+    table and Step 2's payloads (68-140, one passage), and the common patterns 204-232. 142-198 is
+    split at its H2 headings (142-158, 162-185, 189-198). Engine facts re-checked in
+    `buildpad-daas-go`: every nested row checked as a direct write, three relations deep, 403 and
+    nothing written on a refused row.
 
 - [ ] 5. Convert the apps and platform Skills (design Group 5; after task 3; before task 8; parallel with tasks 4 and 6)
 - [x] 5.1 (P) Convert `add-buildpad` (row 4, BP)
@@ -659,7 +708,7 @@
   - _Boundary: create-migration/, converted/create-migration, supabase-view-changes/create-migration.json_
 
 - [ ] 8. Convert the automation Skills (design Group 4; after tasks 4 and 5)
-- [ ] 8.1 (P) Convert `add-cron` (row 5, BP)
+- [x] 8.1 (P) Convert `add-cron` (row 5, BP)
   - `SKILL.md` 32-41 (address, CORS), 171, 194 (an eng passage with ES-6 after the `mfaRequired`
     error kind), 203 and 213.
   - Engine content: ES-1, ES-15, ES-13n and ES-6, and a pointer to `create-cron/SKILL.md` for the
@@ -667,7 +716,13 @@
   - Done when: FD holds for `add-cron`.
   - _Requirements: 1.2, 1.9, 2.1, 3.14, 4.6, 4.7, 3.15_
   - _Boundary: add-cron/, converted/add-cron, supabase-view-changes/add-cron.json_
-- [ ] 8.2 (P) Convert `add-workflows` (row 12, BP)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. Of 32-41 only 39-41 differ (32-37 hold for both); ES-1, ES-15 and ES-13n stand there, and
+    the `mfaRequired` passage after 194 is Engine-only. Widened beyond the plan: line 18 (the Engine
+    has no MCP tool for cron jobs). Checked in the Engine: a run executes as the system account,
+    which holds the Administrator policy, and a refused second factor is 403 `MFA_REQUIRED`.
+- [x] 8.2 (P) Convert `add-workflows` (row 12, BP)
   - `SKILL.md` 34-43, 158, 176 (an eng passage with ES-6 after the `mfaRequired` error kind) and 198,
     read at `origin/main`, which holds commit `873f492`.
   - Engine content: ES-1, ES-15 and ES-6. Instance writes go only through
@@ -675,7 +730,13 @@
   - Done when: FD holds for `add-workflows`.
   - _Requirements: 1.2, 1.9, 2.1, 4.6, 3.15_
   - _Boundary: add-workflows/, converted/add-workflows, supabase-view-changes/add-workflows.json_
-- [ ] 8.3 (P) Convert `create-cron` (row 17, BP)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. Of 34-43 only 41-43 differ; ES-1, ES-15 and the transition-only rule for instances stand
+    there. The plan's 198 is the blank line before the post-install sentence, so that sentence (199)
+    is marked. Line 158's Engine copy says what `GET /api/collections` lists for a non-administrator
+    on the Engine (the collections the user may read), checked in `buildpad-daas-go`.
+- [x] 8.3 (P) Convert `create-cron` (row 17, BP)
   - `SKILL.md` 13, 28-83 (MCP `cron` calls, sup), 104-168, 212, 240-318 and 323 (link, sup).
     `references/cron-mcp.instructions.md` becomes file:sup (no `cron` tool, PP-29).
     `references/cron-sandbox.instructions.md` 18-128 and 234-312, with the link at 59 moved into sup.
@@ -688,7 +749,18 @@
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.2, 3.10, 3.14, 4.7, 3.15_
   - _Depends: 5.8_
   - _Boundary: create-cron/, converted/create-cron, supabase-view-changes/create-cron.json_
-- [ ] 8.4 (P) Convert `create-service` (row 21, BP)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md`, `cron-sandbox`
+    and `cron-api` from `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gates and the
+    file marker (change file `[]`), and every `x-pp29-tool` hit lies in `supabase` text. Widened by
+    S6: `cron-sandbox` and `cron-api` are each one four-backtick `instructions` fence from line 1 to the end,
+    so each listed range widens to the whole file: a `supabase` passage holding the file and an
+    `engine` passage holding its Engine copy, the Gate before line 1; the link at 59 lies inside
+    the `supabase` passage. `SKILL.md` 212 widens to its fence 204-216. The `Engine runtime` table
+    stands in `SKILL.md`, which `add-cron` links. Checked in `buildpad-daas-go`: the routes and the
+    grant each needs, `201` on create, `200` with `{ success, message }` on delete, the run answer
+    `{ historyId, message }`, descriptors such as `@hourly`, day of week 0-6, a read without
+    `limit` returns 25 rows, and the stale-lock grace `CRON_STALE_LOCK_GRACE_MS`.
+- [x] 8.4 (P) Convert `create-service` (row 21, BP)
   - `SKILL.md` 19, 28-79 (MCP `services`, sup), 97-111, 141-150 (link 145, sup), 199-302, 365 and 374
     (link, sup). `references/custom-services.instructions.md` 90-155, 157-237, 265-337 and 393-427.
     `references/stripe.instructions.md` 10-47.
@@ -699,7 +771,18 @@
     passages.
   - _Requirements: 1.2, 1.9, 2.1, 3.2, 3.10, 3.15_
   - _Boundary: create-service/, converted/create-service, supabase-view-changes/create-service.json_
-- [ ] 8.5 Convert `hooks-extensions` into a separate Engine file set (row 27, EF)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md`,
+    `custom-services` and `stripe` from `check.mjs --render`; the Supabase view is `v1.0.0` but for
+    the Gates (change file `[]`). The links at 145 and 374 lie inside `supabase` passages; their
+    Engine counterparts link `hooks-extensions/SKILL.md`. Lines 19 and 365 are left shared: the
+    Engine holds the same name rule as a check constraint. `SKILL.md` 97-111 and 199 widen to their
+    fences; `stripe` is one four-backtick `instructions` fence, so it is a `supabase` passage and
+    an Engine copy, the Gate before line 1; `custom-services` 90-155 and 157-237 are joined (gap
+    rule). Widened beyond the plan: the Validator fence of `SKILL.md` 307-333 (`readOne` throws
+    `NOT_FOUND` on the Engine). Checked in `buildpad-daas-go`: the routes and grants, `draft` as the
+    default status, `409` for a taken name or a dependent service, the test summary under `data`,
+    no `URLSearchParams` and no `console` in a service body, and `services.env` empty unless named.
+- [x] 8.5 Convert `hooks-extensions` into a separate Engine file set (row 27, EF)
   - `SKILL.md`: the Gate after the H1. The sup passage is body 9-225 verbatim. The eng passage is a
     new body linking the three Engine files. The three existing references become file:sup.
   - New `references/engine-hooks.instructions.md`, `references/engine-services-api.instructions.md`
@@ -715,6 +798,17 @@
   - Not (P): it file-marks targets linked from 4.4, 5.8, 8.3 and 8.4.
   - _Requirements: 1.2, 1.3, 1.9, 2.1, 3.1, 3.10, 5.3, 3.15_
   - _Depends: 4.4, 5.8, 8.3, 8.4_
+  - Note 16 October 2026: read through with `check.mjs --render`: the Engine view holds `SKILL.md`
+    (Gate, then the new body with the `Engine runtime` table) and the three Engine files, every
+    link resolving; the Supabase view holds `SKILL.md` and the three file:sup references, equal to
+    `v1.0.0` apart from the Gate (change file `[]`). R6b reports no broken link into the
+    references. Checked in `buildpad-daas-go`: the `/api/extensions` routes (writes administrator
+    only, `inactive` by default, no test route), events only from item operations through the
+    Items API, the MCP `items` tool and `services.items` (no administration-route or sign-in
+    events), `HookError` and its answers, `services.cron.trigger` answering a history id string,
+    mail options limited to `to`, `subject`, `text`, `html`, `replyTo`, and the utility routes'
+    gates (hash generate and random string for any signed-in user, the rest administrator only
+    except the stored export).
 
 - [ ] 9. Release `v2.0.0` (design "Last"; after tasks 4 to 8)
 - [ ] 9.1 Run the release read-through and the install check on the candidate

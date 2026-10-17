@@ -6,6 +6,37 @@ applyTo: "**/*.{ts,tsx}"
 
 # Module-Level Access — Implementation Reference
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 Platform-native capability flags stored as `module_access JSONB` on `daas_policies` and managed via the `daas_module_access_keys` registry. No custom columns or server utilities required.
 
 ## Architecture Overview
@@ -41,6 +72,7 @@ Admin users (`admin_access: true` on any policy) receive `true` for all keys.
 
 Key format constraint: `^[a-z][a-z0-9_:./-]*$`, globally UNIQUE.
 
+<!-- buildpad-backend: supabase -->
 ### System-seeded keys
 
 | Key | Purpose |
@@ -56,9 +88,22 @@ Key format constraint: `^[a-z][a-z0-9_:./-]*$`, globally UNIQUE.
 | `system:services` | Manage custom services |
 | `workflow:approve` | Execute `approve` workflow transitions |
 | `workflow:reject` | Execute `reject` workflow transitions |
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### System-seeded keys
+
+| Key | Purpose |
+|---|---|
+| `system:logs` | View application logs page |
+| `workflow:approve` | Execute `approve` workflow transitions |
+| `workflow:reject` | Execute `reject` workflow transitions |
+
+On an Engine project these three are seeded; register any other key you need.
+<!-- /buildpad-backend -->
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## MCP Tools
 
 ### Register a key
@@ -91,6 +136,44 @@ Key format constraint: `^[a-z][a-z0-9_:./-]*$`, globally UNIQUE.
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## MCP Tools
+
+### Register a key
+
+On an Engine project keys are rows of `daas_module_access_keys`, written with the `items` tool:
+
+```json
+{
+  "name": "items",
+  "arguments": {
+    "action": "create",
+    "collection": "daas_module_access_keys",
+    "data": {
+      "display_name": "Export Reports",
+      "key": "reports:export",
+      "sort": 10
+    }
+  }
+}
+```
+
+### Grant on a policy
+
+```json
+{
+  "name": "policies",
+  "arguments": {
+    "action": "update",
+    "id": "<policy-uuid>",
+    "data": {
+      "module_access": { "reports:export": true }
+    }
+  }
+}
+```
+<!-- /buildpad-backend -->
 
 ---
 
@@ -131,6 +214,7 @@ console.log(moduleAccess); // → { "reports:export": true, ... }
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Server-Side Check Pattern
 
 ```typescript
@@ -147,6 +231,22 @@ const allowed = isAdmin || policies?.some(
 
 if (!allowed) return new Response('Forbidden', { status: 403 });
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Server-Side Check Pattern
+
+On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`.
+
+```typescript
+const headers = await getAuthHeaders(); // from '@/lib/api/auth-headers'
+const res = await fetch(`${getDaasUrl()}/api/permissions/me`, { headers, cache: 'no-store' });
+const { isAdmin, moduleAccess } = await res.json();
+
+const allowed = isAdmin === true || moduleAccess?.['reports:export'] === true;
+
+if (!allowed) return new Response('Forbidden', { status: 403 });
+```
+<!-- /buildpad-backend -->
 
 ---
 
@@ -165,6 +265,7 @@ if (!allowed) return new Response('Forbidden', { status: 403 });
 `module_access_keys` and `policies` are OR'd in the transition route. Existing `policies`-only workflows are fully backward compatible.
 
 
+<!-- buildpad-backend: supabase -->
 Full implementation guide for adding named boolean permission flags (`"MyApp.Feature.Key": true`) that integrate with the DaaS Policy/Role/User assignment chain.
 
 ## Architecture Overview
@@ -477,3 +578,9 @@ The editor validates key naming (`AppName.Domain.Capability` dot-notation), prev
 - `enforceCustomPermission` in the API route is the **security boundary**
 - Only `admin_access: true` users can write `daas_policies` — no privilege escalation
 - Admin bypass is consistent with collection permission behaviour
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Custom Capability Flags on Policies
+
+Custom policy columns are not available on an Engine project: a policy holds a fixed set of fields, and an extra column on the policies collection is not one of them. If the developer asks for custom capability columns on policies, tell them so and stop. Application capability flags on an Engine project are the module access keys described above.
+<!-- /buildpad-backend -->

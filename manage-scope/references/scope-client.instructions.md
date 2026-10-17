@@ -6,8 +6,40 @@ applyTo: "**/*.{ts,tsx}"
 
 # Client-Side Scope Integration
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 The DaaS scope system is purely server-side — the frontend's only job is to communicate the **active scope URI** with every request and handle scope-related errors gracefully.
 
+<!-- buildpad-backend: supabase -->
 The Next.js UI calls DaaS **directly** (no proxy routes for data). `DaaSProvider` supplies the base URL and auth token via `useDaaSContext()`. Scope is stored in the `daas_resource_uri` cookie and forwarded as `X-Resource-Uri` header in cross-origin requests.
 
 ---
@@ -20,6 +52,21 @@ The Next.js UI calls DaaS **directly** (no proxy routes for data). `DaaSProvider
 | `X-Resource-Uri` header | **Required for cross-origin requests** to DaaS — send with every scoped fetch |
 
 > **Note:** Cookies are `SameSite=Lax` and will NOT be sent automatically to a different origin. Always read `daas_resource_uri` from `document.cookie` and send it as `X-Resource-Uri` header.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+On an Engine project the UI calls the Engine directly through the SDK — `DaaSProvider` supplies the Engine's address and the signed-in user's access token via `useDaaSContext()` — or through the app's own server routes, which forward the user's token. The Engine accepts no cookie session, and a cookie on the app's origin never reaches it: the scope is stored in the app's own `daas_resource_uri` cookie and sent as the `X-Resource-Uri` header with every request to a scoped collection.
+
+---
+
+## How Scope Context Is Sent
+
+| Method | When to use |
+|---|---|
+| `daas_resource_uri` cookie | Set by the scope UI on the app's own origin; read to build the header. It is never sent to the Engine |
+| `X-Resource-Uri` header | **Required on every request to a scoped collection** — from the browser through the SDK, and from every server route that forwards a call |
+
+> **Note:** A request to a scoped collection without the header is refused with 403 `MISSING_SCOPE` for any user who does not reach every scope. Always read `daas_resource_uri` from `document.cookie` (or from the request, in a server route) and send it as `X-Resource-Uri`.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -105,6 +152,7 @@ import ScopeSwitcher from '@/components/ScopeSwitcher';
 <ScopeSwitcher />
 ```
 
+<!-- buildpad-backend: supabase -->
 `ScopeSwitcher` calls `GET /api/scope/available` which returns:
 - Items where `selectable: true` — the user can switch to these
 - Items where `selectable: false` — ancestor nodes shown only as breadcrumb labels
@@ -155,6 +203,61 @@ export function ScopeSelector() {
   );
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+`ScopeSwitcher` calls `GET /api/scope/available`, which answers `{ data: [...], root_access }`:
+- Items where `selectable: true` — the user can switch to these
+- Items where `selectable: false` — ancestor nodes shown only as breadcrumb labels
+
+Each item carries `id`, `name`, `uri_path`, `scope_type_id`, `scope_type` (`{ id, name }`) and `parent_item_id`.
+
+### Custom scope selector
+
+```tsx
+// components/ScopeSelector.tsx
+'use client';
+import { useEffect, useState } from 'react';
+import { useScope } from '@/lib/scope/context';
+import { useDaaSContext } from '@/lib/buildpad/services';
+
+interface ScopeItem {
+  id: string;
+  name: string;
+  uri_path: string;
+  scope_type: { id: string; name: string } | null;
+  selectable?: boolean;
+}
+
+export function ScopeSelector() {
+  const { resourceUri, setScope } = useScope();
+  const { buildUrl, getHeaders } = useDaaSContext();
+  const [options, setOptions] = useState<ScopeItem[]>([]);
+
+  useEffect(() => {
+    fetch(buildUrl('/api/scope/available'), { headers: getHeaders() })
+      .then((r) => r.json())
+      .then((data) => {
+        const selectable = (data.data ?? []).filter((s: ScopeItem) => s.selectable !== false);
+        setOptions(selectable);
+      });
+  }, []);
+
+  return (
+    <select
+      value={resourceUri ?? ''}
+      onChange={(e) => setScope(e.target.value || null)}
+    >
+      <option value="">— Select scope —</option>
+      {options.map((s) => (
+        <option key={s.id} value={s.uri_path}>
+          {s.scope_type?.name}: {s.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+```
+<!-- /buildpad-backend -->
 
 ---
 
@@ -244,6 +347,7 @@ if (!resourceUri && !isPublicRoute(pathname)) {
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Making Scoped API Requests
 
 Since the UI calls DaaS directly (cross-origin), the scope cookie is NOT sent automatically. Always read the scope from `document.cookie` and attach it as `X-Resource-Uri` header:
@@ -285,6 +389,51 @@ const res = await fetch(buildUrl('/api/items/orders'), {
 | `403` | `FORBIDDEN_SCOPE` | User has no role assigned at or above the active scope URI |
 | `400` | `INVALID_SCOPE` | The `resource_uri` in the cookie/header is malformed or refers to a deleted scope item |
 | `401` | `UNAUTHENTICATED` | No valid session — redirect to login |
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Making Scoped API Requests
+
+The Engine takes the scope from the header, and a cookie on the app's origin never reaches it. Always read the scope from `document.cookie` (through `useScope()`) and attach it as `X-Resource-Uri`:
+
+```ts
+import { useDaaSContext } from '@/lib/buildpad/services';
+import { useScope } from '@/lib/scope/context';
+
+// In a client component:
+const { buildUrl, getHeaders } = useDaaSContext();
+const { resourceUri } = useScope();
+
+// ✅ Correct — send scope as header for direct Engine calls
+const res = await fetch(buildUrl('/api/items/orders'), {
+  headers: { ...getHeaders(), 'X-Resource-Uri': resourceUri ?? '' },
+});
+const { data } = await res.json();
+```
+
+### Explicit scope override
+
+Use when you need to query a different scope than the active one (e.g., admin viewing another branch):
+
+```ts
+const res = await fetch(buildUrl('/api/items/orders'), {
+  headers: { ...getHeaders(), 'X-Resource-Uri': '/<tenant-type-id>:<tenant-id>/<type-id>:<item-id>' },
+});
+```
+
+---
+
+## Handling 400 and 403 Errors
+
+### Error codes returned by the API
+
+| HTTP | `extensions.code` | Meaning |
+|---|---|---|
+| `403` | `FORBIDDEN` | User is authenticated but their roles at this scope don't grant the action |
+| `403` | `FORBIDDEN_SCOPE` | User has no role assigned at or above the active scope URI |
+| `403` | `MISSING_SCOPE` | The request named no scope, and the collection needs one for this user |
+| `400` | `INVALID_SCOPE` | The `X-Resource-Uri` names no scope node: malformed, or a deleted node |
+| `401` | `UNAUTHENTICATED`, `TOKEN_INVALID`, `TOKEN_EXPIRED` | No valid session — redirect to login |
+<!-- /buildpad-backend -->
 
 ### Centralised fetch wrapper
 

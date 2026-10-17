@@ -6,7 +6,43 @@ applyTo: "**/*.{ts,tsx,json}"
 
 # Locale Routing
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
+<!-- buildpad-backend: supabase -->
 All code below assumes the CLI-scaffolded layout (`buildpad bootstrap`): Supabase middleware in `lib/supabase/middleware.ts`, `publicOrigin()` in `lib/origin.ts`, Buildpad components in `components/ui`, and `lib/buildpad/*`. Adjust import paths if the project uses `src/`.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+All code below assumes the CLI-scaffolded layout (`buildpad bootstrap`): the session middleware in `lib/supabase/middleware.ts` (on an Engine project its Supabase client keeps the user's Engine sign-in session fresh and reads no data), `publicOrigin()` in `lib/origin.ts`, Buildpad components in `components/ui`, and `lib/buildpad/*`. Adjust import paths if the project uses `src/`.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -90,6 +126,7 @@ export function negotiateLocale(request: NextRequest): Locale {
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### 2b. Root middleware — `middleware.ts` (or `proxy.ts` on Next.js 16)
 
 Replaces the CLI template (`@buildpad/origin: middleware`). The locale redirect runs **before** `updateSession`, so it never discards a refreshed session cookie; the prefixed request that follows goes through the full session refresh.
@@ -158,6 +195,77 @@ import { defaultLocale, getLocaleFromPathname, stripLocale } from "@/lib/i18n/co
 
   return supabaseResponse;
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### 2b. Root middleware — `middleware.ts` (or `proxy.ts` on Next.js 16)
+
+Replaces the CLI template (`@buildpad/origin: middleware`). The locale redirect runs **before** `updateSession`, so it never discards a refreshed session cookie; the prefixed request that follows goes through the full session refresh.
+
+```ts
+import { NextResponse, type NextRequest } from "next/server";
+import { updateSession } from "@/lib/supabase/middleware";
+import { publicOrigin } from "@/lib/origin";
+import { getLocaleFromPathname } from "@/lib/i18n/config";
+import { negotiateLocale } from "@/lib/i18n/negotiate";
+
+export async function middleware(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+
+  // Page request without a locale prefix → redirect to the negotiated locale.
+  // /api/* is never prefixed and goes straight to the session refresh.
+  if (!pathname.startsWith("/api") && !getLocaleFromPathname(pathname)) {
+    const locale = negotiateLocale(request);
+    // publicOrigin(): behind a proxy request.nextUrl names the server process,
+    // and redirects emit an absolute Location header (see lib/origin.ts).
+    const url = new URL(`/${locale}${pathname === "/" ? "" : pathname}`, publicOrigin(request));
+    url.search = search;
+    return NextResponse.redirect(url);
+  }
+
+  const response = await updateSession(request);
+  // Every response depends on session state — never let a shared cache store it.
+  response.headers.set("Cache-Control", "private, no-store, must-revalidate");
+  return response;
+}
+
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)",
+  ],
+};
+```
+
+On Next.js 16 with `proxy.ts`, the body is identical: `export default async function proxy(request: NextRequest) { ... }`.
+
+### 2c. Session middleware — `lib/supabase/middleware.ts`
+
+Only the route-gating block changes (`@buildpad/origin: supabase/middleware`). Everything above `supabase.auth.getUser()` stays exactly as scaffolded. On an Engine project the Supabase client there reads the signed-in user from the Engine, and the public routes are the sign-in page and the app's own sign-in route only: an Engine project has no sign-up page and no OAuth callback.
+
+```ts
+import { defaultLocale, getLocaleFromPathname, stripLocale } from "@/lib/i18n/config";
+// ...existing imports and createServerClient setup unchanged...
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+  const locale = getLocaleFromPathname(pathname) ?? defaultLocale;
+  const path = stripLocale(pathname); // compare routes without the locale prefix
+
+  const publicRoutes = ["/login", "/api/auth"];
+  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
+  const isApiRoute = path.startsWith("/api");
+
+  if (!user && !isPublicRoute && !isApiRoute) {
+    const url = new URL(`/${locale}/login`, publicOrigin(request));
+    url.search = request.nextUrl.search;
+    return NextResponse.redirect(url);
+  }
+
+  return supabaseResponse;
+```
+<!-- /buildpad-backend -->
 
 If the app also redirects signed-in users away from `/login`, prefix that target too (`/${locale}/`).
 
