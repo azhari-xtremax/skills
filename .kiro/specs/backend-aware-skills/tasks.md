@@ -368,7 +368,7 @@
     nothing written on a refused row.
 
 - [ ] 5. Convert the apps and platform Skills (design Group 5; after task 3; before task 8; parallel with tasks 4 and 6)
-- [ ] 5.1 (P) Convert `add-buildpad` (row 4, BP)
+- [x] 5.1 (P) Convert `add-buildpad` (row 4, BP)
   - `SKILL.md` 29-38, 45, 85 and 113. `references/buildpad.instructions.md` 89-109, 138, 157-166,
     399-416, 534-635, 665-710, 923-964, 1044-1069 and 1169-1199.
   - Engine content: ES-1, ES-2 (DaaSProvider and Storybook take a session token), ES-11 (asset path)
@@ -376,7 +376,13 @@
   - Done when: FD holds for `add-buildpad`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.3, 3.11, 3.15_
   - _Boundary: add-buildpad/, converted/add-buildpad, supabase-view-changes/add-buildpad.json_
-- [ ] 5.2 (P) Convert `add-files` (row 6, BP)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` and
+    `references/buildpad.instructions.md` from `check.mjs --render`; the Supabase view is `v1.0.0`
+    but for the Gate, and the change file is `[]`. Ranges were widened to their whole fences and
+    tables, and 89-109 and 923-964 were split at the `##` headings inside them (S6). The Engine
+    serves `limit=-1` as its cap of 1000 rather than refusing it, so the Engine text says that; only
+    a single-item delete answers 204 with no body.
+- [x] 5.2 (P) Convert `add-files` (row 6, BP)
   - `SKILL.md` 26-28, 47, 53-67 and 136-166.
   - Engine content: ES-1, ES-11 and ES-15. The upload limit is `APP_MAX_UPLOAD_BYTES` (100 MiB),
     with no MIME allow list. Delete answers 204. The generated assets proxy targets a path the Engine
@@ -384,7 +390,12 @@
   - Done when: FD holds for `add-files`.
   - _Requirements: 1.2, 1.9, 2.1, 3.3, 3.11, 3.15_
   - _Boundary: add-files/, converted/add-files, supabase-view-changes/add-files.json_
-- [ ] 5.3 (P) Convert `add-microapp` (row 8, BP)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. The Engine text keeps the module's hooks and steps, states that the generated assets proxy
+    forwards to a path the Engine does not serve (so `getAssetUrl` previews do not load), and shows a
+    file in a browser through `GET /api/files/signed-url`.
+- [x] 5.3 (P) Convert `add-microapp` (row 8, BP)
   - `SKILL.md` 13-26, 72-86 (Step 0), 138-149, 151-213, 350-394, 585-596 and 626. Move the links at
     26 and 170 into sup. In references: `context-discovery` 32-48, 120-130 and 153-158;
     `app-urls-config` 8-16, 115 (link, sup) and 118-140; `deployment-topology` 5-63, 140-156, 203
@@ -396,7 +407,18 @@
     passages, and their eng counterparts link `add-microfrontend/SKILL.md`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.3, 3.4, 3.15_
   - _Boundary: add-microapp/, converted/add-microapp, supabase-view-changes/add-microapp.json_
-- [ ] 5.4 Convert `add-microfrontend` (row 9, NY)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` and the five
+    references from `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the
+    change file is `[]`. The three `auth-bridge` links lie inside `supabase` passages and their
+    Engine counterparts link `add-microfrontend/SKILL.md`. Because composition is not yet available
+    on an Engine project (rows 9 and 10), passages were added beyond the listed ranges where the
+    baseline gave iframe, bridge or Supabase steps: `SKILL.md` 9, 30-66, 131-136, 231-289, 421-453,
+    457-526, 530-540, 562-583; `context-discovery` 66-69, 164-171; `app-urls-config` 45-50,
+    68-91, 95-112; `deployment-topology` 67-77, 133-136, 181-188. In the Engine view each app
+    runs on its own address, the Main App only links to the micro-apps, and framing is stated as not
+    yet available. Adjacent ranges were joined (gap rule) and ranges widened to whole fences, tables
+    and lists. The `Engine runtime` table sits beside the event-hook body it governs.
+- [x] 5.4 Convert `add-microfrontend` (row 9, NY)
   - `SKILL.md`: the Gate, then the eng passage "Sharing one session between a host and its frames is
     not available on an Engine project yet. Tell the developer so and stop.". The sup passage is the
     rest of the body. Its description is reworded to name the kind (C4).
@@ -407,7 +429,12 @@
   - Not (P): it file-marks `auth-bridge.instructions.md`, which 5.3 links.
   - _Requirements: 1.2, 1.6, 1.9, 2.1, 3.5, 4.7, 4.8, 3.15, 2.4_
   - _Depends: 5.3_
-- [ ] 5.5 (P) Convert `add-microfrontend-zones` (row 10, NY)
+  - Note 16 October 2026: read through the views from `check.mjs --render`: the Engine view of
+    `add-microfrontend` is `SKILL.md` alone, the Gate and the stop text; the Supabase view is
+    `v1.0.0` but for the Gates, the Pointer lines and the description, whose rewording ("Supabase
+    projects only for now: not yet available on an Engine project") is the change file's one entry.
+    The five references are file:sup, and the 14 assets carry the file marker and the Pointer.
+- [x] 5.5 (P) Convert `add-microfrontend-zones` (row 10, NY)
   - `SKILL.md`: the Gate, the NY stop text as in 5.4, and the sup passage for the rest. Its
     description is reworded (C4). `references/pinned-edits.instructions.md` becomes file:sup. Each
     `assets/**/*.ts(x)` (9 files) gets the file marker and the Pointer. `assets/shared/zones.json`
@@ -416,7 +443,13 @@
     lines 126, 138, 344, 345, 349 and 504.
   - _Requirements: 1.2, 1.6, 1.9, 2.1, 4.7, 3.15, 2.4_
   - _Boundary: add-microfrontend-zones/, converted/add-microfrontend-zones, supabase-view-changes/add-microfrontend-zones.json_
-- [ ] 5.6 (P) Convert `create-project` (row 19, BP)
+  - Note 16 October 2026: read through the views from `check.mjs --render`: the Engine view of
+    `add-microfrontend-zones` is `SKILL.md` (the Gate and the stop text of 5.4, word for word) and
+    the unchanged `assets/shared/zones.json`; the Supabase view is `v1.0.0` but for the Gates, the
+    Pointer lines and the description, whose rewording is the change file's one entry. The
+    `platform-supabase` lines 126, 138, 344, 345, 349 and 504 lie inside the `supabase` passage,
+    so R1 reports nothing.
+- [x] 5.6 (P) Convert `create-project` (row 19, BP)
   - `SKILL.md` line 3 (description, C4), then 15-19, 46-73, 88-143, 165-192 (the MCP cross-origin
     step, sup) and 256-268. `references/environment.instructions.md` 19-106, with the service-role
     block 51-61 as sup. `references/project-creation.instructions.md` 59-67, 95 and 110.
@@ -426,7 +459,13 @@
   - Done when: FD holds for `create-project`.
   - _Requirements: 1.2, 1.9, 2.1, 3.3, 3.4, 3.5, 3.8, 3.16, 3.15, 2.4_
   - _Boundary: create-project/, converted/create-project, supabase-view-changes/create-project.json_
-- [ ] 5.7 (P) Convert `create-tests` (row 22, BP)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md`,
+    `environment` and `project-creation` from `check.mjs --render`; the Supabase view is `v1.0.0`
+    but for the Gates and the reworded description (the change file's one entry). Ranges were
+    widened to whole fences, `SKILL.md` 46-73 and 256-268 were split around lines that hold for
+    both backends, and the service-role block 51-61 is `supabase` text with ES-3's "add none" as
+    its Engine counterpart. `project-creation` has no front matter, so its Gate stands before line 1.
+- [x] 5.7 (P) Convert `create-tests` (row 22, BP)
   - `SKILL.md` line 3 (description, C4), then 24-80, 110, 176-178, 227-266, 359-392, 428 and
     453-456. `references/playwright-testing.instructions.md` 59-75, 178-306, 355-374, 485-528,
     907-958, 1351-1367, 1453-1729, 2006-2064 and 2124-2127.
@@ -436,7 +475,15 @@
   - Done when: FD holds for `create-tests`.
   - _Requirements: 1.2, 1.9, 2.1, 3.7, 3.8, 3.12, 3.17, 3.15, 2.4_
   - _Boundary: create-tests/, converted/create-tests, supabase-view-changes/create-tests.json_
-- [ ] 5.8 (P) Convert `daas-platform` (row 24, BP, kept in-file per Issue 9)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` and
+    `references/playwright-testing.instructions.md` from `check.mjs --render`; the Supabase view is
+    `v1.0.0` but for the Gates and the reworded description (the change file's one entry). Ranges
+    were widened to whole fences and tables and split at `##` headings (S6). Checked in the Engine:
+    `POST /api/auth/login` takes its tenant from the body's `tenant` (the header `X-Tenant-Id` is
+    what the Supabase client's password sign-in reads), so the text sends both; the account budget
+    is 30 creations per caller per 10 minutes and the request budget 20 per second per address,
+    both operator-adjustable; `isAdmin` sits beside `data` in `GET /api/permissions/me`.
+- [x] 5.8 (P) Convert `daas-platform` (row 24, BP, kept in-file per Issue 9)
   - `SKILL.md` line 3 (description, C4), then 9-35, 51-85, 87-153, 164, 176-192 (including 189) and
     207-292. `references/daas-api.instructions.md` 11-97, 101-292, 339-362, 472-565 and 573 (link,
     sup). `references/daas-mcp-tools.instructions.md` 101-169, 305, 636, 685, 1156-1481 (tools the
@@ -451,7 +498,19 @@
     `create-cron/SKILL.md`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.3, 3.5, 3.8, 3.10, 3.11, 4.6, 5.5, 3.15, 2.4_
   - _Boundary: daas-platform/, converted/daas-platform, supabase-view-changes/daas-platform.json_
-- [ ] 5.9 (P) Convert `debugging-and-error-recovery` (row 25, BP)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` and the four
+    references from `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gates and the
+    reworded description (the change file's one entry). The links 573, 1158, 1271 and 1718 lie
+    inside `supabase` passages, and their Engine counterparts link `hooks-extensions/SKILL.md` or
+    `create-cron/SKILL.md`. Ranges were widened to whole fences and tables and joined where the gap
+    rule required. Passages were added beyond the listed ranges where the baseline was wrong for the
+    Engine: `SKILL.md` 157-160; `builtin-features` 19-27, 39-46, 167, 177-180, 190-194, 202-209;
+    `daas-mcp-tools` 61-73, 89-99, 196-207, 259-272, 295-303, 383-450, 619-632, 853-883, 1500-1532
+    (field, item and collection calls take `keys`; there is no `assets` tool; deletes follow the
+    `mcp_allow_deletes` project setting; tool errors are results with `isError`). ES-13n is added
+    where the text sends the reader to cron jobs. The `Engine runtime` table sits in
+    `builtin-features`, beside the ES-10 sentence that links it.
+- [x] 5.9 (P) Convert `debugging-and-error-recovery` (row 25, BP)
   - `SKILL.md` 57-60, 87-88 (the MCP cross-origin fix, sup) and 112-117.
   - Engine content: Engine causes (`TOKEN_INVALID`, `FORBIDDEN_SCOPE`, `MISSING_SCOPE`, sign-in
     naming a foreign tenant, `ReferenceError` from `fetch`/`process`/`require`, and the Supabase
@@ -459,13 +518,26 @@
   - Done when: FD holds for `debugging-and-error-recovery`.
   - _Requirements: 1.2, 1.9, 2.1, 3.1, 3.15_
   - _Boundary: debugging-and-error-recovery/, converted/debugging-and-error-recovery, supabase-view-changes/debugging-and-error-recovery.json_
-- [ ] 5.10 (P) Convert `security-and-hardening` (row 31, BP)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. The three ranges lie inside fences, so each passage takes its whole fence (53-62, 80-89,
+    110-118). The Engine fences name `TOKEN_INVALID`/`TOKEN_EXPIRED`, a sign-in refused for an
+    account with no role in the tenant, `FORBIDDEN_SCOPE` and `MISSING_SCOPE` (both 403, checked in
+    the Engine), `ReferenceError` from `fetch`/`process`/`require`, and the 501 refusal of the
+    Supabase service; the log is `GET /api/logs` (administrator or `system:logs`), with ES-15.
+- [x] 5.10 (P) Convert `security-and-hardening` (row 31, BP)
   - `SKILL.md` 26, 29-36, 56-90, 119-132 and 161. The service-role lines are sup.
   - Engine content: ES-2, ES-3, ES-5 and ES-15. The Engine refuses caller-supplied SQL.
   - Done when: FD holds for `security-and-hardening`.
   - _Requirements: 1.2, 1.9, 2.1, 3.2, 3.4, 3.5, 3.15_
   - _Boundary: security-and-hardening/, converted/security-and-hardening, supabase-view-changes/security-and-hardening.json_
-- [ ] 5.11 (P) Convert `worker-messaging` (row 44, BP with an Engine passage only)
+  - Note 16 October 2026: read through the Engine and Supabase views of `SKILL.md` from
+    `check.mjs --render`; the Supabase view is `v1.0.0` but for the Gate, and the change file is
+    `[]`. 29-36 is one passage (it spans the `### Ask First` heading of the same level, which S6
+    allows), and the Engine copy repeats the lines of that range that hold for both. 56-90 holds
+    ES-2, ES-5, ES-3 (the service-role lines stay `supabase` text) and ES-15; line 26 and the
+    checklist say the Engine refuses caller-supplied SQL.
+- [x] 5.11 (P) Convert `worker-messaging` (row 44, BP with an Engine passage only)
   - `SKILL.md`: the Gate after the H1, and a new eng section "Reaching the data service from a
     worker" after Step 3b (line 136) holding ES-14n verbatim. There is no sup text. The Supabase view
     is the baseline apart from the Gate.
@@ -473,6 +545,11 @@
     `v1.0.0` once the Gate is removed, and the change file is `[]`.
   - _Requirements: 1.2, 1.6, 1.9, 2.1, 3.2, 4.7, 5.7, 5.9, 3.15_
   - _Boundary: worker-messaging/, converted/worker-messaging, supabase-view-changes/worker-messaging.json_
+  - Note 16 October 2026: read through the views from `check.mjs --render`: the Supabase view of
+    `SKILL.md` is byte-equal to `v1.0.0` once the Gate is removed, and the change file is `[]`. The
+    Engine section "Reaching the data service from a worker" holds ES-14n verbatim; it stands at the
+    end of Step 3b (before Step 4), after the consumer code whose handler calls the data service,
+    rather than inside the step after its line-136 introduction, so the step's code stays under it.
 
 - [ ] 6. Convert the Shared_Guidance and reword the wording-only Skills (design Group 6; after task 3; parallel with tasks 4 and 5)
 - [ ] 6.1 (P) Mark the agent personas (row 13, BP)

@@ -6,6 +6,37 @@ applyTo: "**/.env*"
 
 # Environment Configuration Instructions
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 ## Prerequisites
 
 Before configuring environment or running any project commands, verify required tools:
@@ -16,6 +47,7 @@ node --version && pnpm --version && git --version
 
 If missing, see [prerequisites.instructions.md](prerequisites.instructions.md) for installation by OS.
 
+<!-- buildpad-backend: supabase -->
 ## Architecture Overview
 
 Generated DaaS applications use a **two-tier architecture** with a **server-side proxy**:
@@ -48,6 +80,45 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_BUILDPAD_DAAS_URL=http://localhost:3000
 ```
 
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Architecture Overview
+
+On an Engine project the application has two tiers:
+
+1. **Frontend App** (this project) - Next.js application with proxy API routes
+2. **Buildpad Engine** - the data API, sign-in and file storage, with its own database, at the Engine_URL. This project runs no backend server and holds no database credentials.
+
+```
+┌─────────────────┐      ┌─────────────────────────┐
+│  Frontend App   │ ──── │  Buildpad Engine        │
+│  (Next.js)      │ API  │  (Engine_URL)           │
+└─────────────────┘      └─────────────────────────┘
+```
+
+On an Engine project the data API's address is the Engine_URL, which both `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` hold. The Studio's address is an administration interface: send no data call to it.
+
+On an Engine project the data API serves no request without a session; only the sign-in, `GET /api/server/info` and the Engine's password routes (which an application does not use: password recovery is not available on an Engine project) are served without one. The requests that take their tenant from the header `X-Tenant-Id` are the password sign-in and anonymous reads of public files. A browser cannot send `X-Tenant-Id` to the Engine until the Engine allows that header from another origin, which it does not yet do: so the request that names the tenant is the sign-in made through the application's own server route, which sends `X-Tenant-Id` with the value of `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. A public file shown in a browser is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read. A request without a session that names no tenant is served from the Engine's host plane, not from the project. A request with a session takes its tenant from the session.
+
+**Sign-in goes through the app's own `/api/auth/login` route**, which names the tenant. Every other call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the app's `/api/*` proxy routes or from the SDK; the Engine accepts no cookie session on its data API.
+
+## Required Environment Variables
+
+### For Frontend Apps (main-nextjs pattern)
+
+On an Engine project the environment is: `NEXT_PUBLIC_SUPABASE_URL=<Engine_URL>`, `NEXT_PUBLIC_BUILDPAD_DAAS_URL=<Engine_URL>`, `NEXT_PUBLIC_SUPABASE_ANON_KEY=buildpad-engine-public-anon-key` (a fixed value that is not a secret; the Engine does not read it, the Supabase client needs one), and `NEXT_PUBLIC_BUILDPAD_TENANT_ID=<the project's tenant id>`. There is no service-role key on an Engine project: add none.
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=<Engine_URL>
+NEXT_PUBLIC_BUILDPAD_DAAS_URL=<Engine_URL>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=buildpad-engine-public-anon-key
+NEXT_PUBLIC_BUILDPAD_TENANT_ID=<the project's tenant id>
+```
+
+Use the project's own Engine_URL and tenant id; if you do not have them, ask the developer. A local Engine runs on port 8080, so its Engine_URL is `http://localhost:8080`.
+
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: supabase -->
 ### For DaaS Backend (DaaS)
 
 ```env
@@ -60,6 +131,8 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 MCP_ENABLED=true
 ```
 
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: supabase -->
 ## Setup Steps
 
 1. **Start the DaaS Backend first**:
@@ -104,3 +177,52 @@ MCP_ENABLED=true
 - Verify Supabase URL and anon key are set
 - Check Supabase project has auth enabled
 - Ensure redirect URLs are configured in Supabase dashboard
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Setup Steps
+
+1. **Check that the Engine answers first**:
+
+   ```bash
+   curl <Engine_URL>/api/server/info
+   curl <Engine_URL>/api/health
+   # a local Engine: curl http://localhost:8080/api/health
+   ```
+
+   Both routes answer without a session. If neither answers, ask the developer to start the Engine or to give the right Engine_URL.
+
+2. **Configure Frontend App**:
+   ```bash
+   cd your-app
+   cp .env.local.example .env.local
+   # Set the four Engine values of "Required Environment Variables"
+   pnpm dev
+   ```
+
+## Common Issues
+
+### CORS errors when calling the Engine
+
+- On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere.
+- Send no cookie session and no `credentials` mode that sends cookies; send the user's access token as `Authorization: Bearer <access token>`
+- The browser must never send `X-Tenant-Id`: verify login page uses `fetch('/api/auth/login')` not `supabase.auth.signInWithPassword()`, so the server route names the tenant
+- See the [authentication-proxy](../../authentication-proxy/SKILL.md) skill
+
+### "Unauthorized" or 401 errors
+
+- Check that the Engine answers: `GET <Engine_URL>/api/server/info` or `GET <Engine_URL>/api/health`
+- Verify `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` both hold the Engine_URL
+- Ensure user is authenticated: the data API serves no request without a session. The code `UNAUTHENTICATED` means no token was sent; check that `DaaSProvider` has the token
+- The code `TOKEN_INVALID` means the token sent did not verify, for example a session that went stale: sign in again
+
+### "Connection refused" errors
+
+- Check that the Engine is running at the Engine_URL; a local Engine listens on port 8080 (`http://localhost:8080`)
+- Check the port matches the URL
+
+### Auth not working
+
+- Verify the four values of "Required Environment Variables" are set
+- The account must hold a role in the project's tenant: an account that holds no role in the project's tenant is refused at sign-in. An administrator gives it one in the Studio's Users module or through `POST /api/users/:id/roles` with `role_id` (see the [add-users](../../add-users/SKILL.md) skill)
+- Sign-up, OAuth sign-in, magic link, one-time code and password recovery are not available on an Engine project, so there are no redirect URLs to configure
+<!-- /buildpad-backend -->

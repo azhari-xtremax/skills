@@ -1,3 +1,5 @@
+// buildpad-backend-file: supabase
+// Backend: before using this file, establish the backend as "Establish the backend first" in this skill's SKILL.md says, keep only the parts for that backend, and copy no marker line into the application.
 // token/route.ts — hand the current access token to this micro-app's own browser code.
 //
 // Copy to: app/api/auth/token/route.ts  (a NEW file — no CLI collision).
