@@ -259,6 +259,7 @@ has no `converted/<folder>` file (rule R13).
 | R11 | A skill missing from the README catalogue or listed twice; the README without `npx skills add buildpad-ai/skills#v1.0.0` |
 | R12 | `backend-contract.json` or `cases.json` that no longer agree with their pinned copy (`test/contract.test.mjs`) |
 | R13 | On a tag push, a folder whose plan is not `UC` and that has no `converted/<folder>` |
+| R14 | A `SKILL.md` or persona whose front matter is not valid YAML, in the raw file or either view: `npx skills add` skips such a file without a word. Quote a value that holds `: ` or ` #`, or that starts with `[`, `{` or another YAML indicator |
 
 `tools/repo-check/contract/backend-contract.json` and `cases.json` are shared with the Buildpad
 Platform, which runs its own tests against them. A change to either needs the same change on the

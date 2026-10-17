@@ -647,6 +647,7 @@ flowchart TD
 | R11 README | 6.4, 6.7 | A Skill folder missing from the README catalogue or listed twice; the README lacking `npx skills add buildpad-ai/skills#v1.0.0` |
 | R12 Contract | S8 | `backend-contract.json` differs from the literal §C13/§C20 copies in `contract.test.mjs`, or a case in `cases.json` gives another result |
 | R13 Converted | 7.1, 7.2, 2.3, 3.15 | On a push of a `v*` tag: a row of `skill-map.json` whose `plan` is not `UC` and that has no `tools/repo-check/converted/<folder>`, so no release carries a folder the check has not held to every rule |
+| R14 Front-matter YAML | 7.4 | A `SKILL.md` or `agents/*.md` whose front matter the `yaml` package (which `npx skills add` uses) would refuse, in the raw file or either view: a plain value holding `: ` or ` #`, a flow collection that does not close or has text after it, a quoted value that does not close or has text after it, a duplicate key, a tab in the indentation. Not run by the `baseline` job: `v1.0.0` has such a front matter in `add-microfrontend-zones` |
 
 Criterion 7.7: the CI job `baseline` runs R4, R5 (front matter only) and R6a on the tree of
 `v1.0.0`, with the current `skill-map.json`, building the checked set from `git ls-tree` (Scope and
@@ -677,7 +678,7 @@ The maintainer makes both jobs required status checks on `main` (a repository se
 
 | Component | File | Interface | Rules |
 |---|---|---|---|
-| CLI | `tools/repo-check/check.mjs` | `main(argv) → exit code` (0, 1 or 2); options as in Interface | runs R1 to R13 |
+| CLI | `tools/repo-check/check.mjs` | `main(argv) → exit code` (0, 1 or 2); options as in Interface | runs R1 to R14 |
 | Checked set | `lib/checked-set.mjs` | `checkedSet(root, {ref}) → string[]`: `git ls-files` in a work tree, else `git ls-tree -r --name-only <ref>`, else a directory walk | all |
 | Passages | `lib/passages.mjs` | `validateMarkers(text) → MarkerIssue[]`, `validateMarkerPlacement(path, text) → MarkerIssue[]`, `fileBackend(path, text) → 'engine'\|'supabase'\|null`, `stripBackendPassages(text, keep) → {text, removed}` (§C13 names, from S8's data); `authoringIssues(text) → {line, code}[]` with `straddles-fence`, `marker-in-table`, `gap-between-passages` | R2, views |
 | Guard | `lib/guard.mjs` | `scanView(path, text) → {line, id}[]`: S8 patterns, path rule, fenced-block rule, `x-pp29-tool` | R1 |
@@ -740,7 +741,7 @@ folders, `tools/repo-check/supabase-view-changes/<folder>.json` and
 CHANGELOG.md                              # Release record, "Supabase projects" subsection per tag (6.2, 2.4)
 CONTRIBUTING.md                           # Markers, Gate, Pointer, ES set, how to add a Skill (5.8)
 tools/repo-check/
-├── check.mjs                             # CLI: runs R1-R13, --render, --tag
+├── check.mjs                             # CLI: runs R1-R14, --render, --tag
 ├── gate.md                               # The canonical Gate (S3)
 ├── skill-map.json                        # Machine Skill_Map, 64 rows (R4)
 ├── supabase-view-changes/<folder>.json    # Listed Supabase-view changes, one file per folder (R7, R10)
@@ -847,7 +848,7 @@ Withdrawn, not traced: **1.4, 7.6**. Every other criterion has one row.
 | 7.1 | Invalid_Instruction outside Supabase text fails with file and line | R1 in every converted folder; R13 refuses a release with an unconverted one | Tests `guard.test.mjs`, `map.test.mjs` |
 | 7.2 | Passage without the Gate fails with the file | R3 in every converted folder; R13 | `gate.test.mjs` |
 | 7.3 | Skill_Map coverage both ways | R4 | `map.test.mjs` |
-| 7.4 | Front matter name and description | R5 | `frontmatter.test.mjs` |
+| 7.4 | Front matter name and description | R5, R14 | `frontmatter.test.mjs` |
 | 7.5 | Skill-to-Skill link not resolving fails | R6a | `links.test.mjs` |
 | 7.7 | Passes on the baseline for 7.3, 7.4, 7.5 | CI `baseline` job | CI |
 | 7.8 | Unpaired or unknown-kind markers fail with file and line | R2 | `passages.test.mjs` |
