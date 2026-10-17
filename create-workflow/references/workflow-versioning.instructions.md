@@ -6,6 +6,37 @@ applyTo: "app/**/*.{ts,tsx}, lib/**/*.{ts,tsx}"
 
 # Workflow & Content Versioning Instructions
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 ## Overview
 
 The platform supports **content lifecycle management** through two integrated systems:
@@ -24,6 +55,7 @@ These work together to enable:
 
 ### Two-Tier System
 
+<!-- buildpad-backend: supabase -->
 ```
 ┌─────────────────────────────────────────────────┐
 │              Frontend (main-nextjs)              │
@@ -61,6 +93,48 @@ These work together to enable:
 3. **Workflow State**: Frontend polls for instance → Displays available commands via WorkflowButton
 4. **Transition**: User clicks command → Frontend calls `/api/workflow/transition` → DaaS updates state + history
 
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```
+┌─────────────────────────────────────────────────┐
+│              Frontend (main-nextjs)              │
+│  ├── ItemViewWithVersions                       │
+│  ├── WorkflowButton                             │
+│  ├── useVersions()                              │
+│  ├── useWorkflow()                              │
+│  └── useWorkflowVersioning()                    │
+└──────────────────────┬──────────────────────────┘
+                       │ API calls (user's access token)
+                       ▼
+┌──────────────────────────────────────────────────┐
+│              Buildpad Engine                     │
+│  ├── /api/versions                              │
+│  ├── /api/workflow/transition                   │
+│  ├── /api/workflows, /api/workflow-assignments  │
+│  ├── Workflow automation (instance auto-start)  │
+│  └── Version delta management                   │
+└──────────────────────┬───────────────────────────┘
+                       │ Database access
+                       ▼
+┌──────────────────────────────────────────────────┐
+│        The project's Engine database             │
+│  ├── daas_wf_definition                          │
+│  ├── daas_wf_assignment                          │
+│  ├── daas_wf_instance                            │
+│  ├── daas_wf_history                             │
+│  └── daas_versions                               │
+└──────────────────────────────────────────────────┘
+```
+
+### Data Flow
+
+1. **Version Creation**: User saves changes → Frontend calls `/api/versions` → the Engine creates the version record
+2. **Workflow Instance**: the Engine starts an instance in `daas_wf_instance` for a new item or version that an assignment matches
+3. **Workflow State**: Frontend reads the instance → Displays available commands via WorkflowButton
+4. **Transition**: User clicks command → Frontend calls `/api/workflow/transition` (through the app's own route) → the Engine updates state + history
+
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: supabase -->
 ## Content Versioning
 
 ### Core Concepts
@@ -90,6 +164,27 @@ CREATE TABLE daas_versions (
 );
 ```
 
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Content Versioning
+
+### Core Concepts
+
+| Concept           | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| **Version**       | A snapshot of item data stored in `daas_versions`   |
+| **Version Key**   | Identifier for a version (e.g., "1", "draft", "v2") |
+| **Version Delta** | JSON diff of changes from the main item             |
+| **Promote**       | Apply version delta back to main item               |
+
+### Data Model
+
+#### daas_versions
+
+An Engine project has no migrations; the Engine owns this collection. A version carries `key`, `name`, `collection`, `item` (the main item's id) and `delta`, plus its `id`. The Engine also serves `POST /api/versions/:id/save` and `POST /api/versions/:id/promote`.
+
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: supabase -->
 #### URL Parameters
 
 Retrieve specific versions:
@@ -100,6 +195,12 @@ GET /api/items/articles/item-uuid?version=draft
 GET /api/items/articles/item-uuid?version=1
 GET /api/items/articles/item-uuid         // Latest published
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+#### Reading a Version
+
+On an Engine project `/api/items` ignores the `version` query parameter: `GET /api/items/articles/item-uuid` always returns the main item. Read a version, with its `delta`, from `GET /api/versions/:id` (or list them with `GET /api/versions` and a filter on `collection` and `item`).
+<!-- /buildpad-backend -->
 
 ### API: Versions
 
@@ -181,6 +282,7 @@ const response = await fetch("/api/items/articles/item-uuid", {
 
 ### Workflow Definition Structure
 
+<!-- buildpad-backend: supabase -->
 ```json
 {
   "id": "wf-uuid",
@@ -295,6 +397,80 @@ CREATE TABLE daas_wf_transition_history (
   user_id UUID
 );
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```json
+{
+  "id": "wf-uuid",
+  "name": "Publishing Workflow",
+  "workflow_json": {
+    "initial_state": "draft",
+    "states": [
+      {
+        "name": "draft",
+        "label": "Draft",
+        "commands": [
+          {
+            "name": "submit",
+            "label": "Submit for Review",
+            "next_state": "review",
+            "policies": [],
+            "actions": []
+          }
+        ],
+        "isEndState": false
+      },
+      {
+        "name": "review",
+        "label": "In Review",
+        "commands": [
+          {
+            "name": "approve",
+            "label": "Approve & Publish",
+            "next_state": "published",
+            "policies": ["policy-uuid-reviewer"],
+            "actions": [
+              {
+                "name": "Promote Version",
+                "event_name": "xtr.item.promote",
+                "parameters": {}
+              }
+            ]
+          },
+          {
+            "name": "reject",
+            "label": "Send Back to Draft",
+            "next_state": "draft",
+            "policies": ["policy-uuid-reviewer"],
+            "actions": []
+          }
+        ],
+        "isEndState": false
+      },
+      {
+        "name": "published",
+        "label": "Published",
+        "commands": [],
+        "isEndState": true
+      }
+    ]
+  }
+}
+```
+
+On an Engine project a command's action names an `event_name` (`xtr.item.promote` promotes the instance's version); see the workflow schema reference.
+
+### Data Model
+
+An Engine project has no migrations: the Engine owns the workflow collections and serves each through its own route, with an administrator's session for writes.
+
+| Collection           | Fields                                                                                  | Route                                   |
+| -------------------- | --------------------------------------------------------------------------------------- | --------------------------------------- |
+| `daas_wf_definition` | `id`, `name`, `description`, `workflow_json`                                            | `/api/workflows`                        |
+| `daas_wf_assignment` | `id`, `workflow`, `collection`, `filter_rule`                                           | `/api/workflow-assignments`             |
+| `daas_wf_instance`   | `id`, `workflow`, `collection`, `item_id`, `version_key`, `current_state`, `terminated` | `/api/workflow-instances`               |
+| `daas_wf_history`    | one row per transition: the command, the states from and to, who ran it, and when       | `/api/workflow-instances/:id/history`   |
+<!-- /buildpad-backend -->
 
 ### Setting Up Workflows
 
@@ -777,7 +953,12 @@ export function ArticleView({ collection, itemId, versionKey }) {
 **Cause**: Filter rule doesn't match item or no assignment exists
 **Solution**:
 
+<!-- buildpad-backend: supabase -->
 1. Check assignment exists: `SELECT * FROM daas_wf_assignment WHERE collection = 'articles'`
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+1. Check assignment exists: `GET /api/workflow-assignments?filter={"collection":{"_eq":"articles"}}`
+<!-- /buildpad-backend -->
 2. Test filter rule: Verify item matches the filter rule JSON
 3. Check logs for errors during version creation
 
