@@ -1,3 +1,5 @@
+// buildpad-backend-file: supabase
+// Backend: before using this file, establish the backend as "Establish the backend first" in this skill's SKILL.md says, keep only the parts for that backend, and copy no marker line into the application.
 // mfe-middleware.ts — the micro-app's bridge additions to the CLI auth middleware.
 //
 // Copy to: lib/bridge/mfe-middleware.ts

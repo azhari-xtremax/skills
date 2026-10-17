@@ -1,0 +1,8 @@
+[
+  {
+    "path": "incremental-implementation/SKILL.md",
+    "kind": "text",
+    "reason": "The first data slice defines the collection through create-collection, which writes a migration on a Supabase project and calls the Engine on an Engine project, instead of naming a migration.",
+    "release": "unreleased"
+  }
+]

@@ -1,3 +1,5 @@
+// buildpad-backend-file: supabase
+// Backend: before using this file, establish the backend as "Establish the backend first" in this skill's SKILL.md says, keep only the parts for that backend, and copy no marker line into the application.
 // Copy to: lib/shell/usePublicPathname.ts (every app, unchanged).
 // lib/shell/usePublicPathname.ts — add-microfrontend-zones Step 6. Identical in every app.
 'use client';

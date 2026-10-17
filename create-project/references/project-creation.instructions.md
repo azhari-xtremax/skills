@@ -1,3 +1,34 @@
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 ````instructions
 ---
 name: Project Creation
@@ -56,6 +87,7 @@ npx @buildpad/cli@latest bootstrap --cwd /path/to/project
 cd /path/buildpad-ui && pnpm cli bootstrap --cwd /path/to/project
 ```
 
+<!-- buildpad-backend: supabase -->
 Bootstrap creates a complete project skeleton:
 
 - `package.json` with all dependencies
@@ -65,6 +97,20 @@ Bootstrap creates a complete project skeleton:
 - All 40+ Buildpad UI components
 - API proxy routes
 - Supabase auth utilities
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+Bootstrap creates a complete project skeleton:
+
+- `package.json` with all dependencies
+- `tsconfig.json` with path aliases
+- `next.config.ts`
+- `app/layout.tsx` and `app/page.tsx`
+- All 40+ Buildpad UI components
+- API proxy routes
+- Supabase client utilities, which an Engine project keeps for sign-in only
+
+On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`.
+<!-- /buildpad-backend -->
 
 ### Correct Foundation Sequence
 
@@ -86,6 +132,7 @@ See [prerequisites.instructions.md](prerequisites.instructions.md) for full deta
 
 **Option A: Using bootstrap (RECOMMENDED — single command, works on empty or non-empty dirs)**
 
+<!-- buildpad-backend: supabase -->
 ```
 1. ✅ Prerequisites verified             (Step 0 above)
 2. Create directory                → mkdir -p /path/to/project
@@ -97,9 +144,24 @@ See [prerequisites.instructions.md](prerequisites.instructions.md) for full deta
 6. Create AI tool config folders  → Copy AI tools LAST (not first!)
 7. Run Buildpad-First validation   → grep for forbidden Mantine imports (see below)
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```
+1. ✅ Prerequisites verified             (Step 0 above)
+2. Create directory                → mkdir -p /path/to/project
+3. Run bootstrap                   → npx @buildpad/cli@latest bootstrap --cwd /path/to/project
+   (or from local clone: pnpm cli bootstrap --cwd /path/to/project)
+   (creates Next.js skeleton, installs ALL components, installs ALL npm deps)
+4. Create .env.local               → Only NOW create project-specific files (the four Engine values: environment.instructions.md)
+5. Create app pages                → app/login/page.tsx, etc.
+6. Create AI tool config folders  → Copy AI tools LAST (not first!)
+7. Run Buildpad-First validation   → grep for forbidden Mantine imports (see below)
+```
+<!-- /buildpad-backend -->
 
 **Option B: Using create-next-app (only for empty directories)**
 
+<!-- buildpad-backend: supabase -->
 ```
 1. ✅ Prerequisites verified             (Step 0 above)
 2. Create EMPTY directory          → mkdir -p /path/to/project
@@ -112,6 +174,21 @@ See [prerequisites.instructions.md](prerequisites.instructions.md) for full deta
 8. Create AI tool config folders  → Copy AI tools LAST (not first!)
 9. Run Buildpad-First validation   → grep for forbidden Mantine imports (see below)
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```
+1. ✅ Prerequisites verified             (Step 0 above)
+2. Create EMPTY directory          → mkdir -p /path/to/project
+3. Run create-next-app from PARENT → cd /path/to && npx create-next-app project-name ...
+4. Add Buildpad components       → npx @buildpad/cli@latest add --all --with-api --cwd /path/to/project-name
+   (or from local clone: pnpm cli add --all --with-api --cwd /path/to/project-name)
+5. Install dependencies            → cd /path/to/project-name && pnpm install
+6. Create .env.local               → Only NOW create project-specific files (the four Engine values: environment.instructions.md)
+7. Create app pages                → app/login/page.tsx, etc.
+8. Create AI tool config folders  → Copy AI tools LAST (not first!)
+9. Run Buildpad-First validation   → grep for forbidden Mantine imports (see below)
+```
+<!-- /buildpad-backend -->
 
 > **Do NOT mix Option A and B.** If you use bootstrap, you do NOT need create-next-app or separate `pnpm add` commands.
 

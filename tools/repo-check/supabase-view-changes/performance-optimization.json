@@ -1,0 +1,8 @@
+[
+  {
+    "path": "performance-optimization/SKILL.md",
+    "kind": "text",
+    "reason": "Engine-project sentences added: a field is indexed through schema.add_index when it is created, deep is ignored, and limit is capped at 1000; the Supabase guidance is unchanged.",
+    "release": "unreleased"
+  }
+]

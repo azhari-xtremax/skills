@@ -1,3 +1,5 @@
+// buildpad-backend-file: supabase
+// Backend: before using this file, establish the backend as "Establish the backend first" in this skill's SKILL.md says, keep only the parts for that backend, and copy no marker line into the application.
 // Copy to: next.config.ts (Main App). Replaces any iframe-skill next.config.ts.
 // next.config.ts — Main App / default zone (add-microfrontend-zones Step 3)
 import type { NextConfig } from 'next';

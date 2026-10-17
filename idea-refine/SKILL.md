@@ -63,7 +63,7 @@ VALIDATION:
 - [ ] Problem is real (users actually have this pain)
 - [ ] Solution addresses the core problem (not a symptom)
 - [ ] Scope is bounded (clear what's included and excluded)
-- [ ] Approach is feasible with current stack (Next.js + DaaS + Supabase)
+- [ ] Approach is feasible with current stack (Next.js and the project's Buildpad backend: DaaS + Supabase, or the Buildpad Engine)
 - [ ] DaaS built-in features are leveraged (not rebuilt)
 - [ ] One or more alternatives were considered and rejected with reasons
 ```
@@ -78,9 +78,9 @@ Before refining any data-centric idea, check what DaaS provides out of the box:
 | Approval processes | Workflow state machines |
 | Content drafts | Versioning API |
 | File management | Files API |
-| Scheduled tasks | Cron jobs |
+| Scheduled tasks | Cron jobs (on an Engine project they run only when run by hand, until its scheduler runs) |
 | Access control | RBAC (roles, policies, permissions) |
-| Data partitioning | Scope system (multi-tenancy) |
+| Data partitioning | Scope system (multi-tenancy; on an Engine project the project is one tenant and its scopes sit below it) |
 | Data import/export | Utils API |
 
 **If DaaS provides it, the idea refinement should focus on how to configure and present it — not whether to build it.**

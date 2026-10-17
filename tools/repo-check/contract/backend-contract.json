@@ -1,0 +1,40 @@
+{
+  "contract": "buildpad-backend-passages",
+  "version": 1,
+  "source": "buildpad-platform .kiro/specs/engine-backed-project-provisioning/design.md §C13 §C20",
+  "markerRegex": "^[ \\t]*(?:<!--|//|#|--|/\\*)?[ \\t]*(/buildpad-backend|buildpad-backend(-file)?:[ \\t]*([A-Za-z]+))[ \\t]*(?:-->|\\*/)?[ \\t]*$",
+  "token": "buildpad-backend",
+  "kinds": ["engine", "supabase"],
+  "onlyDirs": {"engine-only": "engine", "supabase-only": "supabase"},
+  "steeringToken": "kiro-steering:",
+  "issueCodes": ["malformed-marker", "unpaired-open", "unpaired-close", "nested", "unknown-kind",
+    "straddles-steering", "misplaced-file-marker", "conflicting-scope", "marker-in-front-matter"],
+  "guardPatterns": [
+    {"id": "rpc", "regex": "\\.rpc\\("},
+    {"id": "rest", "regex": "/rest/v1/"},
+    {"id": "service-role", "regex": "SUPABASE_SERVICE_ROLE_KEY|service_role|serviceRoleKey"},
+    {"id": "auth-admin", "regex": "auth\\.admin\\."},
+    {"id": "client-auth", "regex": "auth\\.(updateUser|exchangeCodeForSession|verifyOtp|signInWithOtp|resetPasswordForEmail)\\("},
+    {"id": "stored-supabase", "regex": "createClient\\(\\s*process\\.env\\.SUPABASE"},
+    {"id": "sql-policy", "regex": "CREATE POLICY|auth\\.uid\\(\\)|storage\\.objects|auth\\.users"},
+    {"id": "migration", "regex": "supabase/migrations/|supabase (db push|migration new)"},
+    {"id": "storage", "regex": "storage\\.(from|createBucket|updateBucket)\\("},
+    {"id": "service-token-data", "regex": "DAAS_SERVICE_TOKEN|Bearer \\$\\{?SERVICE_TOKEN"},
+    {"id": "cors-mcp", "regex": "mcp_daas_cors-settings|\"name\":\\s*\"cors-settings\""},
+    {"id": "missing-mcp", "regex": "mcp_daas_(smtp-settings|module_access_keys)\\b|\"name\":\\s*\"(smtp-settings|module_access_keys)\""},
+    {"id": "platform-supabase", "regex": "supabaseServiceRoleKey|supabaseAnonKey|supabaseUrl"}
+  ],
+  "guardPathRegex": "(^|/)supabase/migrations/",
+  "guardPathSuffixUnderSkill": ".sql",
+  "fencedBlockRule": {"credentials": "credentials:\\s*['\"]include['\"]", "dataApi": "DAAS_URL|/items"},
+  "fencedLinksAreLinks": false,
+  "recordedLinkBreaks": [
+    {"file": "create-rbac/SKILL.md", "lineAtBaseline": 288, "target": "../../references/module-access-checklist.md", "layouts": ["repository", "kiro", "claude", "antigravity"]},
+    {"file": "grant-module-access/SKILL.md", "lineAtBaseline": 245, "target": "../../references/module-access-checklist.md", "layouts": ["repository", "kiro", "claude", "antigravity"]},
+    {"file": "relational-permissions/SKILL.md", "lineAtBaseline": 242, "target": "../../microbuild-supabase-users/docs/RELATIONAL_PERMISSIONS.md", "layouts": "all"},
+    {"file": "generate-docs/references/documentation.instructions.md", "lineAtBaseline": 190, "target": "./related1.md", "layouts": "all"},
+    {"file": "generate-docs/references/documentation.instructions.md", "lineAtBaseline": 191, "target": "./related2.md", "layouts": "all"},
+    {"file": "generate-docs/references/documentation.instructions.md", "lineAtBaseline": 320, "target": "./related1.md", "layouts": "all"},
+    {"file": "generate-docs/references/documentation.instructions.md", "lineAtBaseline": 321, "target": "./related2.md", "layouts": "all"}
+  ]
+}

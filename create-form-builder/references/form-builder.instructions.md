@@ -93,8 +93,8 @@ Because real-column answers are ordinary DaaS columns, the existing Items API *i
 ## Multi-Tenancy / Scopes
 
 - Data requests reuse the existing `DaaSProvider` header injection, so scoped reads/writes partition by `X-Resource-Uri` automatically on the direct deployment.
-- For a scope-enabled **target** collection, `DynamicForm` passes the active scope URI as a create-time default (`scopeField`, default `'resource_uri'`; `injectActiveScope` default `true`) unless DaaS permission presets already inject it. The active scope is read from the `daas_resource_uri` cookie.
-- **Definitions** follow a *global-baseline + optional per-tenant-override* model: by default `fb_definitions` is unscoped (one form for all tenants). Scope-enable it and `resolveScreen` picks the nearest-ancestor-or-self definition per scope.
+- For a scope-enabled **target** collection, `DynamicForm` passes the active scope URI as a create-time default (`scopeField`, default `'resource_uri'`; `injectActiveScope` default `true`) unless DaaS permission presets already inject it. The active scope is read from the `daas_resource_uri` cookie. On an Engine project permission presets are not applied on write, so there the scope comes only from this create-time default.
+- **Definitions** follow a *global-baseline + optional per-scope-override* model: by default `fb_definitions` is unscoped (one form for all scopes; on an Engine project, the project is one tenant and its scopes sit below it). Scope-enable it and `resolveScreen` picks the nearest-ancestor-or-self definition per scope.
 
 See [manage-scope](../../manage-scope/SKILL.md) for the DaaS scope system.
 

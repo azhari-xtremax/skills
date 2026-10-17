@@ -6,6 +6,37 @@ applyTo: "**/*.{ts,tsx}"
 
 # RBAC Setup Instructions
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 Complete reference for configuring role-based access control (RBAC) via DaaS MCP tools.
 
 ## RBAC Entity Graph
@@ -36,11 +67,21 @@ A user's effective permissions come from **three sources** combined with OR logi
 
 1. **Role policies**: ALL roles in `daas_user_roles` → `daas_access` (matching any role) → `policy` → `permissions`
 2. **Direct policies**: `daas_access` (where `user = user.id`) → `policy` → `permissions`
+<!-- buildpad-backend: supabase -->
 3. **Public policies**: `daas_access` (where `role IS NULL AND user IS NULL`) → `policy` → `permissions`
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+3. **Every-user policies**: `daas_access` (where `role IS NULL AND user IS NULL`) → `policy` → `permissions`. On an Engine project such an entry applies to every signed-in user; the data API serves no request without a session, so nothing is public
+<!-- /buildpad-backend -->
 
 Policies from ALL of a user's roles are collected and merged together.
 
+<!-- buildpad-backend: supabase -->
 Admin users (those whose policies grant `admin_access: true`) bypass **all** permission checks. Use `has_admin_access()` RPC to check.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+Admin users (those whose policies grant `admin_access: true`) bypass **all** permission checks. To check, forward the user's token to `GET <Engine_URL>/api/permissions/me` and read `isAdmin`.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -87,12 +128,22 @@ Admin users (those whose policies grant `admin_access: true`) bypass **all** per
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 **Important policy flags:**
 
 - `admin_access: true` — bypasses ALL permission checks (use only for admin policy)
 - `app_access: true` — grants access to the DaaS app/dashboard UI
 - `enforce_tfa: true` — requires two-factor authentication
 - `delegate_access: true` — allows acting on behalf of another user via `X-On-Behalf-Of` header (for service account delegation)
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+**Important policy flags:**
+
+- `admin_access: true` — bypasses ALL permission checks (use only for admin policy)
+- `app_access: true` — grants access to the Studio, the Engine's administration interface
+- `enforce_tfa: true` — requires two-factor authentication. On an Engine project multi-factor enrolment, challenge and verification are not served through the Supabase client. The Engine's own routes, each called with the user's session, are `POST /api/auth/mfa/enroll`, `GET /api/auth/mfa/factors`, `POST /api/auth/mfa/verify` and `POST /api/auth/mfa/unenroll`; a session that still needs its second factor is accepted elsewhere only after `POST /api/auth/mfa/verify`.
+- `delegate_access: true` — allows acting on behalf of another user via `X-On-Behalf-Of` header (for service account delegation)
+<!-- /buildpad-backend -->
 
 ### access — Link Policies to Roles/Users
 
@@ -104,6 +155,7 @@ Admin users (those whose policies grant `admin_access: true`) bypass **all** per
 
 **Important:** Always pass `data` as a single object, NOT an array. Create one access entry per call.
 
+<!-- buildpad-backend: supabase -->
 ```json
 // Assign policy to role (most common)
 { "name": "access", "arguments": { "action": "create", "data": { "policy": "<policy-uuid>", "role": "<role-uuid>" } } }
@@ -117,6 +169,24 @@ Admin users (those whose policies grant `admin_access: true`) bypass **all** per
 // Read access entries filtered by role
 { "name": "access", "arguments": { "action": "read", "filter_role": "<role-uuid>" } }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```json
+// Assign policy to role (most common)
+{ "name": "access", "arguments": { "action": "create", "data": { "policy": "<policy-uuid>", "role": "<role-uuid>" } } }
+
+// Assign policy directly to user
+{ "name": "access", "arguments": { "action": "create", "data": { "policy": "<policy-uuid>", "user": "<user-uuid>" } } }
+
+// Every signed-in user — omit role and user
+{ "name": "access", "arguments": { "action": "create", "data": { "policy": "<policy-uuid>" } } }
+
+// Read access entries filtered by role
+{ "name": "access", "arguments": { "action": "read", "filter_role": "<role-uuid>" } }
+```
+
+On an Engine project an entry with neither `role` nor `user` applies to every signed-in user, not to anonymous callers: the data API serves no request without a session.
+<!-- /buildpad-backend -->
 
 ### permissions — Manage Permission Rules
 
@@ -127,12 +197,24 @@ Admin users (those whose policies grant `admin_access: true`) bypass **all** per
 >
 > The `data` parameter accepts a **single object** or **array of objects**. The JSON Schema for this tool uses `z.any()` (no oneOf), so any valid object or array is accepted — validation happens server-side.
 
+<!-- buildpad-backend: supabase -->
 | Action   | Required Fields                                 | Optional                                                             |
 | -------- | ----------------------------------------------- | -------------------------------------------------------------------- |
 | `create` | `data.policy`, `data.collection`, `data.action` | `data.fields`, `data.permissions`, `data.validation`, `data.presets` |
 | `read`   | —                                               | `keys`, `policy`, `collection`, `query`                              |
 | `update` | `id`, `data`                                    | —                                                                    |
 | `delete` | `keys`                                          | —                                                                    |
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+| Action   | Required Fields                                 | Optional                                                             |
+| -------- | ----------------------------------------------- | -------------------------------------------------------------------- |
+| `create` | `data.policy`, `data.collection`, `data.action` | `data.fields`, `data.permissions` (`data.validation` and `data.presets` are stored but not applied on write) |
+| `read`   | —                                               | `keys`, `policy`, `collection`, `query`                              |
+| `update` | `id`, `data`                                    | —                                                                    |
+| `delete` | `keys`                                          | —                                                                    |
+
+The Engine keeps one rule per policy, collection and action: update the existing rule instead of creating a second one.
+<!-- /buildpad-backend -->
 
 ```json
 // Create read permission with item filter
@@ -166,6 +248,7 @@ Admin users (those whose policies grant `admin_access: true`) bypass **all** per
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Dynamic Variables
 
 Use these in `permissions` (item filters), `validation`, and `presets` fields:
@@ -213,6 +296,47 @@ Users can fully manage their own items and read others' published items.
 // Delete — own items only
 { "policy": "P", "collection": "C", "action": "delete", "permissions": { "user_created": { "_eq": "$CURRENT_USER" } } }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Dynamic Variables
+
+Use these in `permissions` (item filters):
+
+| Variable                | Type        | Description                          | Example                                                       |
+| ----------------------- | ----------- | ------------------------------------ | ------------------------------------------------------------- |
+| `$CURRENT_USER`         | `string`    | Current user's UUID                  | `{ "user_created": { "_eq": "$CURRENT_USER" } }`              |
+| `$CURRENT_USER.<field>` | `any`       | One column of the current user's own record | `{ "organization": { "_eq": "$CURRENT_USER.organization" } }` |
+| `$CURRENT_ROLE`         | `string`    | One role UUID of the user            | `{ "assigned_role": { "_eq": "$CURRENT_ROLE" } }`             |
+| `$NOW`                  | `timestamp` | Current timestamp                    | `{ "publish_date": { "_lte": "$NOW" } }`                      |
+
+> On an Engine project a rule that uses any other variable is refused: `$CURRENT_ROLES`, `$CURRENT_POLICIES`, `$CURRENT_ROLE.<field>`, an adjusted `$NOW(...)`, and a path through a relation such as `$CURRENT_USER.<relation>.<field>`.
+
+### Variable Resolution
+
+The Engine resolves the variables of a rule on every request. `$CURRENT_USER.<field>` is read from the caller's own `daas_users` row by the statement that applies the rule, so it is always current. Presets and validation are not applied on write, so a variable in `presets` or `validation` has no effect.
+
+---
+
+## Common RBAC Patterns
+
+### Pattern 1: Own Items CRUD
+
+Users can fully manage their own items and read others' published items. `user_created` is filled by its `user-created` special, so the create rule needs no preset.
+
+```json
+// Create
+{ "policy": "P", "collection": "C", "action": "create", "fields": ["*"] }
+
+// Read — own items + published
+{ "policy": "P", "collection": "C", "action": "read", "fields": ["*"], "permissions": { "_or": [{ "user_created": { "_eq": "$CURRENT_USER" } }, { "status": { "_eq": "published" } }] } }
+
+// Update — own items only
+{ "policy": "P", "collection": "C", "action": "update", "fields": ["title", "content", "status"], "permissions": { "user_created": { "_eq": "$CURRENT_USER" } } }
+
+// Delete — own items only
+{ "policy": "P", "collection": "C", "action": "delete", "permissions": { "user_created": { "_eq": "$CURRENT_USER" } } }
+```
+<!-- /buildpad-backend -->
 
 ### Pattern 2: Role Hierarchy (Admin → Editor → Viewer)
 
@@ -226,6 +350,7 @@ Viewer Policy:  read-only on published content
 
 Use the DaaS scope system for tenant/org isolation. RBAC only defines the role and policy — scope enforcement is handled by the platform automatically.
 
+<!-- buildpad-backend: supabase -->
 ```json
 // 1. Create a role and policy as normal
 // mcp_daas_roles -> { "name": "Member" }
@@ -269,6 +394,59 @@ The platform resolves: active scope URI → match `scope_field` value → return
 // Authenticated policy (access.role = authenticated-role)
 { "policy": "auth-P", "collection": "articles", "action": "create", "fields": ["title", "content"], "presets": { "status": "draft", "user_created": "$CURRENT_USER" } }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```json
+// 1. Create a role and policy as normal
+// mcp_daas_roles -> { "name": "Member" }
+// mcp_daas_policies -> { "name": "Member Access" }
+
+// 2. Create permissions with NO tenant filter — scope handles isolation
+{
+  "policy": "<policy-id>",
+  "collection": "orders",
+  "action": "read",
+  "fields": ["*"],
+  "permissions": null
+}
+
+// 3. Assign user to role at a specific scope node (below the tenant node)
+// mcp_daas_scope -> action: assign_user_role
+{
+  "action": "assign_user_role",
+  "assignment": {
+    "user_id": "<uuid>",
+    "role_id": "<role-uuid>",
+    "resource_uri": "/<tenant-type-uuid>:<tenant-uuid>/<type-uuid>:<item-uuid>"
+  }
+}
+
+// 4. Configure collection to filter by scope — POST /api/scope/collection-config,
+//    with an administrator's session (the MCP scope tool only assigns roles)
+{
+  "collection": "orders",
+  "field_name": "resource_uri",
+  "inheritance_mode": "exact",
+  "missing_uri_mode": "reject"
+}
+```
+
+The Engine resolves: active scope URI (`X-Resource-Uri`) → match the scope field → return only that scope's data. No permission filter needed. See `/manage-scope` skill for complete setup.
+
+### Pattern 4: Signed-In Read, Restricted Write
+
+On an Engine project the data API serves no request without a session, so there is no anonymous read: give the read rule to a policy granted to every signed-in user (an access entry with neither `role` nor `user`).
+
+```json
+// Member policy (granted to every signed-in user)
+{ "policy": "member-P", "collection": "articles", "action": "read", "fields": ["id", "title", "content", "author"], "permissions": { "status": { "_eq": "published" } } }
+
+// Author policy
+{ "policy": "author-P", "collection": "articles", "action": "create", "fields": ["title", "content"] }
+```
+
+A create rule cannot set `status` for the author, because presets are not applied: leave `status` out of its `fields` and give the field a default, or move the item through a workflow (`create-workflow`).
+<!-- /buildpad-backend -->
 
 ### Pattern 5: System Collection Permissions
 
@@ -338,15 +516,28 @@ Read back permissions per policy:
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 Test via debug endpoint:
 
 ```
 GET /api/permissions/me?debug=true
 Authorization: Bearer <user-token>
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+Test with the user's own token:
+
+```
+GET /api/permissions/me
+Authorization: Bearer <user-token>
+```
+
+It answers the user's permissions as `data`, with `isAdmin`, `moduleAccess`, and a `meta` that names the user's `role_ids` and `policy_ids`.
+<!-- /buildpad-backend -->
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Validation Checklist
 
 Before considering RBAC setup complete, verify:
@@ -359,6 +550,21 @@ Before considering RBAC setup complete, verify:
 - [ ] Presets auto-set `user_created` on create actions where needed
 - [ ] Field lists don't accidentally expose sensitive columns (password, token, secret)
 - [ ] Non-admin roles do NOT have `admin_access: true` on their policy
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Validation Checklist
+
+Before considering RBAC setup complete, verify:
+
+- [ ] Every role has at least one policy linked via access
+- [ ] Every collection in the app has at least read permissions for the intended roles
+- [ ] `daas_users` has read permission if the app shows user info (avatars, names)
+- [ ] `daas_files` has create+read permission if the app allows file uploads
+- [ ] Item-level filters use only `$CURRENT_USER`, `$CURRENT_USER.<field>`, `$CURRENT_ROLE` and `$NOW` (not hardcoded UUIDs)
+- [ ] No rule relies on `presets` or `validation`: the Engine does not apply them on write
+- [ ] Field lists don't accidentally expose sensitive columns (password, token, secret)
+- [ ] Non-admin roles do NOT have `admin_access: true` on their policy
+<!-- /buildpad-backend -->
 
 ---
 

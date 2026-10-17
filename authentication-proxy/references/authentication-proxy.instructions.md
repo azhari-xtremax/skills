@@ -28,10 +28,16 @@ Browser (localhost:3001)            Next.js API Routes (localhost:3001)         
       │  ◄── { data: [...] }                 │  ◄── { data: [...] }                   │
 ```
 
+The diagram shows a Supabase project, where the right-hand column is the DaaS backend and Supabase Auth. On an Engine project the right-hand column is the Engine at the Engine_URL (a local Engine answers on `localhost:8080`): the Supabase client in the API routes signs in, refreshes the session, reads the user and signs out at the Engine, and the data routes forward the user's token to the Engine. On an Engine project the data API's address is the Engine_URL, which both `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` hold. The Studio's address is an administration interface: send no data call to it.
+
 ### Why This Matters
 
 - **CORS**: The DaaS backend runs on a different port/domain. Browser requests to
-  cross-origin servers trigger CORS preflight checks and cookie restrictions.
+  cross-origin servers trigger CORS preflight checks and cookie restrictions. On an Engine
+  project the data API accepts requests from any origin but never with cookies, and a browser
+  cannot send the tenant header `X-Tenant-Id` to it yet, so the sign-in that names the tenant is
+  made by the app's own server route, which sends `X-Tenant-Id` with the value of
+  `NEXT_PUBLIC_BUILDPAD_TENANT_ID`.
 - **Security**: Server-side proxy routes can forward auth tokens securely without
   exposing them to the browser.
 - **Cookies**: Session cookies set via the proxy have `SameSite=Lax` by default,
@@ -43,10 +49,12 @@ The Buildpad CLI installs these proxy routes automatically with `--all` or `--wi
 
 | Route                | Method | Purpose                                     |
 | -------------------- | ------ | ------------------------------------------- |
-| `/api/auth/login`    | POST   | Login with email/password via Supabase Auth |
+| `/api/auth/login`    | POST   | Login with email/password via Supabase Auth (via the Supabase client to the Engine, on an Engine project) |
 | `/api/auth/logout`   | POST   | Sign out and clear session cookies          |
 | `/api/auth/user`     | GET    | Get current authenticated user profile      |
-| `/api/auth/callback` | GET    | Handle OAuth/email-confirm redirects        |
+| `/api/auth/callback` | GET    | Handle OAuth/email-confirm redirects (Supabase projects only) |
+
+On an Engine project the Supabase client is kept for sign-in only. Password sign-in, session refresh, reading the signed-in user and sign-out work through it, and its default sign-out ends the user's sessions on every device. An account that holds no role in the project's tenant is refused at sign-in. Not available on an Engine project: sign-up; OAuth sign-in; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; code exchange; and the Supabase administration API. The Platform's password-less handoff opens the Studio; it is not a way for an application to sign a user in.
 
 ## ❌ WRONG: Direct Supabase Auth from Browser
 
@@ -129,6 +137,7 @@ The same proxy pattern applies to ALL data operations:
 
 ```tsx
 // ❌ WRONG: Direct call to DaaS backend
+// (localhost:3000 is a local DaaS backend; a local Engine answers on localhost:8080)
 const response = await fetch("http://localhost:3000/api/items/todos");
 
 // ✅ CORRECT: Same-origin proxy route
@@ -292,12 +301,24 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 The proxy routes use these environment variables:
 
 ```env
-# Frontend app (.env.local)
+# Frontend app (.env.local), on a Supabase project
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_BUILDPAD_DAAS_URL=http://localhost:3000
 ```
 
+On an Engine project the environment is: `NEXT_PUBLIC_SUPABASE_URL=<Engine_URL>`, `NEXT_PUBLIC_BUILDPAD_DAAS_URL=<Engine_URL>`, `NEXT_PUBLIC_SUPABASE_ANON_KEY=buildpad-engine-public-anon-key` (a fixed value that is not a secret; the Engine does not read it, the Supabase client needs one), and `NEXT_PUBLIC_BUILDPAD_TENANT_ID=<the project's tenant id>`. There is no service-role key on an Engine project: add none.
+
+```env
+# Frontend app (.env.local), on an Engine project
+NEXT_PUBLIC_SUPABASE_URL=<Engine_URL>
+NEXT_PUBLIC_BUILDPAD_DAAS_URL=<Engine_URL>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=buildpad-engine-public-anon-key
+NEXT_PUBLIC_BUILDPAD_TENANT_ID=<the project's tenant id>
+```
+
 The middleware (`middleware.ts`) handles session refresh automatically.
 Auth proxy routes use `@/lib/supabase/server` client for server-side auth operations.
-Data proxy routes use `@/lib/api/auth-headers` to forward the JWT to the DaaS backend.
+Data proxy routes use `@/lib/api/auth-headers` to forward the JWT to the data API at
+`NEXT_PUBLIC_BUILDPAD_DAAS_URL` (the DaaS backend on a Supabase project, the Engine_URL on an
+Engine project).
