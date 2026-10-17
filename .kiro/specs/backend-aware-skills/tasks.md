@@ -931,7 +931,7 @@
     gates (hash generate and random string for any signed-in user, the rest administrator only
     except the stored export).
 
-- [ ] 9. Release `v2.0.0` (design "Last"; after tasks 4 to 8)
+- [x] 9. Release `v2.0.0` (design "Last"; after tasks 4 to 8)
 - [x] 9.1 Run the release read-through and the install check on the candidate
   - Run `node tools/repo-check/check.mjs --render <out>` and go through Testing Strategy steps 2 to 5
     for all 44 changed folders. Gather the per-folder read-through records from the pull requests.
@@ -953,7 +953,7 @@
     with no `unreleased` entry and every non-UC row converted. The pull request is merged.
   - _Requirements: 2.4, 6.2, 7.1, 7.2_
   - Note 17 October 2026: pull request #30; 33 entries released, `check.mjs --tag v2.0.0` exits 0.
-- [ ] 9.3 Tag `v2.0.0` and publish the GitHub Release (maintainer)
+- [x] 9.3 Tag `v2.0.0` and publish the GitHub Release (maintainer)
   - Create the annotated tag `v2.0.0` on the merge commit of 9.2, push it, and publish a GitHub
     Release carrying the `v2.0.0` CHANGELOG section.
   - Then install the tag into a scratch folder with `npx skills@1.7.1 add buildpad-ai/skills#v2.0.0@create-project`
@@ -963,6 +963,10 @@
   - _Requirements: 6.2, 6.3_
   - External note: the Platform does not re-sync until `v2.0.0`. Its `pnpm sync:skills --ref v2.0.0`
     and `skills-vendor.json` are the Platform's work (SP-2, PP-39), not tasks here.
+  - Note 17 October 2026: annotated tag `v2.0.0` on `a4f86db` (merge of pull request #31); the
+    tag-push `repo-check` run passed; release page https://github.com/buildpad-ai/skills/releases/tag/v2.0.0.
+    From the tag, `#v2.0.0@create-project` installed 1 skill and `#v2.0.0 --all` 62, every file equal
+    to `git ls-tree -r v2.0.0`; the lock records `ref: v2.0.0`.
 
 - [ ] 10. External gates: switch each "not yet available" statement when its dependency is met
   - Each sub-task stays blocked until its row is recorded as met in the requirements' Dependencies,
