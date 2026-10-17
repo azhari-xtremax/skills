@@ -24,7 +24,7 @@ Every feature gets spec artifacts in `.kiro/specs/<feature-name>/` before implem
 ## Planning Process
 
 1. **Understand Requirements** — What problem does this solve? Who are the users?
-2. **Check Built-In DaaS Features** — Before designing anything, review the [Built-in DaaS features reference](../daas-platform/references/builtin-features.instructions.md). If DaaS provides it natively (audit trail, workflow, versioning, file management, cron, RBAC, scoping, import/export), use it — do NOT rebuild it.
+2. **Check Built-In DaaS Features** — Before designing anything, review the [Built-in DaaS features reference](../daas-platform/references/builtin-features.instructions.md). If DaaS provides it natively (audit trail, workflow, versioning, file management, cron, RBAC, scoping, import/export), use it — do NOT rebuild it. On an Engine project the Engine provides them; where one differs there (scheduled cron runs, for example), the checklist below and the skill for that feature say so.
 3. **Design Data Model** — Collections, fields, types, relationships, permissions. For every collection, follow the [Standard Fields decision tree](../create-collection/references/standard-fields.instructions.md#decision-tree--which-field-groups-to-include): always include audit fields, add workflow fields if approval/lifecycle needed, add scope field if multi-tenancy needed.
 4. **Plan API Endpoints** — CRUD routes with request/response formats
 5. **Design UI** — Pages, components, user flows
@@ -38,11 +38,13 @@ For each collection in the feature, answer these questions during the design sta
 
 - [ ] **Audit fields included?** → ALWAYS yes (Group A: user_created, date_created, user_updated, date_updated)
 - [ ] **Needs workflow/approval?** → Add Group B fields + plan `create-workflow` skill invocation
-- [ ] **Needs multi-tenancy?** → Add Group C field + plan `manage-scope` skill invocation
+- [ ] **Needs multi-tenancy (data separated by scope)?** → Add Group C field + plan `manage-scope` skill invocation. On an Engine project the project is one tenant, and the scopes are levels below its tenant node.
 - [ ] **Needs versioning?** → Plan DaaS versioning API integration (NOT custom version tables)
-- [ ] **Needs scheduled tasks?** → Plan DaaS cron jobs (NOT Next.js cron routes)
+- [ ] **Needs scheduled tasks?** → Plan DaaS cron jobs (NOT Next.js cron routes). On an Engine project a cron job's body runs in the Engine's runtime: it has no `fetch`, `process`, `require` or timers, no Supabase service and no SQL; it reads and writes data through `services.items(collection)` (with `{ elevated: true }` where it must act as an administrator) and calls outside hosts through `services.fetch` (see [create-cron](../create-cron/SKILL.md)). On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet.
 - [ ] **Needs capability/role gating?** → Plan Module-Level Access Keys (`grant-module-access` skill): register key in `daas_module_access_keys`, grant on policy `module_access` JSONB, check in React with `usePermissions().hasModuleAccess(key)`. **NEVER check role names directly** — this applies to every button, section, page, or nav item that is conditionally shown/hidden based on role.
 - [ ] **Needs audit/change tracking?** → Already built-in via `GET /api/activity` (do NOT build custom)
+
+On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`.
 
 ## Buildpad Component Selection
 
@@ -59,7 +61,7 @@ For each collection in the feature, answer these questions during the design sta
 | Dynamic form      | `VForm`, `CollectionForm`                                       |
 | Listing records   | `CollectionList` (with search, filter, pagination, permissions) |
 | Filtering records | `FilterPanel` (field-type-aware, DaaS-compatible JSON output)   |
-| Aggregate/stats   | DaaS aggregate API (`aggregate[count]=id&groupBy=status`)       |
+| Aggregate/stats   | DaaS aggregate API (`aggregate[count]=id&groupBy=status`), on either kind of project |
 
 Custom components allowed ONLY for: app-specific layouts, dashboards, specialized visualizations.
 
@@ -103,7 +105,9 @@ See [VForm usage reference](references/vform-usage.instructions.md) for the requ
 - Handle submission externally via `onClick` on a Button
 - Consider `CollectionForm` as an all-in-one alternative to VForm for CRUD pages
 
-## Scope-Aware Context Pattern (REQUIRED when feature has tenant-scoped data)
+## Scope-Aware Context Pattern (REQUIRED when feature has scoped data)
+
+On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool only assigns a role to a user at a scope (`assign_user_role`). On a Supabase project the scope hierarchy is the project's own, as `manage-scope` describes.
 
 > **Bug 26:** Any React context or component that calls DaaS on mount AND lives inside `ScopeProvider` must wait for the scope to be ready before fetching. Firing the request before the `daas_resource_uri` cookie is set results in a 401. The `.catch()` handler will have set state to `false`/empty, and the effect will NOT re-run unless `scopeLoading` is in the dependency array.
 
@@ -121,7 +125,7 @@ useEffect(() => {
     .then(...)
     .catch(...);
 
-  // Re-fetch when tenant changes (policies/data may differ per scope)
+  // Re-fetch when the scope changes (policies/data may differ per scope)
 }, [version, resourceUri, scopeLoading]);
 //             ^^^^^^^^^^  ^^^^^^^^^^^  ← REQUIRED deps
 ```
@@ -138,7 +142,7 @@ Provide a structured plan with:
   - module key (`domain:capability`)
   - granted policies
   - UI guard points (`hasModuleAccess`)
-  - API guard points (policy module_access OR-merge)
+  - API guard points (policy module_access OR-merge; on an Engine project, the user's token forwarded to `GET <Engine_URL>/api/permissions/me`)
 - Implementation tasks in `tasks.md`, ordered by dependency layer
 - Testing strategy per layer
 - Time estimates

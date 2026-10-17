@@ -1,0 +1,8 @@
+[
+  {
+    "path": "create-api-route/SKILL.md",
+    "kind": "description",
+    "reason": "The description names both kinds of project: on an Engine project the Skill writes routes that forward the signed-in user's session to the Engine, and on a Supabase project the Supabase auth routes it wrote before.",
+    "release": "unreleased"
+  }
+]

@@ -8,7 +8,7 @@ argument-hint: "[file path or feature name to review]"
 
 Perform multi-dimensional code review for DaaS platform applications.
 
-> **Delegate for isolated review.** For a thorough pass that doesn't bloat the main conversation, hand the change to the `code-reviewer` subagent (and `security-auditor` for auth/CORS/RLS/secret concerns) — see `subagent-delegation`. Treat findings as advisory and verify fixes on the main thread.
+> **Delegate for isolated review.** For a thorough pass that doesn't bloat the main conversation, hand the change to the `code-reviewer` subagent (and `security-auditor` for auth, CORS, access-rule (RLS on a Supabase project) and secret concerns) — see `subagent-delegation`. Treat findings as advisory and verify fixes on the main thread.
 
 ## Review Dimensions
 
@@ -21,19 +21,19 @@ Perform multi-dimensional code review for DaaS platform applications.
 
 ### 2. Security
 
-- [ ] No secrets in code (check `.env.local` usage)
+- [ ] No secrets in code (check `.env.local` usage); on an Engine project any service-role key reference is a finding, because an Engine project has none
 - [ ] Auth checks on all API routes
 - [ ] Input validation with Zod on all POST/PATCH handlers
-- [ ] No direct Supabase calls from client (must use proxy routes)
+- [ ] No direct Supabase calls from client (must use proxy routes); on an Engine project any Supabase client call other than sign-in (password sign-in, session refresh, reading the signed-in user, sign-out) is a finding, because it has no server there
 - [ ] No `dangerouslySetInnerHTML` without sanitization
 - [ ] CSRF protection on mutations
 
 ### 3. DaaS & Buildpad Compliance
 
 - [ ] **Buildpad-First Rule**: No raw Mantine form/input components when Buildpad provides them
-- [ ] **Proxy Pattern**: All API calls go through `/api/*` routes, never direct to DaaS backend
-- [ ] **Auth Proxy**: Login/logout via `/api/auth/*`, never direct `supabase.auth.*`
-- [ ] **Backend-First**: Business logic uses DaaS extensions/workflows, not Next.js API routes
+- [ ] **Proxy Pattern**: All API calls go through `/api/*` routes, never direct to DaaS backend (the Engine_URL on an Engine project)
+- [ ] **Auth Proxy**: Login/logout via `/api/auth/*`, never direct `supabase.auth.*` (on an Engine project the routes use the Supabase client for sign-in only)
+- [ ] **Backend-First**: Business logic uses DaaS extensions/workflows, not Next.js API routes (on an Engine project: stored hooks, cron jobs and custom services in the Engine's runtime, and its workflows)
 - [ ] Components imported from `@/components/ui/` or `@/lib/buildpad/`
 - [ ] No manually created files in `components/ui/` or `lib/buildpad/` (CLI only)
 

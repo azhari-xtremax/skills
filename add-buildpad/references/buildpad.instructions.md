@@ -6,6 +6,37 @@ applyTo: "lib/buildpad/**/*.{ts,tsx}"
 
 # Buildpad Component Instructions
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 ## � Documentation Reference
 
 For detailed information, refer to the **buildpad-ui** documentation:
@@ -86,6 +117,7 @@ See [prerequisites.instructions.md](../../create-project/references/prerequisite
 
 Then choose one approach:
 
+<!-- buildpad-backend: supabase -->
 **Option A: Use npx (Recommended — no local clone needed)**
 
 ```bash
@@ -96,9 +128,57 @@ npx @buildpad/cli@latest bootstrap --cwd /path/to/your-project
 
 1. Clone `buildpad-ui` repository locally
 2. Build the packages: `cd buildpad-ui && pnpm install && pnpm build`
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+**Option A: Use npx (Recommended — no local clone needed)**
+
+```bash
+npx @buildpad/cli@latest bootstrap --cwd /path/to/your-project
+```
+
+`bootstrap` runs `init`, then `add --all` with the proxy routes and the sign-in layer, installs the dependencies and validates.
+
+On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`.
+
+**Option B: Use local clone (Development)**
+
+1. Clone `buildpad-ui` repository locally
+2. Build the packages: `cd buildpad-ui && pnpm install && pnpm build`
+<!-- /buildpad-backend -->
 
 ## Adding Components
 
+<!-- buildpad-backend: supabase -->
+CLI commands can be run via npx or from the local `buildpad-ui` directory:
+
+```bash
+# Via npx (recommended)
+npx @buildpad/cli@latest init --cwd /path/to/your-project
+npx @buildpad/cli@latest add input select-dropdown datetime --cwd /path/to/your-project
+npx @buildpad/cli@latest add --category selection --cwd /path/to/your-project
+npx @buildpad/cli@latest add --all --cwd /path/to/your-project
+npx @buildpad/cli@latest list
+npx @buildpad/cli@latest status --cwd /path/to/your-project
+npx @buildpad/cli@latest diff input --cwd /path/to/your-project
+npx @buildpad/cli@latest validate --cwd /path/to/your-project
+npx @buildpad/cli@latest fix --cwd /path/to/your-project
+npx @buildpad/cli@latest outdated --cwd /path/to/your-project
+
+# Via local clone
+cd /path/to/buildpad-ui
+pnpm cli init --cwd /path/to/your-project
+pnpm cli add input select-dropdown datetime --cwd /path/to/your-project
+pnpm cli add --category selection --cwd /path/to/your-project
+pnpm cli add --all --cwd /path/to/your-project
+pnpm cli list
+pnpm cli status --cwd /path/to/your-project
+pnpm cli diff input --cwd /path/to/your-project
+pnpm cli validate --cwd /path/to/your-project
+pnpm cli fix --cwd /path/to/your-project
+pnpm cli outdated --cwd /path/to/your-project
+```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
 CLI commands can be run via npx or from the local `buildpad-ui` directory:
 
 ```bash
@@ -128,19 +208,33 @@ pnpm cli fix --cwd /path/to/your-project
 pnpm cli outdated --cwd /path/to/your-project
 ```
 
+On an Engine project `add --all` writes the same sign-in layer and routes as `bootstrap`: do not call the files that Option A above names.
+<!-- /buildpad-backend -->
+
 ### New CLI Commands
 
+<!-- buildpad-backend: supabase -->
 | Command              | Description                                                                                              |
 | -------------------- | -------------------------------------------------------------------------------------------------------- |
 | `buildpad fix`       | Auto-fix common issues (untransformed imports, broken paths, missing CSS, SSR issues, duplicate exports) |
 | `buildpad outdated`  | Check which installed components have newer versions available                                           |
 | `buildpad validate`  | Check for untransformed imports, missing files, SSR problems                                             |
 | `buildpad bootstrap` | Full setup: init + add --all + install deps + validate                                                   |
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+| Command              | Description                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| `buildpad fix`       | Auto-fix common issues (untransformed imports, broken paths, missing CSS, SSR issues, duplicate exports) |
+| `buildpad outdated`  | Check which installed components have newer versions available                                           |
+| `buildpad validate`  | Check for untransformed imports, missing files, SSR problems                                             |
+| `buildpad bootstrap` | Full setup: init + add --all + install deps + validate. On an Engine project, do not call the generated files that Option A names |
+<!-- /buildpad-backend -->
 
 ## Project Structure After Installation
 
 Components are copied to your project with this structure:
 
+<!-- buildpad-backend: supabase -->
 ```
 your-project/
 ├── components/ui/          # Copied UI components
@@ -184,6 +278,56 @@ your-project/
 │       └── FormFieldInterface.tsx
 └── buildpad.json         # Tracks installed components
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```
+your-project/
+├── components/ui/          # Copied UI components
+│   ├── input.tsx
+│   ├── select-dropdown.tsx
+│   ├── datetime.tsx
+│   └── ...
+├── lib/buildpad/         # Shared libs (auto-installed as dependencies)
+│   ├── utils.ts            # cn() and other utilities
+│   ├── types/              # TypeScript type definitions
+│   │   ├── core.ts
+│   │   ├── file.ts
+│   │   └── relations.ts
+│   ├── services/           # CRUD service classes + Engine API utilities
+│   │   ├── items.ts
+│   │   ├── fields.ts
+│   │   ├── collections.ts
+│   │   ├── permissions.ts
+│   │   ├── api-request.ts     # apiRequest, buildApiUrl, getApiHeaders (Authorization: Bearer <access token>)
+│   │   └── daas-provider.tsx  # DaaSProvider, useDaaSContext (the session's access token)
+│   ├── hooks/              # React hooks
+│   │   ├── useAuth.ts             # Authentication state (the signed-in user)
+│   │   ├── usePermissions.ts      # Permission checking (GET /api/permissions/me)
+│   │   ├── useRelationM2M.ts
+│   │   ├── useRelationM2O.ts
+│   │   ├── useRelationO2M.ts
+│   │   ├── useRelationM2A.ts
+│   │   ├── useFiles.ts
+│   │   ├── useSelection.ts
+│   │   ├── usePreset.ts
+│   │   ├── useEditsGuard.ts
+│   │   ├── useClipboard.ts
+│   │   ├── useLocalStorage.ts
+│   │   ├── useVersions.ts
+│   │   ├── useWorkflowAssignment.ts
+│   │   └── useWorkflowVersioning.ts
+│   └── ui-form/            # VForm dynamic form system
+│       ├── VForm.tsx
+│       ├── FormField.tsx
+│       ├── FormFieldLabel.tsx
+│       └── FormFieldInterface.tsx
+└── buildpad.json         # Tracks installed components
+```
+
+On an Engine project the services and hooks call the Engine with the signed-in user's access token, as "DaaS API Utilities" below says.
+
+On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`: a browser cannot name the tenant on an anonymous read yet. Set no storage bucket option: the Engine stores files on its own disk or in S3.
+<!-- /buildpad-backend -->
 
 ## Import Transformation
 
@@ -390,6 +534,7 @@ function ArticleForm() {
 
 VForm can filter fields based on user permissions, following the DaaS security architecture:
 
+<!-- buildpad-backend: supabase -->
 ```tsx
 import { VForm } from "@/lib/buildpad/ui-form";
 import { DaaSProvider } from "@/lib/buildpad/services";
@@ -415,6 +560,46 @@ function ProtectedForm() {
   );
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```tsx
+import { VForm } from "@/lib/buildpad/ui-form";
+import { DaaSProvider } from "@/lib/buildpad/services";
+import { createClient } from "@/lib/supabase/client";
+
+// The signed-in user's access token, read from the session
+const getAccessToken = () =>
+  createClient()
+    .auth.getSession()
+    .then(({ data }) => data.session?.access_token ?? null);
+
+function ProtectedForm() {
+  const [values, setValues] = useState({});
+
+  return (
+    <DaaSProvider
+      config={{
+        url: process.env.NEXT_PUBLIC_BUILDPAD_DAAS_URL!,
+        getToken: getAccessToken,
+      }}
+    >
+      <VForm
+        collection="articles"
+        modelValue={values}
+        onUpdate={setValues}
+        enforcePermissions={true}
+        action="update" // 'create' | 'update' | 'read'
+        onPermissionsLoaded={(fields) =>
+          console.log("Accessible fields:", fields)
+        }
+      />
+    </DaaSProvider>
+  );
+}
+```
+
+On an Engine project `DaaSProvider` takes the signed-in user's access token, never a static token. Under the authenticated layout the generated `DaaSProviderWrapper` already provides it: there, render `VForm` without a provider of its own.
+<!-- /buildpad-backend -->
 
 **Permission Enforcement Props:**
 
@@ -531,6 +716,7 @@ interface FieldInterfaceProps {
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Authentication Hooks
 
 Buildpad provides authentication and permission hooks that follow the DaaS architecture:
@@ -634,6 +820,116 @@ const supabase = createBrowserClient(
   <App />
 </DaaSProvider>;
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Authentication Hooks
+
+Buildpad provides authentication and permission hooks that follow the DaaS architecture:
+
+### useAuth Hook
+
+Get authentication state and methods:
+
+```tsx
+import { useAuth } from "@/lib/buildpad/hooks";
+
+function UserProfile() {
+  const {
+    user, // Current user object
+    isAdmin, // Boolean - user has admin role
+    isAuthenticated, // Boolean - user is logged in
+    loading, // Boolean - auth state loading
+    error, // Error if any
+    refresh, // () => Promise - refresh auth state
+    checkPermission, // (collection, action) => boolean
+  } = useAuth();
+
+  if (loading) return <Spinner />;
+  if (!isAuthenticated) return <LoginButton />;
+
+  return (
+    <div>
+      <h1>Welcome, {user.first_name}!</h1>
+      {isAdmin && <Badge>Admin</Badge>}
+    </div>
+  );
+}
+```
+
+### usePermissions Hook
+
+Check field-level and action-level permissions:
+
+```tsx
+import { usePermissions } from "@/lib/buildpad/hooks";
+
+function ArticleEditor({ articleId }: { articleId: string }) {
+  const {
+    canPerform, // Check action permission
+    getAccessibleFields, // Get fields user can access
+    isFieldAccessible, // Check specific field access
+    isAdmin, // User has admin privileges
+    loading,
+  } = usePermissions({ collections: ["articles"] });
+
+  if (!canPerform("articles", "update")) {
+    return <Alert>You don't have permission to edit articles</Alert>;
+  }
+
+  const editableFields = getAccessibleFields("articles", "update");
+
+  return (
+    <ArticleForm
+      fields={editableFields}
+      readonly={!isFieldAccessible("articles", "update", "title")}
+    />
+  );
+}
+```
+
+On an Engine project these hooks read the signed-in user and the user's permissions from the Engine, with the user's access token as `Authorization: Bearer`: use them inside the `DaaSProvider` of the authenticated layout. `usePermissions` reads `GET /api/permissions/me`, the same response that holds `isAdmin` and `moduleAccess` for a module-access check.
+
+## DaaS API Utilities
+
+For direct access to the Engine's data API in the application, in Storybook or in tests:
+
+### DaaSProvider (React Context)
+
+On an Engine project the data API's address is the Engine_URL, which both `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` hold. The Studio's address is an administration interface: send no data call to it.
+
+On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
+
+On an Engine project `DaaSProvider` takes a session token: in the application, `getToken` returns the signed-in user's access token from the session; in Storybook and tests, `token` is the access token of a user signed in to the project. Never pass a static token: on an Engine project a static token is an MCP credential or an administrator token, and the data API refuses it. An access token expires; when the Engine answers `TOKEN_EXPIRED`, sign in again.
+
+```tsx
+import { DaaSProvider } from "@/lib/buildpad/services";
+
+// Storybook or tests: the access token of a user signed in to the project
+<DaaSProvider
+  config={{
+    url: "<Engine_URL>",
+    token: accessToken,
+  }}
+  onAuthenticated={(user) => console.log("Authenticated:", user)}
+>
+  <VForm collection="articles" />
+</DaaSProvider>;
+
+// In Next.js app (calls the Engine directly with the signed-in user's access token)
+import { createClient } from "@/lib/supabase/client";
+<DaaSProvider
+  config={{
+    url: process.env.NEXT_PUBLIC_BUILDPAD_DAAS_URL!,
+    getToken: () =>
+      createClient()
+        .auth.getSession()
+        .then(({ data }) => data.session?.access_token ?? null),
+  }}
+>
+  <App />
+</DaaSProvider>;
+```
+<!-- /buildpad-backend -->
 
 ### useDaaSContext Hook
 
@@ -655,6 +951,7 @@ function MyComponent() {
 
 ### apiRequest (Auto-Detects Mode)
 
+<!-- buildpad-backend: supabase -->
 ```tsx
 import {
   apiRequest,
@@ -711,6 +1008,67 @@ pnpm storybook:form
 - **Permission Settings**: Enable field-level permission filtering
 - **Action Selection**: Test create/update/read permissions separately
 - **Collection Dropdown**: Select any collection from the schema
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```tsx
+import {
+  apiRequest,
+  buildApiUrl,
+  getApiHeaders,
+} from "@/lib/buildpad/services";
+
+// Sends the user's access token as Authorization: Bearer (getToken in the app, token in Storybook)
+const response = await apiRequest("/api/items/articles?limit=10");
+
+// Build full Engine URL manually
+const url = buildApiUrl("/api/items/articles");
+
+// Get auth headers synchronously (only from a token set in the config; with getToken, use apiRequest)
+const headers = getApiHeaders();
+```
+
+### Testing with Storybook (Two-Tier Strategy)
+
+Buildpad uses a two-tier testing strategy:
+
+**Tier 1: Storybook Tests (Isolated, No Auth)**
+
+- `pnpm storybook:form` - Start VForm Storybook on port 6006
+- Test components with mocked data
+- Fast iteration during development
+- All 40+ interface types available
+
+**Tier 2: E2E Tests (Real API, Auth Required)**
+
+- `pnpm test:e2e` - Run Playwright against a hosted Engine
+- Full integration with authentication
+- Test permissions and workflow
+- Real Engine backend
+
+### VForm DaaS Playground (Storybook)
+
+Test VForm with real schemas from the Engine directly in Storybook:
+
+```bash
+# Start Storybook with a signed-in user's access token (Storybook calls the Engine directly, no proxy needed)
+STORYBOOK_DAAS_URL=<Engine_URL> \
+STORYBOOK_DAAS_TOKEN=<access token of a user signed in to the project> \
+pnpm storybook:form
+
+# Navigate to "Forms/VForm DaaS Playground" → "Playground" story
+```
+
+On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere.
+
+On an Engine project `STORYBOOK_DAAS_TOKEN` holds a session token: the access token of a user signed in to the project, never the project's MCP token or another administrator token. Get it from a sign-in made through the application: a browser cannot send `X-Tenant-Id` to the Engine yet, so a sign-in made from a Storybook page does not reach the project. When the token expires, sign in again and restart Storybook with the new token.
+
+**Playground Features:**
+
+- **Static Token Tab**: Uses the access token from the environment variable (automatic)
+- **Permission Settings**: Enable field-level permission filtering
+- **Action Selection**: Test create/update/read permissions separately
+- **Collection Dropdown**: Select any collection from the schema
+<!-- /buildpad-backend -->
 
 **Running Storybook Tests:**
 
@@ -920,6 +1278,7 @@ Workflow definitions use an **Array Format** stored in `workflow_json`:
 - `states[].commands[].next_state` - Target state after transition
 - `states[].commands[].policies` - Array of policy UUIDs (empty = all users)
 
+<!-- buildpad-backend: supabase -->
 ### Required Database Tables
 
 - `daas_wf_definition` - Workflow definitions
@@ -936,9 +1295,32 @@ Workflow definitions use an **Array Format** stored in `workflow_json`:
 - `PATCH /api/items/daas_wf_instance/:id` - Update workflow instance (execute transitions)
 
 **Note:** The workflow definition is embedded in the instance response via the `workflow.*` fields relation.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Required Database Tables
+
+- `daas_wf_definition` - Workflow definitions
+- `daas_wf_instance` - Active workflow instances
+- `daas_wf_assignment` - Assignment rules
+- `daas_wf_history` - Transition history (optional)
+
+On an Engine project the Engine creates a workflow instance when an item enters a collection that is bound to a workflow, and moves it only through `POST /api/workflow/transition`. Never write a `daas_wf_instance` row yourself, through `/api/items` or otherwise.
+
+### Required API Endpoints
+
+On an Engine project the Engine serves these workflow routes, each called with the user's access token:
+
+- `GET /api/workflows` - Workflow definitions
+- `GET /api/workflow-instances` - Workflow instances (`GET /api/workflow-instances/:id/history` for the transition history)
+- `GET /api/workflow-assignments` - Workflow assignments (which collections have workflows)
+- `GET /api/users/me` - Get current user with policies
+- `GET /api/access` - Fetch policy details by IDs
+- `POST /api/workflow/transition` - Execute a command of the instance's current state (the transition)
+<!-- /buildpad-backend -->
 
 ## Import Patterns
 
+<!-- buildpad-backend: supabase -->
 Once components are copied to your project, import them using local paths:
 
 ```tsx
@@ -1040,9 +1422,114 @@ import { AutocompleteAPI } from "@/components/ui/autocomplete-api";
 import { CollectionItemDropdown } from "@/components/ui/collection-item-dropdown";
 import { SelectIcon } from "@/components/ui/select-icon";
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+Once components are copied to your project, import them using local paths:
+
+```tsx
+// Types - from lib/buildpad/types
+import type {
+  Field,
+  Collection,
+  AnyItem,
+  PrimaryKey,
+  Query,
+  Filter,
+  DaaSFile,
+  M2MRelationInfo,
+  M2ORelationInfo,
+  O2MRelationInfo,
+} from "@/lib/buildpad/types";
+
+// Services - from lib/buildpad/services
+import {
+  ItemsService,
+  FieldsService,
+  CollectionsService,
+  PermissionsService, // includes static `isAdmin` getter (true when /api/permissions/me returns isAdmin)
+} from "@/lib/buildpad/services";
+
+// Engine API Utilities (direct access to the Engine with the user's access token)
+import {
+  apiRequest, // Make API requests (auto-detects proxy vs direct mode)
+  buildApiUrl, // Build URL respecting DaaS configuration
+  getApiHeaders, // Get auth headers for direct mode
+  DaaSProvider, // React provider for direct Engine access
+  useDaaSContext, // Hook to access DaaS config
+  setGlobalDaaSConfig, // Set global config for non-React contexts
+} from "@/lib/buildpad/services";
+
+// VForm Component (dynamic form system)
+import {
+  VForm, // Main dynamic form component
+  FormField, // Individual field wrapper
+  FormFieldLabel, // Label with required indicator
+  FormFieldInterface, // Dynamic interface loader
+} from "@/lib/buildpad/ui-form";
+
+// Hooks - from lib/buildpad/hooks
+import {
+  useRelationM2M,
+  useRelationM2MItems,
+  useRelationM2O,
+  useRelationM2OItem,
+  useRelationO2M,
+  useRelationO2MItems,
+  useRelationM2A,
+  useRelationM2AItems,
+  useFiles,
+  useSelection,
+  usePreset,
+  useEditsGuard,
+  useHasEdits,
+  useClipboard,
+  useLocalStorage,
+  // Versioning & workflow hooks
+  useVersions,
+  useWorkflowAssignment,
+  useWorkflowVersioning,
+} from "@/lib/buildpad/hooks";
+
+// UI Components - from components/ui
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { InputCode } from "@/components/ui/input-code";
+import { SelectDropdown } from "@/components/ui/select-dropdown";
+import { SelectRadio } from "@/components/ui/select-radio";
+import {
+  SelectMultipleCheckbox,
+  SelectMultipleCheckboxTree,
+  SelectMultipleDropdown,
+} from "@/components/ui/select-multiple-checkbox";
+import { DateTime } from "@/components/ui/datetime";
+import { Boolean } from "@/components/ui/boolean";
+import { Toggle } from "@/components/ui/toggle";
+import { Color } from "@/components/ui/color";
+import { Tags } from "@/components/ui/tags";
+import { Slider } from "@/components/ui/slider";
+import { Notice } from "@/components/ui/notice";
+import { Divider } from "@/components/ui/divider";
+import { GroupDetail } from "@/components/ui/group-detail";
+import { FileInterface, FileImage, Files, Upload } from "@/components/ui/file";
+import { ListM2M } from "@/components/ui/list-m2m";
+import { ListM2O } from "@/components/ui/list-m2o";
+import { ListO2M } from "@/components/ui/list-o2m";
+import { ListM2A } from "@/components/ui/list-m2a";
+import { CollectionForm } from "@/components/ui/collection-form";
+import { CollectionList } from "@/components/ui/collection-list";
+import { WorkflowButton } from "@/components/ui/workflow-button";
+import { RichTextHtml } from "@/components/ui/rich-text-html";
+import { RichTextMarkdown } from "@/components/ui/rich-text-markdown";
+import { InputBlockEditor } from "@/components/ui/input-block-editor";
+import { AutocompleteAPI } from "@/components/ui/autocomplete-api";
+import { CollectionItemDropdown } from "@/components/ui/collection-item-dropdown";
+import { SelectIcon } from "@/components/ui/select-icon";
+```
+<!-- /buildpad-backend -->
 
 ## Service Usage
 
+<!-- buildpad-backend: supabase -->
 ```tsx
 // ItemsService - CRUD operations
 const itemsService = new ItemsService("products");
@@ -1067,6 +1554,38 @@ const updated = await itemsService.updateOne(id, { title: "Updated" });
 // Delete item
 await itemsService.deleteOne(id);
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+```tsx
+// ItemsService - CRUD operations
+const itemsService = new ItemsService("products");
+
+// Read items with query
+const items = await itemsService.readByQuery({
+  filter: { status: { _eq: "published" } },
+  sort: ["-date_created"],
+  limit: 50,
+  fields: ["id", "title", "status", "category.*"],
+});
+
+// Read single item
+const item = await itemsService.readOne(id);
+
+// Create item
+const created = await itemsService.createOne({ title: "New Product" });
+
+// Update item
+const updated = await itemsService.updateOne(id, { title: "Updated" });
+
+// Delete item (answered 204 with no body: resolves to nothing)
+await itemsService.deleteOne(id);
+```
+
+On an Engine project:
+
+- A delete of one item (`deleteOne`, `DELETE /api/items/:collection/:id`) is answered `204` with no body. Read nothing from its result.
+- The Engine serves at most 1000 items per request. A larger `limit` is served as 1000, and `limit: -1` does not return the whole collection: the Engine serves it as `limit: 1000` too. Read the rest page by page, with `page` or `offset`.
+<!-- /buildpad-backend -->
 
 ## Hook Usage
 
@@ -1166,6 +1685,7 @@ function ContentBlocks({ pageId }: { pageId: string }) {
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### Content Versions
 
 ```tsx
@@ -1198,6 +1718,43 @@ function ArticleEditor({ articleId }: { articleId: string }) {
   );
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Content Versions
+
+```tsx
+function ArticleEditor({ articleId }: { articleId: string }) {
+  const {
+    versions, // List of all versions
+    currentVersion, // Currently selected version
+    loading,
+    createVersion, // Create new version
+    saveVersion, // Save to version delta
+    deleteVersion, // Delete a version
+    promoteVersion, // Apply version to main item
+  } = useVersions("articles", articleId);
+
+  const handleSaveDraft = async (data: any) => {
+    await saveVersion("draft", data);
+  };
+
+  return (
+    <Stack>
+      <Select
+        label="Version"
+        data={versions.map((v) => ({ value: v.key, label: v.name }))}
+        value={currentVersion?.key}
+      />
+      <Button onClick={() => createVersion("draft", "Draft")}>
+        Create Draft
+      </Button>
+    </Stack>
+  );
+}
+```
+
+On an Engine project versions are served by the Engine's `/api/versions` routes, each called with the user's access token: list (`GET /api/versions`, filtered by collection and item), create (`POST /api/versions`), rename (`PATCH /api/versions/:id`), delete (`DELETE /api/versions/:id`), save a delta (`POST /api/versions/:id/save`) and apply a version to its item (`POST /api/versions/:id/promote`).
+<!-- /buildpad-backend -->
 
 ### Workflow Assignment
 

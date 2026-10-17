@@ -6,6 +6,37 @@ applyTo: "**/*.{ts,tsx,json}"
 
 # DAAS MCP Tools for AI Agents
 
+<!-- backend-gate:begin v1 -->
+**Establish the backend first.** A Buildpad project's backend is either the Buildpad Engine or
+Supabase, and some parts of this file hold for one of them only. Before you act on anything in
+this file, find the backend with these steps, in order, and stop at the first step that answers:
+
+1. Read `.buildpad/project.json` at the project root. If it is JSON and its field `backend` is
+   `"engine"` or `"supabase"`, that is the backend. If `.buildpad/backend-answer.json` names the
+   other backend, tell the developer the two files disagree, and follow `.buildpad/project.json`.
+2. Otherwise read `.buildpad/backend-answer.json` in the same way; if its `backend` is
+   `"engine"` or `"supabase"`, that is the backend.
+3. If a folder named `supabase` at the project root holds a file named `config.toml`, or holds a
+   folder named `migrations` that holds a file whose name ends in `.sql`, the backend is Supabase.
+4. Otherwise ask the developer once: "Is this project's backend the Buildpad Engine or
+   Supabase?" Write the answer to `.buildpad/backend-answer.json` as
+   `{"buildpadBackendAnswer": 1, "backend": "engine"}` or
+   `{"buildpadBackendAnswer": 1, "backend": "supabase"}`, and ask the developer to commit that
+   file. Do not add it to `.gitignore`. Never write `.buildpad/project.json`.
+
+To find the backend, do not open an environment file (`.env`, `.env.*`) or an MCP configuration
+file, and do not call a tool that returns project credentials.
+
+Then follow only the parts for that backend. A part starts at a line that holds only a comment
+whose text is `buildpad` + `-backend: engine` or `buildpad` + `-backend: supabase`, and ends at the
+next line that holds only a comment whose text is `/buildpad` + `-backend`. A comment that merely
+mentions a backend is not a part. A file whose first line, after any front matter, holds only a
+comment whose text is `buildpad` + `-backend-file: engine` (or `supabase`) holds for that backend
+only, and so does every file in a folder named `engine-only` or `supabase-only`. Skip the other
+backend's parts and copy no code from them; everything else holds for both. On an Engine project, when this file says that
+something is not available, tell the developer so and stop: do not build a substitute.
+<!-- backend-gate:end -->
+
 Complete reference for using DAAS MCP (Model Context Protocol) tools to interact with DaaS.
 
 ## ⚠️ Quick Reference - Common Patterns
@@ -58,6 +89,7 @@ Complete reference for using DAAS MCP (Model Context Protocol) tools to interact
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### Deleting Fields
 
 ```json
@@ -71,6 +103,22 @@ Complete reference for using DAAS MCP (Model Context Protocol) tools to interact
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Deleting Fields
+
+```json
+// ✅ On an Engine project - name the collection, and the fields in keys
+{
+  "name": "fields",
+  "arguments": {
+    "action": "delete",
+    "collection": "articles",
+    "keys": ["deprecated_field1", "deprecated_field2"]
+  }
+}
+```
+<!-- /buildpad-backend -->
 
 ### Data Parameter Format
 
@@ -86,6 +134,7 @@ Complete reference for using DAAS MCP (Model Context Protocol) tools to interact
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Overview
 
 DAAS MCP provides a standardized interface for AI agents to:
@@ -167,6 +216,100 @@ AI agents authenticate using **static tokens**:
 | Tool            | Description                   |
 | --------------- | ----------------------------- |
 | `system-prompt` | Load DaaS-specific AI context |
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Overview
+
+On an Engine project the MCP server lets AI agents:
+
+- **Query and manage data** - CRUD and aggregates on content collections
+- **Modify schemas** - Create collections, fields, and relations (admin only)
+- **Manage files** - Read and edit file metadata, import files from a URL, organize folders
+- **Configure permissions** - Set up roles, policies, access grants and permission rules (admin only)
+- **Assign scoped roles** - Bind a role to a user at a scope (admin only)
+- **Run workflows** - Read workflow definitions and run a command on an instance
+
+Hooks and cron jobs are not managed through the MCP server on an Engine project: see [Hooks, cron jobs and logs on an Engine project](#hooks-cron-jobs-and-logs-on-an-engine-project).
+
+## DAAS MCP Endpoint
+
+On an Engine project the MCP server is the Engine's own, at `<Engine_URL>/api/mcp`:
+
+```
+POST /api/mcp
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+All requests use **JSON-RPC 2.0** format:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "<tool_name>",
+    "arguments": { ... }
+  }
+}
+```
+
+`GET /api/mcp/sse` and `POST /api/mcp/messages` serve the same tools to a client that keeps a stream open. `GET /api/mcp` answers whether the server is enabled and whether deletes are allowed.
+
+## Authentication
+
+On an Engine project the MCP endpoint reads the token from the `Authorization: Bearer` header only; a token in the query string is refused with `TOKEN_INVALID`. It accepts a user's static token, which is bound to the project's tenant and works only while that user's account is active, or a signed-in user's access token. A session that still needs its second factor is refused until that factor is verified. An unknown or revoked token is answered `TOKEN_INVALID`, and an expired session `TOKEN_EXPIRED`.
+
+Every tool runs as the token's user: that user's roles, policies and permissions apply to every call, and the administrator-only tools are listed and served only to an administrator.
+
+The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
+
+---
+
+## Available Tools
+
+### Data Tools (All Users)
+
+The caller's permissions decide what each call may read or write.
+
+| Tool      | Description                                                                                                                 |
+| --------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `items`   | `read`, `create`, `update`, `delete` and `aggregate` on the items of a content collection                                      |
+| `schema`  | Read collection and field schema (no `action`)                                                                               |
+| `files`   | `read`, `update` and `delete` file metadata, and `import` a file from a URL                                                  |
+| `folders` | `create`, `read`, `update` and `delete` file folders                                                                          |
+| `users`   | `read` and `update` users; credential columns are never returned, and fields only an administrator may change stay administrator-only |
+
+### Admin-Only Tools
+
+| Tool          | Description                                                                          |
+| ------------- | ------------------------------------------------------------------------------------ |
+| `collections` | `create`, `read`, `update` (metadata) and `delete` collections                         |
+| `fields`      | `create`, `read`, `update` and `delete` a collection's fields                          |
+| `relations`   | `create`, `read`, `update` and `delete` foreign-key relations                          |
+| `roles`       | Manage role definitions (CRUD)                                                       |
+| `policies`    | Manage permission policies (CRUD)                                                    |
+| `access`      | Grant a policy to a role or a user, read the grants, revoke one (`create`, `read`, `delete`) |
+| `permissions` | Manage the permission rules inside a policy (CRUD)                                   |
+| `scope`       | Assign a role to a user, optionally at one scope (`assign_user_role` only)           |
+
+On an Engine project collections, fields, relations, roles, policies and permissions are created through the Engine's API (`/api/collections`, `/api/fields/:collection`, `/api/relations`, `/api/roles`, `/api/policies`, `/api/access`, `/api/permissions`) or its MCP tools `collections`, `fields`, `relations`, `roles`, `policies`, `access` and `permissions`. Access is roles, policies and permissions: a permission belongs to a policy, and a policy is attached to a role or a user. The MCP `collections` and `fields` tools keep a field's name, type and `meta` but not its `schema` block (default, not-null, length): set those through `POST /api/fields/:collection` with an administrator's session.
+
+> **Note:** The `items` tool refuses the Engine's own tables by name (`daas_users`, `daas_roles`, `daas_policies`, `daas_permissions`, `daas_access`, `daas_activity`, `daas_sessions`, `daas_settings`). Use the dedicated tool for each.
+
+### System Tools
+
+| Tool            | Description                                                                         |
+| --------------- | ----------------------------------------------------------------------------------- |
+| `system-prompt` | Load DaaS-specific AI context; not listed while the project's settings turn it off |
+
+### One Tool per Verb
+
+The Engine also serves an older set of tools that name the operation in the tool, not in an `action` argument: `daas_read_items`, `daas_create_item`, `daas_update_item`, `daas_delete_item` (listed only while deletes are allowed), `daas_list_collections`, `daas_get_schema`, `daas_create_collection` (administrators only), `daas_list_files`, `daas_list_workflows` and `daas_trigger_transition`. The same permissions apply.
+
+The Engine's MCP server has no tool that returns a file's content, and none for runtime hooks, cron jobs or the application log. File content is served at `/api/files/assets/:id`, with a session or a signed token; hooks, cron jobs and the log are described in [Hooks, cron jobs and logs on an Engine project](#hooks-cron-jobs-and-logs-on-an-engine-project).
+<!-- /buildpad-backend -->
 
 ---
 
@@ -193,6 +336,7 @@ CRUD operations on any collection.
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### Read Single Item
 
 ```json
@@ -205,6 +349,23 @@ CRUD operations on any collection.
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Read Single Item
+
+On an Engine project a read addresses items by `keys` (an array), and answers an array of rows:
+
+```json
+{
+  "name": "items",
+  "arguments": {
+    "action": "read",
+    "collection": "articles",
+    "keys": ["article-uuid"]
+  }
+}
+```
+<!-- /buildpad-backend -->
 
 ### Create Item
 
@@ -256,6 +417,7 @@ CRUD operations on any collection.
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### Delete Item
 
 > ⚠️ Requires `DAAS_MCP_ALLOW_DELETES=true` to be enabled
@@ -270,6 +432,23 @@ CRUD operations on any collection.
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Delete Item
+
+> ⚠️ On an Engine project deletes are refused until an administrator turns on the project setting `mcp_allow_deletes` (see [Configuration](#configuration)). A delete addresses items by `keys` (an array), which it requires.
+
+```json
+{
+  "name": "items",
+  "arguments": {
+    "action": "delete",
+    "collection": "articles",
+    "keys": ["article-uuid"]
+  }
+}
+```
+<!-- /buildpad-backend -->
 
 ### Aggregate Items
 
@@ -292,6 +471,7 @@ Perform aggregate calculations (count, sum, avg, min, max, etc.) on a collection
 
 **Supported operations:** `count`, `countDistinct`, `countAll`, `sum`, `sumDistinct`, `avg`, `avgDistinct`, `min`, `max`
 
+<!-- buildpad-backend: supabase -->
 Response uses nested format:
 
 ```json
@@ -303,6 +483,22 @@ Response uses nested format:
 ```
 
 > Aggregate queries respect collection-level read permissions and item-level RLS filters.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+On an Engine project the `items` tool answers its rows under `raw`, as every action-dispatched tool does, and an aggregate row is nested by function:
+
+```json
+{
+  "raw": [
+    { "status": "completed", "count": { "id": 42 }, "sum": { "amount": 12500 } }
+  ]
+}
+```
+
+A group-by column, and a count over `*`, stay flat in the row.
+
+> On an Engine project an aggregate runs under the caller's read permission on the collection, its row filter included.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -380,6 +576,7 @@ Manage database tables.
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### Create Collection
 
 ```json
@@ -448,6 +645,52 @@ Manage database tables.
 }
 ```
 
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Create Collection
+
+On an Engine project the `collections` tool creates the table with an `id` UUID primary key (generated by default) and the columns `created_at` and `updated_at`: do not list an `id` field. Each initial field keeps only its `field` and `type`; a `meta` or `schema` block given with an initial field is not applied. The collection's own `meta` is applied.
+
+```json
+{
+  "name": "collections",
+  "arguments": {
+    "action": "create",
+    "data": [
+      {
+        "collection": "products",
+        "fields": [
+          { "field": "name", "type": "string" },
+          { "field": "price", "type": "decimal" },
+          { "field": "description", "type": "text" },
+          { "field": "status", "type": "string" }
+        ],
+        "meta": {
+          "icon": "shopping_cart",
+          "note": "Product catalog"
+        }
+      }
+    ]
+  }
+}
+```
+
+Add a field that needs `meta` (for example `"special": ["user-created"]`) afterwards with the `fields` tool, which keeps `meta`. Set a `schema` block (length, not-null, default) through `POST /api/fields/:collection` with an administrator's session.
+
+### Delete Collection
+
+```json
+{
+  "name": "collections",
+  "arguments": {
+    "action": "delete",
+    "keys": ["products"]
+  }
+}
+```
+
+On an Engine project a delete names the collections in `keys` (an array), and is refused until `mcp_allow_deletes` is on.
+<!-- /buildpad-backend -->
 ---
 
 ## Tool: `fields` (Admin Only)
@@ -616,6 +859,7 @@ The `data` parameter accepts **both** a single object OR an array of objects:
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 ### Delete Fields
 
 > ⚠️ **Note:** Use `fields` (array) not `field` (string). Can delete multiple at once.
@@ -630,10 +874,32 @@ The `data` parameter accepts **both** a single object OR an array of objects:
   }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### Delete Fields
+
+> ⚠️ **Note:** On an Engine project name the collection, and the fields in `keys` (an array). Can delete multiple at once.
+
+```json
+{
+  "name": "fields",
+  "arguments": {
+    "action": "delete",
+    "collection": "articles",
+    "keys": ["deprecated_field", "old_column"]
+  }
+}
+```
+<!-- /buildpad-backend -->
 
 ### Create Many-to-One Field
 
+<!-- buildpad-backend: supabase -->
 Use the `fields` tool to create an M2O field — this **automatically creates the FK constraint, reloads the PostgREST schema cache, and inserts the `daas_relations` metadata row** in one step.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+Use the `fields` tool to create an M2O field. On an Engine project this creates the column, its foreign-key constraint and the `daas_relations` metadata row in one transaction. `meta.options.related_field` names a referenced column other than the primary key, and `meta.options.on_delete` sets the referential action.
+<!-- /buildpad-backend -->
 
 ```json
 // FK to related collection's primary key (most common)
@@ -682,7 +948,12 @@ Use the `fields` tool to create an M2O field — this **automatically creates th
 }
 ```
 
+<!-- buildpad-backend: supabase -->
 > **When to use the `relations` tool instead:** Use the `relations` tool only to register relation metadata for FKs that were created outside DaaS (e.g. via a raw SQL migration). For all new M2O fields, prefer the `fields` approach above.
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+> **When to use the `relations` tool instead:** On an Engine project the `relations` tool adds the foreign-key constraint and the `daas_relations` row to a column that already exists, for example a field first created without relational `meta`. For all new M2O fields, prefer the `fields` approach above.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -850,6 +1121,7 @@ Manage file organization.
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Tool: `assets`
 
 Retrieve file content.
@@ -881,6 +1153,12 @@ Retrieve file content.
   ]
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## File Content
+
+On an Engine project the MCP server has no tool that returns a file's content. File content is served at `/api/files/assets/:id`, with a session or a signed token; a signed URL comes from `/api/files/signed-url`. Read and edit a file's metadata with the `files` tool.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -1153,6 +1431,7 @@ Full CRUD for permission policy containers.
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Tool: `extensions` (Admin Only)
 
 Manage runtime hooks. See [hooks-extensions.instructions.md](../../hooks-extensions/references/hooks-extensions.instructions.md) for details.
@@ -1479,6 +1758,39 @@ Clear all logs from memory:
   "data": { "titleLength": 3 }
 }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Hooks, cron jobs and logs on an Engine project
+
+On an Engine project the MCP server has no tool for runtime hooks, for cron jobs or for the application log. Do not call one. Each capability is reached another way:
+
+- **Hooks** run code in the Engine when an item is written: a `filter` hook runs before the write and may change the payload or abort it (validation, data transformation); an `action` hook runs after it (audit logging, notifications, external sync). Create and manage hooks in the Studio, or through `<Engine_URL>/api/extensions` with an administrator's session (`POST` to create, `PATCH` and `DELETE` on `/api/extensions/:id`, and `POST /api/extensions/:id/activate`, `/deactivate` and `/clone`). Event names are `items.create`, `items.update` and `items.delete`, or the same prefixed with a collection (`articles.items.create`). The [hooks-extensions](../../hooks-extensions/SKILL.md) skill has the code a hook may run.
+- **Cron jobs** run stored code on a schedule. Create and manage them in the Studio's Cron module, or through `<Engine_URL>/api/cron` with an administrator's session (`/api/cron/:id`, `POST /api/cron/:id/run`, `POST /api/cron/:id/clone`, `GET /api/cron/:id/history`). On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. The [create-cron](../../create-cron/SKILL.md) skill has the steps.
+- **Stored code** (hooks and cron jobs) runs in the Engine's runtime, which has no `fetch`, `process` or `require`; the two skills above say what it provides.
+- **Logs** are read with `GET <Engine_URL>/api/logs`, with the session of an administrator or of a user granted the `system:logs` module access. The parameters `level`, `source`, `extensionName` and `limit` narrow the answer (one value each). `GET /api/logs/stream` streams new entries, and `DELETE /api/logs` clears them (administrators only).
+
+---
+
+## Tool: `scope` (Admin Only)
+
+On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool only assigns a role to a user at a scope (`assign_user_role`).
+
+On an Engine project the MCP `scope` tool has one action, `assign_user_role`, and takes its arguments under `assignment`. It applies the same checks as `POST /api/users/:id/roles`: a role whose scope rules do not allow the scope is refused (`ROLE_SCOPE_MISMATCH`, `ROLE_SCOPE_LOCKED`). See the `/manage-scope` skill for the complete setup.
+
+```json
+// Assign a user to a scoped role
+{ "name": "scope", "arguments": {
+  "action": "assign_user_role",
+  "assignment": {
+    "user_id": "<uuid>",
+    "role_id": "<uuid>",
+    "resource_uri": "/<type-uuid>:<item-uuid>"
+  }
+}}
+```
+
+Omit `resource_uri` for a role binding that is not limited to one scope.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -1497,6 +1809,7 @@ Returns schema information, available tools, and usage guidelines for the AI.
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Error Handling
 
 DAAS MCP errors follow JSON-RPC 2.0 format:
@@ -1530,11 +1843,55 @@ DAAS MCP errors follow JSON-RPC 2.0 format:
 | "Admin access required"      | Tool requires admin           | Use admin user's token            |
 | "Delete operations disabled" | Safety setting                | Set `DAAS_MCP_ALLOW_DELETES=true` |
 | "Collection not found"       | Table doesn't exist           | Check collection name             |
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Error Handling
+
+On an Engine project a tool that refuses a call answers a JSON-RPC `result` marked `"isError": true`; its text is a JSON array holding the message, `[{"error": "<message>"}]`:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "content": [{ "type": "text", "text": "[{\"error\":\"Admin access required for this tool\"}]" }],
+    "isError": true
+  }
+}
+```
+
+A JSON-RPC `error` is answered only for a request the server cannot handle:
+
+| Code     | Meaning                                                  |
+| -------- | -------------------------------------------------------- |
+| `-32700` | Parse error                                              |
+| `-32600` | Invalid request format                                   |
+| `-32601` | Method not found                                         |
+| `-32602` | Invalid parameters, including a `tools/call` with no tool name |
+
+A request without a usable token, and any request while the MCP server is turned off, is refused before JSON-RPC: with an HTTP status and the Engine's error document, `{ "errors": [{ "message": "...", "extensions": { "code": "..." } }] }`.
+
+### Common Error Messages
+
+| Message | Cause | Solution |
+| ------- | ----- | -------- |
+| HTTP 401 `TOKEN_INVALID`: "No token provided." or "Invalid token." | Missing, unknown or revoked token | Send a valid token as `Authorization: Bearer` |
+| HTTP 401 `TOKEN_INVALID`: "Send the token in the Authorization header as a Bearer token; the token query parameter is not accepted." | Token in the query string | Send it in the `Authorization` header |
+| HTTP 401 `TOKEN_EXPIRED`: "Token expired." | Expired session | Sign in again |
+| HTTP 403 `MCP_DISABLED`: "The MCP server is disabled in project settings." | `mcp_enabled` is off | An administrator turns `mcp_enabled` on |
+| "Admin access required for this tool" | Tool requires an administrator | Use an administrator's token |
+| "Delete operations are disabled in project settings (mcp_allow_deletes)." | Safety setting | An administrator turns `mcp_allow_deletes` on; otherwise do not delete |
+| `forbidden: insufficient permissions to <action> "<collection>"` | The caller lacks that grant | Report the missing grant; do not retry |
+| `Cannot access system collection "<name>" via items tool. Use dedicated tools instead.` | `items` called on an Engine table | Use the dedicated tool |
+| `Tool "<name>" not found` | The tool is not served (or the system prompt is turned off) | Use a tool that `tools/list` lists |
+| `Unknown action: <action>` or `argument '<name>' is required` | Wrong arguments | Check the tool's arguments |
+<!-- /buildpad-backend -->
 
 ---
 
 ## Best Practices for AI Agents
 
+<!-- buildpad-backend: supabase -->
 ### 1. Schema-First Approach
 
 Always read schema before operating on collections:
@@ -1559,6 +1916,24 @@ Always read schema before operating on collections:
 // 3. Activate if test passes
 { "name": "extensions", "arguments": { "action": "update", "id": "...", "data": { "status": "active" } } }
 ```
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+### 1. Schema-First Approach
+
+Always read schema before operating on collections:
+
+```json
+// First: Understand the schema
+{ "name": "schema", "arguments": { "keys": ["articles"] } }
+
+// Then: Create items with correct structure
+{ "name": "items", "arguments": { "action": "create", ... } }
+```
+
+### 2. Try Hooks on Scratch Data Before Relying on Them
+
+On an Engine project hooks are not managed through the MCP server, and no route test-runs a hook. Create the hook with `"status": "inactive"` in the Studio or through `POST <Engine_URL>/api/extensions`, activate it (`POST /api/extensions/:id/activate`), write a scratch item with the `items` tool, and check the result and the log (`GET /api/logs`). Deactivate it (`POST /api/extensions/:id/deactivate`) if it misbehaves. See the [hooks-extensions](../../hooks-extensions/SKILL.md) skill.
+<!-- /buildpad-backend -->
 
 ### 3. Use Proper Permissions
 
@@ -1586,6 +1961,7 @@ Always check for error responses and handle appropriately.
 
 ---
 
+<!-- buildpad-backend: supabase -->
 ## Creating Workflows via MCP
 
 Use the `items` tool on workflow tables. **Full schema and examples in [workflow-schema.instructions.md](../../create-workflow/references/workflow-schema.instructions.md).**
@@ -1708,6 +2084,118 @@ DAAS MCP settings can be managed via `/api/settings` or the Settings UI:
 - **daas_mcp_allow_deletes**: Delete safety
 - **daas_mcp_system_prompt**: Custom AI context
 - **daas_mcp_prompts_collection**: Reusable prompts table
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+## Creating Workflows on an Engine Project
+
+On an Engine project a workflow definition is created through the Engine's workflow API, which checks the state machine before it stores it: `POST <Engine_URL>/api/workflows`, and `PATCH /api/workflows/:id` to change one, with an administrator's session. The MCP `items` tool also reaches `daas_wf_definition`, but it stores the row without that check: do not create or change definitions with it. **Full steps in the [create-workflow](../../create-workflow/SKILL.md) skill.**
+
+### Workflow Tables
+
+| Collection           | Purpose                                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `daas_wf_definition` | Workflow definitions - **`workflow_json` column holds state machine**; written through `/api/workflows`  |
+| `daas_wf_assignment` | Binds a definition to a collection, with an optional filter rule; written through `/api/workflow-assignments` |
+| `daas_wf_instance`   | One per item of a bound collection, created by the Engine; read through `/api/workflow-instances`          |
+
+### Key Insight: workflow_json Column
+
+The `workflow_json` column in `daas_wf_definition` must contain a valid state machine:
+
+```json
+{
+  "initial_state": "Draft",
+  "states": [
+    {
+      "name": "Draft",
+      "commands": [
+        {
+          "name": "Submit",
+          "next_state": "Review",
+          "policies": [],
+          "actions": []
+        }
+      ],
+      "isEndState": false
+    },
+    {
+      "name": "Review",
+      "commands": [
+        {
+          "name": "Approve",
+          "next_state": "Published",
+          "policies": [],
+          "actions": []
+        },
+        {
+          "name": "Reject",
+          "next_state": "Draft",
+          "policies": [],
+          "actions": []
+        }
+      ],
+      "isEndState": false
+    },
+    { "name": "Published", "commands": [], "isEndState": true }
+  ]
+}
+```
+
+A command may also list `module_access_keys`: a caller who satisfies the command's `policies` or its module-access keys may run it.
+
+### Minimal Example
+
+```
+POST <Engine_URL>/api/workflows
+Authorization: Bearer <administrator's access token>
+Content-Type: application/json
+
+{
+  "name": "Simple Approval",
+  "workflow_json": {
+    "initial_state": "Draft",
+    "states": [ /* see above */ ]
+  }
+}
+```
+
+Then bind it to a collection:
+
+```
+POST <Engine_URL>/api/workflow-assignments
+Authorization: Bearer <administrator's access token>
+Content-Type: application/json
+
+{
+  "workflow": "definition-uuid",
+  "collection": "articles",
+  "filter_rule": null
+}
+```
+
+A `filter_rule` of `null` binds every item of the collection. The Engine then creates an instance for each item that enters the collection. An instance moves only by a command: the MCP `daas_trigger_transition` tool (`instance_id`, `command_name`) or `POST /api/workflow/transition`. The MCP `daas_list_workflows` tool reads the definitions the caller may read.
+
+### Collection Requirements
+
+On an Engine project the Engine finds an item's workflow fields by what they are, not by their names, and both are optional:
+
+1. a link field: a many-to-one to `daas_wf_instance`, so the item editor can open the item's instance;
+2. a state field with the interface `xtr-interface-workflow`, which shows the current state.
+
+Without them the workflow still runs; the item shows no state.
+
+**For complete schema, field setup, and patterns → See the [create-workflow](../../create-workflow/SKILL.md) skill**
+
+## Configuration
+
+On an Engine project the MCP server reads no environment variable. Its settings belong to the project: read them with `GET <Engine_URL>/api/settings/mcp`, and change them with `PATCH /api/settings/mcp` with an administrator's session.
+
+- **mcp_enabled** (default `true`): master toggle. While it is off, the MCP endpoint answers `403` with `MCP_DISABLED`.
+- **mcp_allow_deletes** (default `false`): delete safety. While it is off, `daas_delete_item` is not listed, and a `delete` action of `items`, `files`, `folders`, `collections`, `fields` or `relations` is refused with "Delete operations are disabled in project settings (mcp_allow_deletes)." Deletes through `roles`, `policies`, `access` and `permissions` are not covered.
+- **mcp_system_prompt_enabled** (default `true`): while it is off, the `system-prompt` tool is not listed.
+- **mcp_system_prompt**: custom AI context.
+- **mcp_prompts_collection**: reusable prompts table.
+<!-- /buildpad-backend -->
 
 ---
 
@@ -1715,5 +2203,10 @@ DAAS MCP settings can be managed via `/api/settings` or the Settings UI:
 
 - See [daas-api.instructions.md](./daas-api.instructions.md) for REST API reference
 - See [permissions-filtering.instructions.md](../../create-rbac/references/permissions-filtering.instructions.md) for permission details
+<!-- buildpad-backend: supabase -->
 - See [hooks-extensions.instructions.md](../../hooks-extensions/references/hooks-extensions.instructions.md) for extension patterns
+<!-- /buildpad-backend -->
+<!-- buildpad-backend: engine -->
+- See the [hooks-extensions](../../hooks-extensions/SKILL.md) skill for hook patterns, and the [create-cron](../../create-cron/SKILL.md) skill for cron jobs
+<!-- /buildpad-backend -->
 - See [workflow-schema.instructions.md](../../create-workflow/references/workflow-schema.instructions.md) for workflow definitions

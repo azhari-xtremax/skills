@@ -26,7 +26,7 @@ From the spec, list every concrete deliverable:
 Feature: Task Management
 
 Deliverables:
-1. Database migration for tasks table
+1. Tasks collection, defined through `create-collection`
 2. API route for CRUD operations
 3. TypeScript interfaces
 4. List page with CollectionList
@@ -40,7 +40,7 @@ Deliverables:
 
 ```
                 ┌─── 3. Types ───────┐
-1. Migration ───┤                    ├─── 5. Form ──┐
+1. Collection ──┤                    ├─── 5. Form ──┐
                 └─── 2. API Route ───┤              ├─── 7. Tests
                                      └─── 4. List ──┘       │
                      6. RBAC ────────────────────────────────┘
@@ -57,17 +57,17 @@ Each task should be:
 - **Committed separately** — each task = one commit
 
 ```markdown
-### Task 1: Create tasks migration
+### Task 1: Define the tasks collection
 **Depends on:** Nothing
-**Files:** supabase/migrations/YYYYMMDD_create_tasks.sql
+**Files:** the collection definition that the `create-collection` skill writes (a migration file on a Supabase project; calls to the Engine's API on an Engine project)
 **Acceptance criteria:**
-- [ ] Migration creates tasks table with fields: id, title, status, date_created, date_updated
+- [ ] The tasks collection has fields: id, title, status, date_created, date_updated
 - [ ] Standard audit fields included (user_created, user_updated)
-- [ ] RLS policies for authenticated users
-- [ ] Migration runs without errors
+- [ ] Access for authenticated users: RLS policies on a Supabase project; roles, policies and permissions on an Engine project
+- [ ] The definition applies without errors
 
 ### Task 2: Create tasks API route
-**Depends on:** Task 1 (migration)
+**Depends on:** Task 1 (collection)
 **Files:** app/api/items/tasks/route.ts
 **Acceptance criteria:**
 - [ ] GET returns paginated task list
@@ -82,7 +82,7 @@ This skill feeds the `tasks.md` stage of spec-driven development (`/buildpad-spe
 
 | Layer | Task Types |
 |-------|-----------|
-| Data | Migrations, API routes, types, API tests |
+| Data | Collections (`create-collection`), API routes, types, API tests |
 | UI | List pages, form pages, navigation, page tests |
 | Logic | Validation hooks, RBAC setup, workflow definitions |
 | Relations | Junction tables, relational fields, file uploads |
@@ -91,7 +91,7 @@ This skill feeds the `tasks.md` stage of spec-driven development (`/buildpad-spe
 ## Task Size Guidelines
 
 ```
-~30 min  → Single file change (migration, type definition)
+~30 min  → Single change (collection definition, type definition)
 ~1 hour  → Small feature slice (API route + test)
 ~2 hours → Moderate slice (page + form + tests)
 ~4 hours → MAXIMUM for a single task — split further if larger
@@ -103,7 +103,7 @@ This skill feeds the `tasks.md` stage of spec-driven development (`/buildpad-spe
 ## Implementation Plan: [Feature Name]
 
 ### Data Foundation
-- [ ] Task 1.1: Create migration — [acceptance criteria]
+- [ ] Task 1.1: Define the collection (`create-collection`) — [acceptance criteria]
 - [ ] Task 1.2: Create API route — [acceptance criteria]
 - [ ] Task 1.3: Define TypeScript types — [acceptance criteria]
 - [ ] Task 1.4: Write API tests — [acceptance criteria]
@@ -124,7 +124,7 @@ This skill feeds the `tasks.md` stage of spec-driven development (`/buildpad-spe
 Once tasks are ordered, independent branches of the dependency graph can run as parallel subagents (see `subagent-delegation`). Define any shared contract (API types, DaaS collection schema) as a first task, then fan out.
 
 - **Safe to parallelize:** independent feature slices, read-only research, per-module reviews.
-- **Keep sequential:** migrations, shared-state changes, and anything on one dependency chain.
+- **Keep sequential:** collection definitions (migrations on a Supabase project), shared-state changes, and anything on one dependency chain.
 - Integrate and verify each subagent's result on the main thread before marking a task done.
 
 ## Common Rationalizations

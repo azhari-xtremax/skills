@@ -1,0 +1,8 @@
+[
+  {
+    "path": "review-code/SKILL.md",
+    "kind": "text",
+    "reason": "Qualified so each check holds for both kinds of project: on an Engine project any service-role key reference and any Supabase client call other than sign-in are findings, and the proxy and backend-first checks name the Engine's counterparts; the Supabase checks are unchanged.",
+    "release": "unreleased"
+  }
+]

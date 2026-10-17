@@ -53,7 +53,7 @@ What is slow?
 │   ├── Data loading? → Measure API response times, check for waterfalls
 │   └── Client rendering? → Profile component render time
 └── Backend / API
-    ├── Single endpoint slow? → Profile DaaS queries, check indexes
+    ├── Single endpoint slow? → Profile DaaS queries, check indexes (on an Engine project, index a field by creating it with `schema.add_index: true` through `POST /api/fields/:collection`)
     ├── All endpoints slow? → Check connection pool, memory, CPU
     └── Intermittent slowness? → Check for lock contention, GC pauses
 ```
@@ -71,6 +71,8 @@ for (const task of tasks) {
 // GOOD: Use DaaS deep query with fields parameter
 const tasks = await fetch('/api/items/tasks?fields=*,owner.*');
 ```
+
+On an Engine project the `fields` parameter expands the relation as shown; the Engine ignores the `deep` parameter.
 
 ### Unnecessary Re-renders (React)
 
@@ -107,6 +109,8 @@ const all = await fetch('/api/items/tasks');
 const page = await fetch('/api/items/tasks?limit=20&offset=0&sort=-date_created');
 ```
 
+On an Engine project `limit` is capped at 1000: a request for more returns at most 1000 items, so page through larger sets.
+
 ## Performance Budget
 
 ```
@@ -126,6 +130,7 @@ Lighthouse Performance score: ≥ 90
 - Leverage DaaS aggregate API for counts/sums instead of fetching all records
 - Use DaaS `fields` parameter to fetch only needed fields
 - Use DaaS `filter` parameter server-side instead of client-side filtering
+- On an Engine project the Engine serves the same `aggregate`, `fields` and `filter` parameters, and caps `limit` at 1000
 
 ## Common Rationalizations
 

@@ -1,0 +1,14 @@
+[
+  {
+    "path": "create-form-builder/SKILL.md",
+    "kind": "text",
+    "reason": "Qualified so each statement is true for both kinds of project: the cross-origin setup is a Supabase-project step (an Engine project needs none, ES-15), create-migration is named for Supabase projects only, and the Engine's list cap of 1000 and 204 delete answer are stated; the Supabase steps are unchanged.",
+    "release": "unreleased"
+  },
+  {
+    "path": "create-form-builder/references/form-builder.instructions.md",
+    "kind": "text",
+    "reason": "Scope wording: per-scope overrides instead of per-tenant, and on an Engine project permission presets are not applied, so the scope comes from the create-time default.",
+    "release": "unreleased"
+  }
+]

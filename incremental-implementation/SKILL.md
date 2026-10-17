@@ -42,7 +42,7 @@ Build in thin vertical slices — implement one piece, test it, verify it, then 
 Build one complete path through the stack:
 
 ```
-Slice 1: Create a task (DB migration + API route + basic form)
+Slice 1: Create a task (define the collection with `create-collection` + API route + basic form)
     → Tests pass, user can create a task
 
 Slice 2: List tasks (DaaS query + API route + CollectionList)
@@ -130,7 +130,7 @@ Incremental slicing follows the DaaS dependency layers used in the spec's `tasks
 
 | Layer | Typical Slices |
 |-------|---------------|
-| Data | Migration → API route → Types → API tests |
+| Data | Collection (`create-collection`) → API route → Types → API tests |
 | UI | List page → Form page → Navigation |
 | Logic | Validation → Permissions → Workflow |
 | Relations | M2O → M2M → File fields |

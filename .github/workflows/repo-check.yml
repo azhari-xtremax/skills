@@ -1,0 +1,51 @@
+# Repository_Check (tools/repo-check): the marker grammar, guard, Gate, Skill map, front matter,
+# links, Supabase-view parity and release rules. Node.js standard library only; nothing is
+# installed and no secret is used.
+name: repo-check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Repository_Check tests
+        run: node --test "tools/repo-check/test/*.test.mjs"
+      - name: Repository_Check
+        run: |
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            node tools/repo-check/check.mjs --tag "$GITHUB_REF_NAME"
+          else
+            node tools/repo-check/check.mjs
+          fi
+
+  baseline:
+    name: baseline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Skill map, front matter and Skill links on the baseline tree (7.7)
+        run: |
+          mkdir -p "$RUNNER_TEMP/baseline"
+          git archive v1.0.0 | tar -x -C "$RUNNER_TEMP/baseline"
+          node tools/repo-check/check.mjs --root "$RUNNER_TEMP/baseline" --baseline-ref v1.0.0 --only R4,R5,R6a --skill-map tools/repo-check/skill-map.json

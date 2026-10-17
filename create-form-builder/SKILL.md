@@ -29,7 +29,7 @@ Definitions are persisted as items in a single collection (default **`fb_definit
 | `key`               | string (nullable) | optional discriminator so multiple forms can share one collection (e.g. per issue type) |
 | `definition`        | json              | the `FormDefinition` body |
 
-If the collection is missing, the list and builder render a **`FormsEmptyState`** hint instead of failing. With DaaS **schema rights** that hint offers a one-click **Create collection** action. Use [create-collection](../create-collection/SKILL.md) or [create-migration](../create-migration/SKILL.md) to provision it explicitly if you prefer.
+If the collection is missing, the list and builder render a **`FormsEmptyState`** hint instead of failing. With DaaS **schema rights** that hint offers a one-click **Create collection** action. Use [create-collection](../create-collection/SKILL.md) to provision it explicitly if you prefer, on either kind of project; on a Supabase project [create-migration](../create-migration/SKILL.md) also works (an Engine project has no migrations).
 
 > Authoring (arranging existing fields) needs only item `create`/`update`/`read` on the definitions collection plus `read` on the target collection's schema — **not** admin/DDL rights. Only *provisioning* (creating a collection or a new real column) needs schema rights.
 
@@ -49,9 +49,11 @@ npx @buildpad/cli@latest add api-routes --cwd /path/to/project
 
 > **If the CLI command fails, `@buildpad/cli` IS published to npm** — verify with `npm view @buildpad/cli version` before assuming otherwise or reaching for a local clone. The CLI fetches its registry from `raw.githubusercontent.com`, so confirm the environment can reach **both** npm and the GitHub raw CDN. A local clone is only needed for CLI development, never to consume components.
 
-The module must render under the authenticated layout (`app/(authenticated)/` with a `DaaSProviderWrapper`) so `DaaSProvider` header injection is in scope — the hooks call `/api/items/*` (and, when provisioning in **proxy** mode, `/api/fields/*` and `/api/collections/*`).
+The module must render under the authenticated layout (`app/(authenticated)/` with a `DaaSProviderWrapper`) so `DaaSProvider` header injection (the signed-in user's session token) is in scope — the hooks call `/api/items/*` (and, when provisioning in **proxy** mode, `/api/fields/*` and `/api/collections/*`).
 
-> **DaaS CORS must be configured first.** `DynamicForm` (via `CollectionForm`) fetches `/users/me`, `/permissions/me`, and item endpoints from the browser with `credentials: 'include'`. DaaS's default `cors_origins: ["*"]` is **incompatible** with credentialed requests — the browser blocks every preflight (`Access-Control-Allow-Origin header must not be the wildcard '*'`). Set explicit origins first (see [daas-platform](../daas-platform/SKILL.md) "CORS must use explicit origins" — Bugs 17+25 — and [debugging-and-error-recovery](../debugging-and-error-recovery/SKILL.md)). This is not form-builder-specific: it affects every authenticated Buildpad component.
+> **On a Supabase project, DaaS CORS must be configured first.** `DynamicForm` (via `CollectionForm`) fetches `/users/me`, `/permissions/me`, and item endpoints from the browser with `credentials: 'include'`. DaaS's default `cors_origins: ["*"]` is **incompatible** with credentialed requests — the browser blocks every preflight (`Access-Control-Allow-Origin header must not be the wildcard '*'`). Set explicit origins first (see [daas-platform](../daas-platform/SKILL.md) "CORS must use explicit origins" — Bugs 17+25 — and [debugging-and-error-recovery](../debugging-and-error-recovery/SKILL.md)). This is not form-builder-specific: it affects every authenticated Buildpad component.
+>
+> **On an Engine project there is nothing to configure.** On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere.
 
 ## The Routes
 
@@ -137,6 +139,7 @@ const { list } = useFormDefinitions();
 ## Data Model & Hook (quick reference)
 
 - **Hook** `useFormDefinitions()` from `@/lib/buildpad/hooks` → `list`, `get`, `create`, `update`, `remove`, `resolveScreen` (the API keeps the legacy *screen* name for a resolved definition), plus `loading`/`error`. `DEFAULT_FORMS_COLLECTION = 'fb_definitions'`.
+- **On an Engine project** a list request returns at most 1000 items (`limit` is capped at 1000), and `remove` is answered `204 No Content` with no body.
 - **Types** `FormDefinition`, `FormSection`, `FormFieldConfig` are re-exported from the component barrel `@/components/ui/form-builder` (as used in the list-view example above). `FieldCondition` is the exception — it is deliberately **not** re-exported from the barrel, so import it from `@/lib/buildpad/types`.
 
 For the full data model, conditions cookbook, storage strategies, and multi-tenant scope behaviour, read **[references/form-builder.instructions.md](references/form-builder.instructions.md)**.
@@ -147,6 +150,6 @@ Forms Storybook (port 6010): `pnpm --filter @buildpad/ui-forms storybook`. The `
 
 ## Related
 
-- [create-collection](../create-collection/SKILL.md) — provision the `fb_definitions` or target collections.
+- [create-collection](../create-collection/SKILL.md) — provision the `fb_definitions` or target collections (on either kind of project).
 - [create-feature/vform-usage](../create-feature/references/vform-usage.instructions.md) — the VForm runtime the builder wraps.
 - [buildpad-reference](../buildpad-reference/SKILL.md) — full component catalog.
