@@ -1061,7 +1061,9 @@ it was approved. No criterion is added, reworded, withdrawn or renumbered, and t
   The design says a delete answers 204 with no body. Only a delete of one item does; a delete of
   several items answers 200 with a body, and a cron job delete answers 200 with
   `{ success, message }`. Skills: `add-buildpad`, `create-api-route`, `create-collection`,
-  `create-tests`. Not re-checked: whether `deleteFiles` (`add-files`, row 6) answers 204 or 200.
+  `create-tests`. Files differ: `DELETE /api/files/:id` and `DELETE /api/files` with a list of ids
+  (`deleteFile`, `deleteFiles`) both answer 204 with no body (`asset_handler.go` `Delete` and
+  `DeleteMany`, checked 17 October 2026), so `add-files` (row 6) stands.
 - **C4. The tenant of a password sign-in** (ES-4, row 22; `tasks.md` 5.7, 7.2). ES-4 says the
   password sign-in takes its tenant from `X-Tenant-Id`. That holds for `/auth/v1/token`, which the
   Supabase client's sign-in calls. The Engine's `POST /api/auth/login` takes it from the body's
