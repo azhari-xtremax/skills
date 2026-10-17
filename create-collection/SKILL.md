@@ -223,7 +223,7 @@ An Engine project has no SQL migration: the standard columns are fields created 
 { errors: [{ message: string, extensions?: { code: string } }] }
 ```
 
-On an Engine project a create on `/api/items` answers 200, a delete answers 204 with no body, and the `meta` query parameter is ignored, so a list carries no `total_count` / `filter_count`. `limit` is capped at 1000.
+On an Engine project a create on `/api/items` answers 200, a delete of one item answers 204 with no body and a delete of several answers 200 with a body, and the `meta` query parameter is ignored, so a list carries no `total_count` / `filter_count`. `limit` is capped at 1000.
 <!-- /buildpad-backend -->
 
 ## Using CollectionForm (preferred for forms)
