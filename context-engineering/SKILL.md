@@ -39,7 +39,7 @@ System Prompt (copilot-instructions.md)
 Defined in this project's always-on AI instructions file (the one your IDE
 loads on every turn):
 - Buildpad-First component rule
-- Two-tier architecture (Frontend → DaaS → Supabase)
+- Two-tier architecture (Frontend → DaaS → Supabase on a Supabase project; Frontend → the Engine on an Engine project, one address for data and sign-in)
 - Server-side proxy pattern
 - Backend-first logic
 - Spec-driven development
@@ -54,11 +54,11 @@ Loaded when the agent detects relevant keywords or via slash commands:
 ### 3. MCP Tools (Live Data)
 
 ```
-DaaS MCP Server:
+DaaS MCP Server (the Engine's MCP on an Engine project):
   ├── schema → Live collection/field definitions
   ├── items → Real data operations
   ├── permissions → Current RBAC state
-  └── extensions → Runtime hooks
+  └── extensions → Runtime hooks (Supabase projects; the Engine's MCP has no extensions tool)
   
 Buildpad MCP Server:
   ├── list_components → Available components
@@ -70,7 +70,7 @@ Buildpad MCP Server:
 
 ```
 High-value context files:
-  ├── .env.local → Actual credentials and URLs
+  ├── .env.local → Actual credentials and URLs (on an Engine project: the one Engine address for data and sign-in, the tenant id and a fixed public anon value, and no secret)
   ├── .kiro/specs/ → Feature specs and progress (requirements, design, tasks)
   ├── package.json → Dependencies and scripts
   ├── next.config.ts → Build configuration
@@ -81,7 +81,7 @@ High-value context files:
 
 ### Session Start
 
-1. Read `.env.local` for environment configuration
+1. Read `.env.local` for environment configuration (on an Engine project `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` both hold the one Engine address)
 2. Check `.kiro/specs/` for active specs and task progress
 3. Scan `app/` directory structure for existing patterns
 4. Load relevant background skills based on task
@@ -103,7 +103,7 @@ Output quality dropping?
 ├── Wrong component patterns → Load buildpad-reference skill
 ├── Wrong API patterns → Load daas-platform skill
 ├── Wrong auth patterns → Load authentication-proxy skill
-├── Stale schema → Query DaaS MCP for current schema
+├── Stale schema → Query the project's MCP (DaaS or Engine) for current schema
 └── Context overflow → Summarize and restart with fresh context
 ```
 

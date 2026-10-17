@@ -552,7 +552,7 @@
     rather than inside the step after its line-136 introduction, so the step's code stays under it.
 
 - [ ] 6. Convert the Shared_Guidance and reword the wording-only Skills (design Group 6; after task 3; parallel with tasks 4 and 5)
-- [ ] 6.1 (P) Mark the agent personas (row 13, BP)
+- [x] 6.1 (P) Mark the agent personas (row 13, BP)
   - `security-auditor.md` 3 (description, C4), 39-43 and 48. `code-reviewer.md` 51.
     `test-engineer.md` 64-65. Each file gets the Gate after its front matter. `name` stays unchanged.
   - The Supabase checks go in sup: service-role key server-side, RLS, SQL functions, OAuth. The eng
@@ -563,7 +563,13 @@
   - Done when: FD holds for `agents`.
   - _Requirements: 1.2, 1.9, 3.13, 5.10, 7.9, 2.4_
   - _Boundary: agents/, converted/agents, supabase-view-changes/agents.json_
-- [ ] 6.2 (P) Mark the top-level reference checklists (row 29, BP)
+  - Note 16 October 2026: converted on `feat/backend-aware-skills-task-6`; the tests and
+    `check.mjs` exit 0 with `converted/agents`. Read through `--render` output: the Engine view of
+    the three personas gives only Engine checks (no service-role key, the MCP and worker tokens,
+    provisioned cross-origin, roles/policies/permissions/scope, `{ elevated: true }`, ES-5's list,
+    ES-7 for test users), and the Supabase view differs from `v1.0.0` only by the Gate and the
+    `security-auditor` description (its change-file entry).
+- [x] 6.2 (P) Mark the top-level reference checklists (row 29, BP)
   - `security-checklist.md` 11-18, 51-64 and 123-127: the Gate at the top, the service-role and RLS
     lines in sup, and the 3.13 replacements in eng. `module-access-checklist.md` 8-16: the Gate, and
     sup/eng for the server check (ES-16). The other three files stay unchanged. No subfolder is
@@ -572,106 +578,199 @@
     `security-checklist.md:125`.
   - _Requirements: 1.2, 1.9, 3.13, 5.10, 7.9_
   - _Boundary: references/, converted/references, supabase-view-changes/references.json_
-- [ ] 6.3 (P) Reword `add-users` (row 11, RW)
+  - Note 16 October 2026: converted on `feat/backend-aware-skills-task-6`; the tests and
+    `check.mjs` exit 0 with `converted/references`, and R1 reports nothing at the former hit
+    `security-checklist.md:125` (now `supabase` text). Read through `--render` output: the
+    Engine view states the 3.13 replacements (no service-role key or Supabase secret, provisioned
+    cross-origin, roles/policies/permissions, ES-15, ES-16), and the Supabase view differs from
+    `v1.0.0` only by the Gate (change file `[]`). In `module-access-checklist.md` only the server
+    check (line 15) differs: lines 8, 9 and 16 hold on the Engine too (`daas_module_access_keys`,
+    policy `module_access`, workflow `module_access_keys`), so they stay shared.
+- [x] 6.3 (P) Reword `add-users` (row 11, RW)
   - `SKILL.md` 9-18, 30-32, 44, 125, 135-143 and 159 become qualified sentences: ES-7 (a role in the
     tenant on create); on an Engine project a static token is an MCP credential; "scope", not
     "tenant". There is no marker and no Gate.
   - Done when: FD holds for `add-users`, and its change file has one `text` entry with a reason.
   - _Requirements: 3.7, 3.17, 5.2, 2.4_
   - _Boundary: add-users/, converted/add-users, supabase-view-changes/add-users.json_
-- [ ] 6.4 (P) Reword `authentication-proxy` (row 14, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/add-users`. Read through: the file
+    reads complete for both kinds of project (cross-origin setup qualified as a Supabase-project
+    step beside ES-15; static tokens as MCP credentials; ES-7 with the role in the tenant;
+    "scope" for the levels inside the project). The change file has one `text` entry.
+- [x] 6.4 (P) Reword `authentication-proxy` (row 14, RW)
   - `SKILL.md` 11-26 and 64-115. `references/authentication-proxy.instructions.md` 16-49, 126-141
     and 290-303. All become qualified sentences, with the address `NEXT_PUBLIC_BUILDPAD_DAAS_URL`.
     Uses ES-1, ES-3, ES-4, ES-5 and ES-6 in their "On an Engine project" form.
   - Done when: FD holds for `authentication-proxy`, with one `text` entry per changed file.
   - _Requirements: 3.3, 3.5, 3.8, 3.16, 4.5, 4.6, 5.2, 2.4_
   - _Boundary: authentication-proxy/, converted/authentication-proxy, supabase-view-changes/authentication-proxy.json_
-- [ ] 6.5 (P) Reword `buildpad-reference` (row 15, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/authentication-proxy`. Read through:
+    both files read complete for both kinds of project (the proxy rule kept for both; the OAuth
+    routes and the external OAuth section qualified as Supabase-project only, with the stop on an
+    Engine project; ES-1, ES-2, ES-4, ES-5 and ES-6 verbatim in `SKILL.md`, ES-1, ES-3 and ES-5 in
+    the reference with an Engine environment block). One `text` entry per changed file.
+- [x] 6.5 (P) Reword `buildpad-reference` (row 15, RW)
   - `SKILL.md` 11, 43-52 (asset URL) and 109-126. `references/react-components.instructions.md`
     15-19, 373 and 404-422. Uses ES-2 (the DaaSProvider token is a session token) and ES-11.
   - Done when: FD holds for `buildpad-reference`.
   - _Requirements: 3.11, 5.2, 2.4_
   - _Boundary: buildpad-reference/, converted/buildpad-reference, supabase-view-changes/buildpad-reference.json_
-- [ ] 6.6 (P) Reword `create-feature` (row 18, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/buildpad-reference`. Read through:
+    both files read complete for both kinds of project (ES-11 and the assets-proxy gap of Issue 6
+    beside the Files module row; the 204 delete answer beside `CollectionList`; the
+    `DaaSProvider` examples use `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and state the token rule with
+    ES-2). `SKILL.md` 11 and the reference's 15-19 needed no change: they hold for both as written.
+- [x] 6.6 (P) Reword `create-feature` (row 18, RW)
   - `SKILL.md` 27, 41-45, 62 and 106-141. `references/vform-usage.instructions.md` 177-216. Qualified
     sentences: scope inside the tenant (ES-9), the module-access check through
     `/api/permissions/me` (ES-16), and the cron body per ES-10.
   - Done when: FD holds for `create-feature`.
   - _Requirements: 3.9, 3.10, 5.2, 2.4_
   - _Boundary: create-feature/, converted/create-feature, supabase-view-changes/create-feature.json_
-- [ ] 6.7 (P) Reword `add-multitenancy` (row 32, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/create-feature`. Read through: both
+    files read complete for both kinds of project (ES-9 at the scope section and the
+    multi-tenancy item; ES-16 after the checklist and at the API guard points; the cron item
+    names the Engine runtime's limits and ES-13n, linking `create-cron/SKILL.md`, since ES-10's
+    table link has no target in this file).
+- [x] 6.7 (P) Reword `add-multitenancy` (row 32, RW)
   - `SKILL.md` 9-13. `references/multitenancy.instructions.md` 4 and 9-13. Qualified ES-9; the scoped
     collection column has a foreign key to `daas_scope_items(uri_path)`.
   - Done when: FD holds for `add-multitenancy`, and R4 reports no marker in this `wording only`
     folder.
   - _Requirements: 3.9, 5.2, 2.4_
   - _Boundary: add-multitenancy/, converted/add-multitenancy, supabase-view-changes/add-multitenancy.json_
-- [ ] 6.8 (P) Reword `buildpad-steering-custom` and add its Gate (row 33, RW+G)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/add-multitenancy`, and R4 reports no
+    marker in this `wording only` folder. Read through: both files read complete for both kinds
+    of project (ES-9 and the scope column's foreign key, checked against the Engine's m2o field
+    service at `d893e3cd`: the key exists when the field relates to `daas_scope_items` with
+    `related_field: uri_path`). The reference's line 4 (`applyTo`) holds for both and is
+    unchanged; its file list is named as a Supabase project's, and it relies on 4.6 for the
+    Engine references that `manage-scope/SKILL.md` will name.
+- [x] 6.8 (P) Reword `buildpad-steering-custom` and add its Gate (row 33, RW+G)
   - `SKILL.md`: the Gate placed by S4. Lines 43-51 become "record the backend the Gate established;
     never infer it from dependency or variable names". The templates and `rules/` stay unchanged.
   - Done when: FD holds for `buildpad-steering-custom`, and R8 reports nothing for its
     `settings-templates/` and `rules/`.
   - _Requirements: 1.2, 5.2, 5.6, 2.4_
   - _Boundary: buildpad-steering-custom/, converted/buildpad-steering-custom, supabase-view-changes/buildpad-steering-custom.json_
-- [ ] 6.9 (P) Reword `context-engineering` (row 34, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`; the tests and
+    `check.mjs` exit 0 with `converted/buildpad-steering-custom` (R3 holds the Gate after the H1;
+    R8 reports nothing for `settings-templates/` and `rules/`, both unchanged). Read through:
+    step 3 now records the backend the Gate established and forbids inferring it from
+    dependency or variable names; no marker. The change file has one `text` entry.
+- [x] 6.9 (P) Reword `context-engineering` (row 34, RW)
   - `SKILL.md` 42, 57-61, 73, 84 and 106. Qualified sentences: one Engine address for data and
     sign-in; the Engine MCP has no extensions tool.
   - Done when: FD holds for `context-engineering`.
   - _Requirements: 3.3, 5.2, 2.4_
   - _Boundary: context-engineering/, converted/context-engineering, supabase-view-changes/context-engineering.json_
-- [ ] 6.10 (P) Reword `create-form-builder` (row 35, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/context-engineering`. Read through:
+    the file reads complete for both kinds of project (one Engine address for data and sign-in
+    in the architecture, the environment file and session start; the Engine's MCP has no
+    extensions tool, named in plain words). The change file has one `text` entry.
+- [x] 6.10 (P) Reword `create-form-builder` (row 35, RW)
   - `SKILL.md` 20-34, 52-54 and 137-150. `references/form-builder.instructions.md` 78-106. Qualified
     sentences: the `limit` cap is 1000; delete answers 204; structure goes through
     `create-collection`, and `create-migration` applies on a Supabase project only.
   - Done when: FD holds for `create-form-builder`.
   - _Requirements: 3.6, 5.2, 2.4_
   - _Boundary: create-form-builder/, converted/create-form-builder, supabase-view-changes/create-form-builder.json_
-- [ ] 6.11 (P) Reword `idea-refine` (row 36, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/create-form-builder`. Read through:
+    both files read complete for both kinds of project (structure through `create-collection`,
+    `create-migration` for Supabase projects only; the cross-origin step qualified beside ES-15;
+    the 1000-item cap and the 204 delete checked against the Engine at `d893e3cd`; presets not
+    applied on an Engine project; "scope" for the override levels).
+- [x] 6.11 (P) Reword `idea-refine` (row 36, RW)
   - `SKILL.md` 66 and 75-84 become "Next.js and the project's Buildpad backend"; scope sits inside
     the tenant.
   - Done when: FD holds for `idea-refine`.
   - _Requirements: 3.9, 5.2, 2.4_
   - _Boundary: idea-refine/, converted/idea-refine, supabase-view-changes/idea-refine.json_
-- [ ] 6.12 (P) Reword `incremental-implementation` (row 37, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/idea-refine`. Read through: the
+    validation line names "Next.js and the project's Buildpad backend", the scope row sits inside
+    the tenant, and the cron row states that an Engine project runs cron jobs only by hand for
+    now (ES-13n), so every row holds for both kinds of project.
+- [x] 6.12 (P) Reword `incremental-implementation` (row 37, RW)
   - `SKILL.md` 45 and 133: the first step defines the collection (`create-collection`).
   - Done when: FD holds for `incremental-implementation`.
   - _Requirements: 3.6, 5.2, 2.4_
   - _Boundary: incremental-implementation/, converted/incremental-implementation, supabase-view-changes/incremental-implementation.json_
-- [ ] 6.13 (P) Reword `performance-optimization` (row 38, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/incremental-implementation`. Read
+    through: the first data slice and the Data layer now define the collection through
+    `create-collection`, true for both kinds of project; nothing else in the file differs.
+- [x] 6.13 (P) Reword `performance-optimization` (row 38, RW)
   - `SKILL.md` 56, 63-72, 106 and 126-128. Qualified sentences: indexing through an indexed field;
     `limit` capped at 1000.
   - Done when: FD holds for `performance-optimization`.
   - _Requirements: 5.2, 2.4_
   - _Boundary: performance-optimization/, converted/performance-optimization, supabase-view-changes/performance-optimization.json_
-- [ ] 6.14 (P) Reword `planning-and-task-breakdown` (row 39, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/performance-optimization`. Read
+    through: the file reads complete for both kinds of project (an index through
+    `schema.add_index` on field create, `fields` expansion with `deep` ignored, and the 1000-item
+    `limit` cap, each checked against the Engine at `d893e3cd`).
+- [x] 6.14 (P) Reword `planning-and-task-breakdown` (row 39, RW)
   - `SKILL.md` 29, 43, 60-67, 71-75 and 85-127: "define the collection through `create-collection`".
     Reword the line-62 example path, the one R1 hit outside a planned `supabase` range.
   - Done when: FD holds for `planning-and-task-breakdown`, and R1 reports nothing at `SKILL.md:62`.
   - _Requirements: 3.1, 3.6, 5.2, 2.4_
   - _Boundary: planning-and-task-breakdown/, converted/planning-and-task-breakdown, supabase-view-changes/planning-and-task-breakdown.json_
-- [ ] 6.15 (P) Reword `review-code` (row 40, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/planning-and-task-breakdown`, and R1
+    reports nothing at `SKILL.md:62` (the example path is gone). Read through: every data task
+    defines the collection through `create-collection`, the access criterion names both kinds of
+    project, and the dependency diagram keeps its alignment.
+- [x] 6.15 (P) Reword `review-code` (row 40, RW)
   - `SKILL.md` 11, 24, 27 and 34-36. Qualified sentences: on an Engine project, any Supabase client
     call other than sign-in has no server, and any service-role key reference is a finding.
   - Done when: FD holds for `review-code`.
   - _Requirements: 3.4, 5.2, 2.4_
   - _Boundary: review-code/, converted/review-code, supabase-view-changes/review-code.json_
-- [ ] 6.16 (P) Reword `spec-driven-development` (row 41, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/review-code`. Read through: each
+    security and compliance check holds for both kinds of project (a service-role key reference
+    and any Supabase client call other than sign-in are findings on an Engine project; the proxy,
+    auth-proxy and backend-first checks name the Engine's counterparts).
+- [x] 6.16 (P) Reword `spec-driven-development` (row 41, RW)
   - `SKILL.md` 47-53: the scope hierarchy sits beneath the tenant.
   - Done when: FD holds for `spec-driven-development`.
   - _Requirements: 3.9, 5.2, 2.4_
   - _Boundary: spec-driven-development/, converted/spec-driven-development, supabase-view-changes/spec-driven-development.json_
-- [ ] 6.17 (P) Reword `subagent-delegation` (row 42, RW)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/spec-driven-development`. Read
+    through: lines 47-52 hold for both kinds of project as written; the scope item now places
+    the hierarchy beneath the tenant on an Engine project (ES-9).
+- [x] 6.17 (P) Reword `subagent-delegation` (row 42, RW)
   - `SKILL.md` 18, 30 and 58: the OAuth review is not available on an Engine project.
   - Done when: FD holds for `subagent-delegation`.
   - _Requirements: 4.1, 5.2, 2.4_
   - _Boundary: subagent-delegation/, converted/subagent-delegation, supabase-view-changes/subagent-delegation.json_
-- [ ] 6.18 (P) Reword `buildpad-steering` and add its Gate (row 43, RW+G)
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`, with no marker and no
+    Gate; the tests and `check.mjs` exit 0 with `converted/subagent-delegation`. Read through:
+    the persona table and the routing notes hold for both kinds of project (RLS named as a
+    Supabase project's; the OAuth review not available on an Engine project, in plain words).
+- [x] 6.18 (P) Reword `buildpad-steering` and add its Gate (row 43, RW+G)
   - `SKILL.md`: the Gate, and lines 53-56 reworded as in 6.8. The templates and `rules/` stay
     unchanged.
   - Done when: FD holds for `buildpad-steering`, and R8 reports nothing for its `settings-templates/`
     and `rules/`.
   - _Requirements: 1.2, 5.2, 5.6, 2.4_
   - _Boundary: buildpad-steering/, converted/buildpad-steering, supabase-view-changes/buildpad-steering.json_
+  - Note 16 October 2026: reworded on `feat/backend-aware-skills-task-6`; the tests and
+    `check.mjs` exit 0 with `converted/buildpad-steering` (R3 holds the Gate after the H1; R8
+    reports nothing for `settings-templates/` and `rules/`, both unchanged). Read through: the
+    bootstrap tech analysis records the backend the Gate established and forbids inferring it
+    from dependency or variable names, as in 6.8; no marker. The change file has one `text`
+    entry.
 
 - [ ] 7. Convert the core Skills (design Group 2; after task 4)
 - [ ] 7.1 (P) Convert `add-external-oauth` (row 1, US)
