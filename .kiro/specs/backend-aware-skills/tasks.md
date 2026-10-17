@@ -52,7 +52,7 @@
   - _Requirements: 6.1_
 
 - [ ] 2. Build the Repository_Check in `tools/repo-check/` (design Group 1, with task 3)
-- [ ] 2.1 Write the shared contract data and its pinning test
+- [x] 2.1 Write the shared contract data and its pinning test
   - Add `tools/repo-check/contract/backend-contract.json` exactly as printed in S8: marker regex,
     token, kinds, `onlyDirs`, `steeringToken`, the nine issue codes, the 13 guard patterns
     (alternation unescaped), path rule, fenced-block rule, `fencedLinksAreLinks: false`, and the
@@ -64,7 +64,7 @@
   - Done when: `node --test tools/repo-check/test/contract.test.mjs` passes, and fails after one
     character of any regex in the JSON is changed.
   - _Requirements: 7.1, 7.8_
-- [ ] 2.2 Implement passages and views (`lib/passages.mjs`, R2)
+- [x] 2.2 Implement passages and views (`lib/passages.mjs`, R2)
   - Implement `validateMarkers`, `validateMarkerPlacement`, `fileBackend` and
     `stripBackendPassages` from S8's data, and `authoringIssues`, which reports `straddles-fence`,
     `marker-in-table` and `gap-between-passages` (S6).
@@ -74,7 +74,7 @@
   - Done when: `node --test tools/repo-check/test/passages.test.mjs` passes and every `markerCases`
     entry of `cases.json` gives its expected issues.
   - _Requirements: 1.8, 1.9, 7.8_
-- [ ] 2.3 (P) Implement the guard (`lib/guard.mjs`, R1)
+- [x] 2.3 (P) Implement the guard (`lib/guard.mjs`, R1)
   - `scanView(path, text)` applies the 13 §C20 patterns per line, the path rule, the fenced-block
     rule, and this repository's `x-pp29-tool` patterns (never written to the contract file).
   - Add `test/guard.test.mjs`: a positive and a negative for each pattern. The negatives include
@@ -85,7 +85,7 @@
     entry gives its expected ids.
   - _Requirements: 3.1, 3.2, 7.1_
   - _Boundary: tools/repo-check/lib/guard.mjs, test/guard.test.mjs_
-- [ ] 2.4 Implement link extraction and resolution (`lib/links.mjs`, R6a, R6b)
+- [x] 2.4 Implement link extraction and resolution (`lib/links.mjs`, R6a, R6b)
   - `extractLinks` skips CommonMark fences. `resolves` works per view. `isRecordedBreak` matches by
     file and target.
   - Add `test/links.test.mjs`: inline and reference-style links, anchors, the nested four-backtick
@@ -95,7 +95,7 @@
   - Done when: `node --test tools/repo-check/test/links.test.mjs` passes, and every `linkCases`
     entry gives its expected links.
   - _Requirements: 2.3, 3.15, 7.5_
-- [ ] 2.5 Write the canonical Gate and its rule (`gate.md`, `lib/gate.mjs`, R3)
+- [x] 2.5 Write the canonical Gate and its rule (`gate.md`, `lib/gate.mjs`, R3)
   - Add `tools/repo-check/gate.md` with the S3 block byte for byte: the sentinels, steps 1 to 4,
     the no-secrets paragraph, the definition of a part, and the stop sentence.
   - `gateIssues` reports: Gate absent, misplaced by S4, or not byte-identical (line endings
@@ -107,7 +107,7 @@
   - Done when: `node --test tools/repo-check/test/gate.test.mjs` passes, and `scanView` over
     `gate.md` returns no finding and the file holds no `buildpad-backend` token.
   - _Requirements: 1.1, 1.2, 1.3, 1.5, 1.6, 1.7, 1.10, 1.11, 1.12, 4.8, 7.2_
-- [ ] 2.6 Implement the checked set and baseline parity (`lib/checked-set.mjs`, `lib/baseline.mjs`, R5, R7)
+- [x] 2.6 Implement the checked set and baseline parity (`lib/checked-set.mjs`, `lib/baseline.mjs`, R5, R7)
   - `checkedSet` uses `git ls-files` in a work tree. Otherwise it uses `git ls-tree -r --name-only <ref>`,
     or else a directory walk that skips `.git/`. The set is every folder with `SKILL.md`, plus
     `agents/` and `references/`. It excludes root files, `.github/`, `.kiro/` and `tools/`.
@@ -119,7 +119,7 @@
   - Done when: `node --test tools/repo-check/test/baseline.test.mjs` passes, including a UC folder
     with one changed byte (fails) and a moved-not-rewritten passage (passes).
   - _Requirements: 2.1, 2.2, 2.4, 2.5_
-- [ ] 2.7 Add the machine Skill_Map and the map, template and README rules (`skill-map.json`, `lib/map.mjs`)
+- [x] 2.7 Add the machine Skill_Map and the map, template and README rules (`skill-map.json`, `lib/map.mjs`)
   - `skill-map.json`: 64 rows, one per folder of the requirements' Skill map, with `dependence`,
     `treatment`, `size` as written there and `plan` from the marking plan (BP 21, EF 3, US 2, NY 2,
     RW 14, RW+G 2, UC 20).
@@ -132,7 +132,7 @@
   - Done when: these three tests pass, and a script comparing `skill-map.json` with the
     requirements' Skill map table finds 64 equal rows and the plan counts above.
   - _Requirements: 5.1, 5.2, 5.6, 5.8, 6.4, 6.7, 7.3_
-- [ ] 2.8 Implement the release rules (`lib/release.mjs`, R10, R13)
+- [x] 2.8 Implement the release rules (`lib/release.mjs`, R10, R13)
   - R10 runs on every run: a change-file entry whose `release` is a tag but whose path is missing
     from that tag's `CHANGELOG.md` section fails. A missing `CHANGELOG.md` counts as having no
     sections (the file is created in 3.2, after this rule). With `--tag`, it also fails when the tag has no
@@ -143,7 +143,7 @@
   - Done when: these tests pass, including "an `unreleased` entry between releases passes",
     "the same entry on a tag push fails" and "R13 fails with one non-UC row unconverted".
   - _Requirements: 2.4, 6.2, 7.1, 7.2_
-- [ ] 2.9 Implement the CLI (`check.mjs`) and the front-matter and coverage tests
+- [x] 2.9 Implement the CLI (`check.mjs`) and the front-matter and coverage tests
   - `main(argv)` takes the options of Interface: `--root`, `--baseline-ref`, `--skill-map`, `--tag`,
     `--only`, `--render`. Exit codes are 0, 1 and 2. A finding line is
     `<rule> <path>:<line> <code> <message>`, plus `::error file=,line=::` under GitHub Actions. Every
@@ -162,6 +162,9 @@
     Handling message. `check.mjs --only R12` exits 0, and exits 1 after one character of a case's
     expected result is changed.
   - _Requirements: 7.4, 7.9_
+  - Note 16 October 2026: between 2.9 and 3.1, `check.mjs` on the tree reports only R11's two
+    findings (the README lacks the `#v1.0.0` command and `add-microfrontend-zones`); every other
+    rule exits 0 there. 3.1 clears them.
 - [ ] 2.10 Add the CI workflow `.github/workflows/repo-check.yml`
   - Triggers: `pull_request` to `main`, `push` to `main`, and `push` of tags `v*`. Uses
     `permissions: contents: read` and no secret, and does not use `pull_request_target`.
@@ -172,9 +175,13 @@
     `check.mjs --root $RUNNER_TEMP/baseline --baseline-ref v1.0.0 --only R4,R5,R6a --skill-map tools/repo-check/skill-map.json`.
   - Done when: on the pull request of tasks 2 and 3, both jobs run and end green.
   - _Requirements: 7.7_
+  - Note 16 October 2026: the workflow and `test/workflow.test.mjs` are committed on
+    `feat/backend-aware-skills-repo-check`; both jobs' commands pass locally on Node 24 (the
+    `baseline` command exits 0). Left unticked: the Done-when needs the pull request's CI run on
+    Node 22, which no one has opened yet.
 
 - [ ] 3. Write the README, CONTRIBUTING and the first CHANGELOG, and land the check green on the unconverted tree (same pull request as task 2)
-- [ ] 3.1 Rewrite `README.md` for the two kinds of project
+- [x] 3.1 Rewrite `README.md` for the two kinds of project
   - Add the sections from Distribution and README: **Two kinds of project** (6.6), and **Install**
     with `#v2.0.0`, `--all`, `#v2.0.0@create-project` and the tree URL, with no hard-coded `main`
     (6.3). Add **Stay on the skills as they were before Engine support**, with
@@ -186,7 +193,7 @@
   - Done when: `node tools/repo-check/check.mjs --only R11` exits 0, and the catalogue lists each of
     the 62 Skill folders once.
   - _Requirements: 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
-- [ ] 3.2 Write `CONTRIBUTING.md` and start `CHANGELOG.md`
+- [x] 3.2 Write `CONTRIBUTING.md` and start `CHANGELOG.md`
   - Create `CHANGELOG.md` at the root (design Group 1) with one section, `v1.0.0`, naming it the
     Baseline_Revision (`7ed910f`), so the README's link from 3.1 resolves. No folder task edits it;
     9.2 and 10.8 add the later sections.
@@ -206,10 +213,20 @@
     `tools/`, `.github/`, `README.md`, `CONTRIBUTING.md` and `CHANGELOG.md` (and `.kiro/` if the spec
     itself is committed). The pull request is merged.
   - _Requirements: 2.2, 7.7_
+  - Note 16 October 2026: run locally on Node 24 at the head of
+    `feat/backend-aware-skills-repo-check`, with no `converted/` file: the tests (215) pass,
+    `check.mjs` exits 0 with no finding, and the `baseline` job command exits 0.
+    `git diff --stat v1.0.0 HEAD` lists only `tools/`, `.github/`, `README.md`, `CONTRIBUTING.md`,
+    `CHANGELOG.md` and `.kiro/`. Left unticked: CI on the pull request and the merge are still to
+    come.
 - [ ] 3.4 Make `check` and `baseline` required status checks on `main` (maintainer, repository setting)
   - Done when: the branch-protection settings for `main` list both checks as required. The design's
     "T-0.3" is this task.
   - _Requirements: 7.1_
+  - Note 16 October 2026: not done here (a repository setting for the maintainer). The checks to
+    require are the two jobs of `.github/workflows/repo-check.yml`, named `check` and `baseline`
+    (shown in GitHub as `repo-check / check` and `repo-check / baseline`). They can be chosen
+    once they have run on the pull request of tasks 2 and 3.
 
 - [ ] 4. Convert the data and access Skills (design Group 3; after task 3; before tasks 7 and 8; parallel with tasks 5 and 6)
 - [ ] 4.1 (P) Convert `add-i18n` (row 7, BP)

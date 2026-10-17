@@ -1,0 +1,615 @@
+{
+  "markerCases": [
+    {
+      "name": "no marker",
+      "path": "x/SKILL.md",
+      "text": "# Title\n\nPlain text for both.\n",
+      "issues": []
+    },
+    {
+      "name": "markdown passage pair",
+      "path": "x/SKILL.md",
+      "text": "# Title\n<!-- buildpad-backend: engine -->\nEngine text.\n<!-- /buildpad-backend -->\n",
+      "issues": []
+    },
+    {
+      "name": "adjacent replaced pair, supabase first",
+      "path": "x/SKILL.md",
+      "text": "# Title\n<!-- buildpad-backend: supabase -->\nSupabase text.\n<!-- /buildpad-backend -->\n<!-- buildpad-backend: engine -->\nEngine text.\n<!-- /buildpad-backend -->\n",
+      "issues": []
+    },
+    {
+      "name": "typescript passage pair",
+      "path": "x/assets/a.ts",
+      "text": "// buildpad-backend: supabase\nconst a = 1;\n// /buildpad-backend\n",
+      "issues": []
+    },
+    {
+      "name": "hash comment pair",
+      "path": "x/assets/a.sh",
+      "text": "# buildpad-backend: engine\necho engine\n# /buildpad-backend\n",
+      "issues": []
+    },
+    {
+      "name": "sql comment pair",
+      "path": "x/assets/a.sql",
+      "text": "-- buildpad-backend: supabase\nselect 1;\n-- /buildpad-backend\n",
+      "issues": []
+    },
+    {
+      "name": "block comment pair",
+      "path": "x/assets/a.css",
+      "text": "/* buildpad-backend: engine */\na { color: red; }\n/* /buildpad-backend */\n",
+      "issues": []
+    },
+    {
+      "name": "bare marker without a comment opener",
+      "path": "x/a.txt",
+      "text": "buildpad-backend: engine\ntext\n/buildpad-backend\n",
+      "issues": []
+    },
+    {
+      "name": "indented marker",
+      "path": "x/SKILL.md",
+      "text": "- item\n  <!-- buildpad-backend: engine -->\n  engine item\n  <!-- /buildpad-backend -->\n",
+      "issues": []
+    },
+    {
+      "name": "crlf pair",
+      "path": "x/SKILL.md",
+      "text": "# Title\r\n<!-- buildpad-backend: engine -->\r\nEngine text.\r\n<!-- /buildpad-backend -->\r\n",
+      "issues": []
+    },
+    {
+      "name": "prose that writes the token",
+      "path": "x/SKILL.md",
+      "text": "# Title\nMark it with buildpad-backend comments.\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "malformed-marker"
+        }
+      ]
+    },
+    {
+      "name": "marker with trailing words",
+      "path": "x/SKILL.md",
+      "text": "<!-- buildpad-backend: engine only -->\nx\n<!-- /buildpad-backend -->\n",
+      "issues": [
+        {
+          "line": 1,
+          "code": "malformed-marker"
+        },
+        {
+          "line": 3,
+          "code": "unpaired-close"
+        }
+      ]
+    },
+    {
+      "name": "unknown kind",
+      "path": "x/SKILL.md",
+      "text": "<!-- buildpad-backend: postgres -->\nx\n<!-- /buildpad-backend -->\n",
+      "issues": [
+        {
+          "line": 1,
+          "code": "unknown-kind"
+        }
+      ]
+    },
+    {
+      "name": "nested passages",
+      "path": "x/SKILL.md",
+      "text": "<!-- buildpad-backend: engine -->\n<!-- buildpad-backend: supabase -->\nx\n<!-- /buildpad-backend -->\n<!-- /buildpad-backend -->\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "nested"
+        }
+      ]
+    },
+    {
+      "name": "opener without closer",
+      "path": "x/SKILL.md",
+      "text": "# Title\n<!-- buildpad-backend: engine -->\nx\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "unpaired-open"
+        }
+      ]
+    },
+    {
+      "name": "closer without opener",
+      "path": "x/SKILL.md",
+      "text": "# Title\n<!-- /buildpad-backend -->\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "unpaired-close"
+        }
+      ]
+    },
+    {
+      "name": "whole-line marker inside a fence counts",
+      "path": "x/SKILL.md",
+      "text": "```md\n<!-- buildpad-backend: engine -->\n```\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "unpaired-open"
+        }
+      ]
+    },
+    {
+      "name": "passage holding a kiro-steering marker",
+      "path": "x/SKILL.md",
+      "text": "<!-- buildpad-backend: engine -->\n<!-- kiro-steering: inclusion always -->\n<!-- /buildpad-backend -->\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "straddles-steering"
+        }
+      ]
+    },
+    {
+      "name": "file marker on line 1",
+      "path": "x/references/a.md",
+      "text": "<!-- buildpad-backend-file: engine -->\n# Engine only\n",
+      "issues": []
+    },
+    {
+      "name": "file marker after front matter",
+      "path": "x/references/a.md",
+      "text": "---\nname: a\n---\n\n<!-- buildpad-backend-file: supabase -->\n# Supabase only\n",
+      "issues": []
+    },
+    {
+      "name": "kiro-style copy keeps its file marker",
+      "path": "x/references/a.md",
+      "text": "---\ninclusion: always\n---\n\n<!-- buildpad-backend-file: engine -->\n# Engine only\n",
+      "issues": []
+    },
+    {
+      "name": "typescript file marker on line 1",
+      "path": "x/assets/a.ts",
+      "text": "// buildpad-backend-file: supabase\nexport const a = 1;\n",
+      "issues": []
+    },
+    {
+      "name": "file marker after a heading",
+      "path": "x/references/a.md",
+      "text": "# Title\n<!-- buildpad-backend-file: engine -->\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "misplaced-file-marker"
+        }
+      ]
+    },
+    {
+      "name": "file marker after a leading blank line",
+      "path": "x/references/a.md",
+      "text": "\n<!-- buildpad-backend-file: engine -->\n# Title\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "misplaced-file-marker"
+        }
+      ]
+    },
+    {
+      "name": "file marker inside an engine-only folder",
+      "path": "x/assets/engine-only/a.md",
+      "text": "<!-- buildpad-backend-file: engine -->\n# Title\n",
+      "issues": [
+        {
+          "line": 1,
+          "code": "misplaced-file-marker"
+        }
+      ]
+    },
+    {
+      "name": "file marker with an unknown kind",
+      "path": "x/references/a.md",
+      "text": "<!-- buildpad-backend-file: mysql -->\n# Title\n",
+      "issues": [
+        {
+          "line": 1,
+          "code": "unknown-kind"
+        }
+      ]
+    },
+    {
+      "name": "two file markers",
+      "path": "x/references/a.md",
+      "text": "<!-- buildpad-backend-file: engine -->\n# Title\n<!-- buildpad-backend-file: supabase -->\n",
+      "issues": [
+        {
+          "line": 3,
+          "code": "conflicting-scope"
+        }
+      ]
+    },
+    {
+      "name": "passage inside a whole-file-marked file",
+      "path": "x/references/a.md",
+      "text": "<!-- buildpad-backend-file: engine -->\n<!-- buildpad-backend: engine -->\nx\n<!-- /buildpad-backend -->\n",
+      "issues": [
+        {
+          "line": 2,
+          "code": "conflicting-scope"
+        }
+      ]
+    },
+    {
+      "name": "marker inside front matter",
+      "path": "x/SKILL.md",
+      "text": "---\nname: x\n# buildpad-backend: engine\n---\n# Title\n",
+      "issues": [
+        {
+          "line": 3,
+          "code": "marker-in-front-matter"
+        }
+      ]
+    },
+    {
+      "name": "gate sentinels are not markers",
+      "path": "x/SKILL.md",
+      "text": "<!-- backend-gate:begin v1 -->\nA part starts at a line that holds only a comment whose text is `buildpad` + `-backend: engine`.\n<!-- backend-gate:end -->\n",
+      "issues": []
+    }
+  ],
+  "guardCases": [
+    {
+      "name": "rpc positive",
+      "line": "const { data } = await supabase.rpc('get_stats');",
+      "ids": [
+        "rpc"
+      ]
+    },
+    {
+      "name": "rpc negative",
+      "line": "Call the remote procedure through the API.",
+      "ids": []
+    },
+    {
+      "name": "rest positive",
+      "line": "fetch(`${url}/rest/v1/articles`)",
+      "ids": [
+        "rest"
+      ]
+    },
+    {
+      "name": "rest negative",
+      "line": "fetch(`${url}/api/items/articles`)",
+      "ids": []
+    },
+    {
+      "name": "service-role key name",
+      "line": "SUPABASE_SERVICE_ROLE_KEY=your-key",
+      "ids": [
+        "service-role"
+      ]
+    },
+    {
+      "name": "service-role role name",
+      "line": "role: 'service_role'",
+      "ids": [
+        "service-role"
+      ]
+    },
+    {
+      "name": "service-role variable",
+      "line": "const client = createAdmin(serviceRoleKey);",
+      "ids": [
+        "service-role"
+      ]
+    },
+    {
+      "name": "service-role negative",
+      "line": "There is no service-role key on an Engine project: add none.",
+      "ids": []
+    },
+    {
+      "name": "auth-admin positive",
+      "line": "await supabase.auth.admin.createUser({ email });",
+      "ids": [
+        "auth-admin"
+      ]
+    },
+    {
+      "name": "auth-admin negative",
+      "line": "An administrator creates every user.",
+      "ids": []
+    },
+    {
+      "name": "client-auth updateUser",
+      "line": "await supabase.auth.updateUser({ password });",
+      "ids": [
+        "client-auth"
+      ]
+    },
+    {
+      "name": "client-auth exchangeCodeForSession",
+      "line": "await supabase.auth.exchangeCodeForSession(code);",
+      "ids": [
+        "client-auth"
+      ]
+    },
+    {
+      "name": "client-auth negative",
+      "line": "await supabase.auth.signInWithPassword({ email, password });",
+      "ids": []
+    },
+    {
+      "name": "stored-supabase positive",
+      "line": "const s = createClient( process.env.SUPABASE_URL, key);",
+      "ids": [
+        "stored-supabase"
+      ]
+    },
+    {
+      "name": "stored-supabase with service role",
+      "line": "const s = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);",
+      "ids": [
+        "service-role",
+        "stored-supabase"
+      ]
+    },
+    {
+      "name": "stored-supabase negative",
+      "line": "const s = createClient(url, anonKey);",
+      "ids": []
+    },
+    {
+      "name": "sql-policy create policy",
+      "line": "CREATE POLICY \"read own\" ON articles FOR SELECT",
+      "ids": [
+        "sql-policy"
+      ]
+    },
+    {
+      "name": "sql-policy auth.uid",
+      "line": "USING (owner = auth.uid())",
+      "ids": [
+        "sql-policy"
+      ]
+    },
+    {
+      "name": "sql-policy storage.objects",
+      "line": "on storage.objects for insert",
+      "ids": [
+        "sql-policy"
+      ]
+    },
+    {
+      "name": "sql-policy auth.users",
+      "line": "references auth.users(id)",
+      "ids": [
+        "sql-policy"
+      ]
+    },
+    {
+      "name": "sql-policy negative",
+      "line": "create policy objects through the policies API",
+      "ids": []
+    },
+    {
+      "name": "migration path",
+      "line": "Create supabase/migrations/20260101000000_init.sql",
+      "ids": [
+        "migration"
+      ]
+    },
+    {
+      "name": "migration command",
+      "line": "Run supabase db push",
+      "ids": [
+        "migration"
+      ]
+    },
+    {
+      "name": "migration negative",
+      "line": "An Engine project has no database migrations.",
+      "ids": []
+    },
+    {
+      "name": "storage positive",
+      "line": "await supabase.storage.from('avatars').upload(path, file);",
+      "ids": [
+        "storage"
+      ]
+    },
+    {
+      "name": "storage negative",
+      "line": "Files are stored and served by the Engine.",
+      "ids": []
+    },
+    {
+      "name": "service-token-data constant",
+      "line": "headers: { Authorization: `Bearer ${DAAS_SERVICE_TOKEN}` }",
+      "ids": [
+        "service-token-data"
+      ]
+    },
+    {
+      "name": "service-token-data shell",
+      "line": "curl -H \"Authorization: Bearer ${SERVICE_TOKEN}\" \"$URL\"",
+      "ids": [
+        "service-token-data"
+      ]
+    },
+    {
+      "name": "service-token-data negative",
+      "line": "Authorization: Bearer ${DAAS_TOKEN}",
+      "ids": []
+    },
+    {
+      "name": "cors-mcp tool prefix",
+      "line": "mcp_daas_cors-settings({ action: \"update\" })",
+      "ids": [
+        "cors-mcp"
+      ]
+    },
+    {
+      "name": "cors-mcp json name",
+      "line": "{\"name\": \"cors-settings\", \"arguments\": {}}",
+      "ids": [
+        "cors-mcp"
+      ]
+    },
+    {
+      "name": "cors-mcp negative",
+      "line": "Change no cross-origin setting.",
+      "ids": []
+    },
+    {
+      "name": "missing-mcp tool prefix",
+      "line": "mcp_daas_smtp-settings",
+      "ids": [
+        "missing-mcp"
+      ]
+    },
+    {
+      "name": "missing-mcp json name",
+      "line": "{\"name\":\"module_access_keys\",\"arguments\":{}}",
+      "ids": [
+        "missing-mcp"
+      ]
+    },
+    {
+      "name": "missing-mcp workflow-command field",
+      "line": "\"module_access_keys\": [\"workflow:approve\"]",
+      "ids": []
+    },
+    {
+      "name": "platform-supabase positive",
+      "line": "const url = project.supabaseUrl;",
+      "ids": [
+        "platform-supabase"
+      ]
+    },
+    {
+      "name": "platform-supabase negative",
+      "line": "const url = project.engineUrl;",
+      "ids": []
+    },
+    {
+      "name": "same-origin credentials include",
+      "line": "fetch('/api/items/articles', { credentials: 'include' })",
+      "ids": []
+    },
+    {
+      "name": "plain words for an unavailable feature",
+      "line": "External OAuth sign-in is not available on an Engine project.",
+      "ids": []
+    },
+    {
+      "name": "repository-only tool names are not in the contract",
+      "line": "mcp_daas_cron({ action: \"create\" })",
+      "ids": []
+    }
+  ],
+  "linkCases": [
+    {
+      "name": "inline link",
+      "text": "See [the guide](./guide.md).\n",
+      "links": [
+        {
+          "line": 1,
+          "target": "./guide.md"
+        }
+      ]
+    },
+    {
+      "name": "inline link with an anchor",
+      "text": "Intro\nSee [step 1](../create-project/SKILL.md#step-1).\n",
+      "links": [
+        {
+          "line": 2,
+          "target": "../create-project/SKILL.md#step-1"
+        }
+      ]
+    },
+    {
+      "name": "inline link with a title",
+      "text": "[a](./a.md \"Title\")\n",
+      "links": [
+        {
+          "line": 1,
+          "target": "./a.md"
+        }
+      ]
+    },
+    {
+      "name": "two links on one line",
+      "text": "[a](./a.md) and [b](./b.md)\n",
+      "links": [
+        {
+          "line": 1,
+          "target": "./a.md"
+        },
+        {
+          "line": 1,
+          "target": "./b.md"
+        }
+      ]
+    },
+    {
+      "name": "image",
+      "text": "![diagram](./assets/flow.png)\n",
+      "links": [
+        {
+          "line": 1,
+          "target": "./assets/flow.png"
+        }
+      ]
+    },
+    {
+      "name": "reference-style definition",
+      "text": "[guide][g]\n\n[g]: ./guide.md\n",
+      "links": [
+        {
+          "line": 3,
+          "target": "./guide.md"
+        }
+      ]
+    },
+    {
+      "name": "external links and anchors are not relative links",
+      "text": "[x](https://example.com) [y](#usage) [z](mailto:a@example.com) [w](/abs.md)\n",
+      "links": []
+    },
+    {
+      "name": "link inside a backtick fence",
+      "text": "```md\n[a](./a.md)\n```\n",
+      "links": []
+    },
+    {
+      "name": "link inside a tilde fence",
+      "text": "~~~\n[a](./a.md)\n~~~\n",
+      "links": []
+    },
+    {
+      "name": "nested four-backtick fence",
+      "text": "````md\n```\n[a](./a.md)\n```\n[b](./b.md)\n````\n[c](./c.md)\n",
+      "links": [
+        {
+          "line": 7,
+          "target": "./c.md"
+        }
+      ]
+    },
+    {
+      "name": "link inside a code span",
+      "text": "Write `[a](./a.md)` in the file.\n",
+      "links": []
+    },
+    {
+      "name": "unclosed fence runs to the end",
+      "text": "```\n[a](./a.md)\n",
+      "links": []
+    }
+  ]
+}
