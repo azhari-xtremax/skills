@@ -1,3 +1,5 @@
+// buildpad-backend-file: supabase
+// Backend: before using this file, establish the backend as "Establish the backend first" in this skill's SKILL.md says, keep only the parts for that backend, and copy no marker line into the application.
 // auth.setup.ts — Copy to: tests/auth.setup.ts (host app).
 //
 // Signs in once through the real login form and saves the browser state, so every

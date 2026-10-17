@@ -4,20 +4,47 @@ Agent skills for building **Buildpad Apps** with AI coding agents. Each skill is
 
 This repository is the **source of truth** for the skills bundled in Buildpad project starters. Starters ship with the skills pre-installed; use the CLI below to update them or to add them to an existing project.
 
+Every release is a git tag. What changed in each release, and why, is in [`CHANGELOG.md`](CHANGELOG.md) and on the [GitHub Releases](https://github.com/buildpad-ai/skills/releases) page.
+
+## Two kinds of project
+
+The skills serve two kinds of Buildpad project: **Engine projects**, whose backend is the Buildpad Engine, and **Supabase projects**, whose backend is a per-project Supabase. Most skills hold for both. A skill whose steps differ by backend carries a short procedure, **"Establish the backend first"**, at the top of each file that needs it. The agent follows it before anything else:
+
+1. It reads `.buildpad/project.json`, which the Platform writes into every starter.
+2. Otherwise it reads `.buildpad/backend-answer.json`, the answer recorded the last time it asked.
+3. Otherwise it looks for a Supabase project folder (`supabase/config.toml`, or SQL files in `supabase/migrations/`).
+4. Otherwise it asks the developer once, and records the answer in `.buildpad/backend-answer.json` (commit that file).
+
+Then it follows only the parts for that backend. Where the Engine has no counterpart (for example external OAuth sign-in or database migrations), the skill says so and stops.
+
+Starters downloaded from the Platform carry only their project's text: the other backend's parts are removed when the starter is assembled.
+
 ## Install
 
 ```bash
-# Install skills (interactive picker)
-npx skills add buildpad-ai/skills
+# Install skills from a release (interactive picker)
+npx skills add buildpad-ai/skills#v2.0.0
 
-# Install everything
-npx skills add buildpad-ai/skills --all
+# Install everything from a release
+npx skills add buildpad-ai/skills#v2.0.0 --all
 
-# Install a single skill
-npx skills add https://github.com/buildpad-ai/skills/tree/main/create-project
+# Install a single skill from a release
+npx skills add buildpad-ai/skills#v2.0.0@create-project
+npx skills add https://github.com/buildpad-ai/skills/tree/v2.0.0/create-project
 ```
 
-The [skills CLI](https://github.com/vercel-labs/skills) detects your agents and writes each skill to the right location (`.claude/skills/`, `.kiro/skills/`, `.agents/skills/`, …).
+The [skills CLI](https://github.com/vercel-labs/skills) detects your agents and writes each skill to the right location (`.claude/skills/`, `.kiro/skills/`, `.agents/skills/`, …). A tag never moves, so installing `#v2.0.0` always gives the same files. Replace `v2.0.0` with any tag from the [releases](https://github.com/buildpad-ai/skills/releases).
+
+## Stay on the skills as they were before Engine support
+
+Supabase projects can keep the skills exactly as they were before Engine support was added. `v1.0.0` is that revision:
+
+```bash
+npx skills add buildpad-ai/skills#v1.0.0
+npx skills add buildpad-ai/skills#v1.0.0 --all
+```
+
+The CLI's lock file records the tag, so `npx skills update` keeps you on `v1.0.0`.
 
 ## Update
 
@@ -26,10 +53,18 @@ npx skills check    # see what's outdated
 npx skills update   # update installed skills
 ```
 
+**In a project made from a Buildpad starter**, the starter ships no `skills-lock.json`, so `npx skills check` and `npx skills update` report nothing to update until you run `npx skills add` once (see [Install](#install)). After that, `check` and `update` work as usual.
+
+- `npx skills add` replaces the starter's copy of each skill you choose with this repository's text. That text holds the parts for both backends, and the "Establish the backend first" procedure picks the right one.
+- In a VS Code starter, the starter's skills are in `.github/skills/`; `npx skills add` writes a second copy under `.agents/skills/` beside them.
+- The agent personas (`agents/`) and the checklists (`references/`) ship with starters; the CLI does not install them.
+
 ## Repository Layout
 
 - **Skill folders (root)** — one folder per skill (`<name>/SKILL.md`), installable via the skills CLI.
 - **`agents/`** — subagent personas (flat `.md` files with `name`/`description` frontmatter). Buildpad starters mirror them to `.kiro/agents/` (Kiro) and `.claude/agents/` (Claude Code), where they run as subagents in isolated context. The skills CLI does not install these — they ship with starters and starter agent-file downloads.
+- **`references/`** — checklists that skills and personas link to (flat, no subfolders). They ship with starters.
+- **`tools/repo-check/`** — the repository's own check, run in CI on every pull request. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to write a skill that holds for both kinds of project.
 
 ## Agents
 
@@ -37,7 +72,7 @@ npx skills update   # update installed skills
 |---|---|
 | [code-reviewer](agents/code-reviewer.md) | Five-axis code review (correctness, readability, architecture, security, performance) + DaaS/Buildpad compliance |
 | [test-engineer](agents/test-engineer.md) | Test strategy, coverage-gap analysis, Playwright/Vitest authoring |
-| [security-auditor](agents/security-auditor.md) | Auth, CORS/RLS, input handling, and secret review |
+| [security-auditor](agents/security-auditor.md) | Auth, CORS, access rules (RLS on a Supabase project), input handling, and secret review, for both kinds of project |
 
 ## Catalog
 
@@ -70,16 +105,16 @@ The core methodology: every feature is specified as `requirements.md` (EARS) →
 
 | Skill | What it does |
 |---|---|
-| [create-project](create-project) | Initialize a new DaaS application (Next.js + Supabase + Buildpad UI) |
-| [create-collection](create-collection) | Generate a collection: migration, API routes, list/form pages, types, tests |
-| [create-migration](create-migration) | Generate a Supabase PostgreSQL migration with RLS, indexes, triggers |
-| [create-api-route](create-api-route) | Generate server-side Next.js auth API routes (login, logout, callback, session) |
+| [create-project](create-project) | Initialize a new Buildpad application (Next.js + Buildpad UI) on the Buildpad Engine or on Supabase |
+| [create-collection](create-collection) | Generate a collection with its schema, API routes, list/form pages, types, and tests |
+| [create-migration](create-migration) | Supabase projects only: generate a PostgreSQL migration with RLS, indexes, triggers; stops on an Engine project |
+| [create-api-route](create-api-route) | Generate server-side Next.js API routes: on an Engine project, routes that forward the user's session to the Engine; on a Supabase project, auth routes (login, logout, callback, session) |
 | [create-component](create-component) | Generate a React component with the mandatory Buildpad-first check |
 | [create-service](create-service) | Create DaaS custom services shared between extensions and cron jobs |
-| [create-cron](create-cron) | Create scheduled DaaS cron jobs with sandboxed JS and timezone support |
+| [create-cron](create-cron) | Create DaaS cron jobs with sandboxed JS and timezone support |
 | [create-workflow](create-workflow) | Workflow state machines, content versioning, multi-stage approvals |
 | [create-rbac](create-rbac) | Role-based access control: roles, policies, permissions, dynamic filters |
-| [create-tests](create-tests) | Playwright E2E and Vitest unit tests for features, APIs, RLS, permissions |
+| [create-tests](create-tests) | Playwright E2E and Vitest unit tests for features, APIs, and permissions (and RLS on a Supabase project) |
 | [create-feature](create-feature) | Plan and implement a complete feature via the spec workflow |
 | [create-form-builder](create-form-builder) | Visual drag-and-drop form authoring plus runtime renderer |
 
@@ -93,9 +128,10 @@ The core methodology: every feature is specified as `requirements.md` (EARS) →
 | [add-workflows](add-workflows) | Scaffold the Workflows module: /workflows (state-diagram editor), /workflow-assignments, /workflow-instances admin pages |
 | [add-cron](add-cron) | Scaffold the Cron Jobs module: /cron (jobs list + run history) and /cron/[id] (job editor with a code editor slot) admin pages |
 | [add-microapp](add-microapp) | Domain boundaries and repo bootstrap: Main App + micro-apps on one DaaS backend (load first) |
-| [add-microfrontend](add-microfrontend) | The composition mechanism: iframe host, postMessage bridge, auth/URL/scope syncing, CSP (load second) |
+| [add-microfrontend](add-microfrontend) | The composition mechanism: iframe host, postMessage bridge, auth/URL/scope syncing, CSP (load second). Supabase projects only for now: not yet available on an Engine project |
+| [add-microfrontend-zones](add-microfrontend-zones) | Path-based composition with Next.js Multi-Zones: one origin, one shared session, no iframes. Supabase projects only for now: not yet available on an Engine project |
 | [add-multitenancy](add-multitenancy) | Multi-tenancy (delegates to manage-scope) |
-| [add-external-oauth](add-external-oauth) | External OAuth/OIDC identity provider integration with PKCE proxy flow |
+| [add-external-oauth](add-external-oauth) | Supabase projects only: external OAuth/OIDC identity provider integration with PKCE proxy flow; stops on an Engine project |
 | [add-i18n](add-i18n) | Internationalization: `app/[lang]` routing, middleware locale negotiation, dictionaries + I18nProvider, LanguageSwitcher, DaaS content translations |
 | [worker-messaging](worker-messaging) | Offload long-running work to a Buildpad runtime worker over RabbitMQ (topic-exchange job convention; Next.js producer + worker consumer/chaining; connection via Platform MCP) |
 
@@ -103,7 +139,7 @@ The core methodology: every feature is specified as `requirements.md` (EARS) →
 
 | Skill | What it does |
 |---|---|
-| [daas-platform](daas-platform) | Core DaaS architecture, REST API, Supabase integration, App Router patterns |
+| [daas-platform](daas-platform) | Core DaaS architecture, REST API, authentication, files, and App Router patterns, for Engine projects and Supabase projects |
 | [buildpad-reference](buildpad-reference) | Buildpad UI component catalog and the Buildpad-First rule |
 | [authentication-proxy](authentication-proxy) | Auth proxy pattern: all browser-to-backend calls go through Next.js API routes |
 | [manage-scope](manage-scope) | Multi-tenancy and data partitioning with the DaaS scope system |

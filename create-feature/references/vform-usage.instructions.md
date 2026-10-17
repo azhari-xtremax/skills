@@ -176,7 +176,7 @@ export default function FormContent({ itemId }: FormContentProps) {
 
 ## Collection-Based Form Pattern (auto-fetches fields)
 
-When the collection schema is stored in DaaS (DaaS), VForm can fetch fields automatically:
+When the collection schema is stored in the data service (the DaaS on a Supabase project, the Engine on an Engine project), VForm can fetch fields automatically:
 
 ```tsx
 "use client";

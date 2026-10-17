@@ -1,0 +1,8 @@
+[
+  {
+    "path": "buildpad-steering/SKILL.md",
+    "kind": "text",
+    "reason": "The skill carries the Gate, and bootstrap's tech analysis now records the backend the Gate established, never inferred from dependency or variable names; the templates and rules are unchanged.",
+    "release": "unreleased"
+  }
+]

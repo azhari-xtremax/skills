@@ -50,7 +50,7 @@ When writing specs for DaaS applications:
 - **UI** (design.md): Name the Buildpad components to use (Buildpad-First rule)
 - **Permissions**: Spec the RBAC model (roles, policies, access entries)
 - **Workflow**: If content lifecycle needed, spec workflow states and transitions
-- **Scope**: If multi-tenant, spec the scope hierarchy
+- **Scope**: If multi-tenant, spec the scope hierarchy (on an Engine project the project is one tenant, and the hierarchy begins beneath its tenant node: no scope type or item without a parent)
 - **Testing** (tasks.md): API tests, page tests, and E2E tests are tasks, not afterthoughts
 
 ## Common Rationalizations

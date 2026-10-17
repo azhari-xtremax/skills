@@ -1,0 +1,8 @@
+[
+  {
+    "path": "spec-driven-development/SKILL.md",
+    "kind": "text",
+    "reason": "The scope item says that on an Engine project the hierarchy begins beneath the project's tenant node; the Supabase guidance is unchanged.",
+    "release": "unreleased"
+  }
+]

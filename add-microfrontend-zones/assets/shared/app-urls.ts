@@ -1,3 +1,5 @@
+// buildpad-backend-file: supabase
+// Backend: before using this file, establish the backend as "Establish the backend first" in this skill's SKILL.md says, keep only the parts for that backend, and copy no marker line into the application.
 // Copy to: config/app-urls.ts (every app, unchanged).
 // config/app-urls.ts — committed to git. Values come from config/zones.json.
 // Local development override: NEXT_PUBLIC_HOST_ORIGIN=http://localhost:3000
