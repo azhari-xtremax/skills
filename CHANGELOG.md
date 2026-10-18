@@ -14,6 +14,26 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## Unreleased
+
+Text for Engine projects only. The release that carries it is a MINOR release.
+
+- `create-project/references/environment.instructions.md`: to check that the Engine serves the
+  project, send `GET /api/server/info` with the header `X-Tenant-Id`. It answers `200` when the
+  project's tenant is served, `403` when that tenant is not served yet or the id is wrong, and
+  `503` when the Engine cannot read its tenants. `/api/health` says only that the Engine is up.
+- `debugging-and-error-recovery/SKILL.md`: a browser also blocks a call to the Engine that carries
+  a header the Engine does not accept from another origin, such as `X-Tenant-Id`. Send that header
+  only from the application's own server route.
+
+Both follow the Engine-fact corrections of 18 October 2026 (F1 and F2) in
+`.kiro/specs/backend-aware-skills/design.md`, which also record what changes for Engine projects
+when the Engine's approved specifications are implemented.
+
+### Supabase projects
+
+No change.
+
 ## v2.0.0
 
 The skills now serve **Engine projects** (backend: the Buildpad Engine) as well as **Supabase

@@ -2,6 +2,7 @@
 
 > **Approved 16 October 2026** (with all three repositories' designs; see `spec.json`, `design_approval_note`). The status note below records how the document was written.
 > **Engine-fact corrections, 17 October 2026.** Ten Engine facts that tasks 4 to 8 found while converting differ from this design or extend it. They are recorded in [Engine-fact corrections, 17 October 2026](#engine-fact-corrections-17-october-2026); the rest of the document is unchanged.
+> **Engine-fact corrections, 18 October 2026.** Twenty-one Engine facts from the Engine and Studio specifications approved on 17 October 2026. Two facts that already hold were missing from two skills, whose Engine text is fixed (SF1, SF2); the others leave the skills true or fix the shape of a dependency before it is met. They are recorded in [Engine-fact corrections, 18 October 2026](#engine-fact-corrections-18-october-2026); the rest of the document is unchanged.
 > **Status.** Not approved. Phase 2 of a gated spec, written against the **approved** requirements
 > of this folder (7 requirements, 68 criteria, 66 live, 2 withdrawn; SD-1 and SD-2 settled; Skill
 > map amended 16 October 2026 with the maintainer's approval). Revised 16 October 2026 to close
@@ -1100,6 +1101,204 @@ it was approved. No criterion is added, reworded, withdrawn or renumbered, and t
   scope.
 - **C10. The scope foreign key** (row 32; `tasks.md` 6.7). The key to `daas_scope_items(uri_path)`
   exists when the field relates to `daas_scope_items` with `related_field: uri_path`.
+
+## Engine-fact corrections, 18 October 2026
+
+Written on 18 October 2026, after the `v2.0.0` tag. This section compares what this design says
+about the Engine with two sets of specifications whose requirements were approved on 17 October
+2026, read with `git show` only:
+
+- `buildpad-daas-go` `main` at `3a00669b`, `.kiro/specs/`: `member-collections-grant`,
+  `static-token-data-api`, `unattended-project-setup`, `handoff-names-its-tenant`,
+  `shared-account-factor-refusal`, `refresh-token-reuse-interval`,
+  `cross-origin-provisioning-contract`, `rate-limit-by-session`, `serving-readiness-and-version`,
+  `least-privilege-database-logins`, `database-replacement-contract`, `mcp-starter-kit-tools` and
+  `permission-presets-and-validation`.
+- `buildpad-daas` (the Studio) `feat/go-backend-switch` at `d10a3962`,
+  `.kiro/specs/go-mode-platform-deployment/requirements.md`.
+
+In each Engine specification only the requirements are approved; its design and tasks wait for
+approval, and none of them is implemented at `3a00669b`. Two checks of the code at that commit
+agree: the allowed cross-origin headers still omit `X-Tenant-Id`
+(`src/domain/governance/constant/constant.go`, `CorsDefaultAllowedHeaders`), and the readiness
+answer of F1 is pinned by `src/middleware/tenant_binder_test.go`. So each fact below says what
+the Engine does now and, where that changes, what it will do when the specification is
+implemented. A fact of the second kind changes no skill now. It gives the approved shape of a
+dependency, so that the sub-task of task 10 that switches the text when the dependency is met is
+written to that shape. As in the section above, the text above is left as approved. No criterion is
+added, reworded, withdrawn or renumbered, and the approval stands.
+
+**Facts that hold now, or whose change leaves the skills true** (SF1 and SF2 below fix the two
+skills that missed F1 and F2):
+
+- **F1. Readiness** (row 19; `serving-readiness-and-version`, Decision 1, option (a)).
+  `GET /api/health` and `GET /api/server/health` answer from the database, cache and storage
+  checks alone. They can answer 200 before the Engine has upgraded its structure, and they say
+  nothing about the project. An anonymous `GET /api/server/info` with `X-Tenant-Id: <tenant id>` answers 200 only
+  when that tenant is ready at the running Engine's version. It answers 403 `FORBIDDEN` when the
+  tenant is not served (behind, migrating, failed) and the same 403 for a tenant that does not
+  exist, and 503 `SERVICE_UNAVAILABLE` when the Engine cannot read its tenants. Without the header
+  it answers for the Engine's host plane. The specification makes this answer the readiness
+  contract; no new route is added. Skill: `create-project` (SF1).
+- **F2. `X-Tenant-Id` from a browser** (row 25; ES-4, ES-11, ES-15; PP-28;
+  `cross-origin-provisioning-contract`, Requirement 1). The Engine's built-in allowed headers are
+  `Origin`, `Content-Type`, `Accept`, `Authorization`, `X-Resource-Uri`, `X-Scope-Id`, `Range`,
+  `X-On-Behalf-Of`, `traceparent`, `tracestate`, `apikey`, `X-Client-Info` and
+  `X-Supabase-Api-Version`. A browser's preflight that asks to send `X-Tenant-Id` fails, so the
+  call is never sent. ES-4 says so for the sign-in. A skill that names only credentials as the
+  cause of a blocked browser call is incomplete. Skill: `debugging-and-error-recovery` (SF2).
+- **F3. No static-token path for an application** (ES-2; row 24). The Supabase text of
+  `daas-platform/references/daas-api.instructions.md` teaches a bearer token and a static token
+  for API clients, mobile apps and server-to-server calls. On an Engine project an application
+  has no such path, now or after F6 and F7: a mobile app or any other client signs a user in and
+  sends that user's access token, as that file's Engine text says ("one way to authenticate a data
+  call"). No change.
+- **F4. Sign-out** (ES-5; the Studio's Requirement 7). The Engine's `POST /api/auth/logout` with no
+  scope ends the caller's session only; only `everywhere: true` widens it. The Supabase client's
+  default sign-out asks for every session of the account. ES-5, which says the Supabase client's
+  default sign-out ends the user's sessions on every device, holds. In Go mode the Studio will end
+  one session at a sign-out. No change.
+- **F5. A handoff names its tenant** (ES-5; `handoff-names-its-tenant`, Decision 1, option (a),
+  every deployment). Once implemented, a handoff assertion that names no tenant, or names the host
+  plane, is refused with 401 `INVALID_CREDENTIALS`; the tenant comes from the signed claim only, and
+  an account that holds a role in the host plane is never handed off. ES-5 (the handoff opens the
+  Studio and is not a way for an application to sign a user in) holds before and after. No change.
+
+**Facts that change when a specification is implemented** (no skill changes now):
+
+- **F6. A static token has a kind** (ES-2, ES-14n; Decision H, PP-30; `static-token-data-api`,
+  Decision 1, option (c)). Today every route but the MCP endpoint answers a static token with 401
+  `TOKEN_INVALID` (a route where signing in is optional ignores it). When implemented, a token is written with `token_kind` `mcp` or `data`. With no
+  kind it is `mcp`, and so is every token written before; any other value is refused with 400
+  `INVALID_PAYLOAD`. The kind is never answered. The data API accepts a `data` token only when its
+  account holds no administrator access in the token's tenant. So the token in the project's MCP
+  configuration, an administrator's, stays refused there, and ES-2 holds.
+- **F7. Where the Worker_Token works** (ES-14m, task 10.2; `static-token-data-api`, Decision 2,
+  option (a)). The data API that accepts a `data` token is `/api/items/:collection`,
+  `/api/items/:collection/:id` (every method) and `GET /api/users/me`, and nothing else: no files,
+  folders, versions, comments or `/api/permissions/me`. The token is served in its own tenant,
+  whatever `X-Tenant-Id` names; a token in the query string is refused with 401 `TOKEN_INVALID`;
+  no session is opened, renewed or ended for it; a cleared or replaced token is refused on the next
+  request. The design revision of task 10.2 must narrow ES-14m to the item routes.
+- **F8. A grant over every member collection** (ES-14n; Decision AA, PP-16;
+  `member-collections-grant`, Decision 1, option (a)). Today a permission whose `collection` is
+  `*` is stored and matches nothing. When implemented, it grants its action on every collection of
+  the policy's tenant that is not a `daas_` system collection, those created later included, with
+  every field and no row filter. It reaches no system collection and confers no administrator or
+  app access, and only an administrator writes it. A rule named `*` that a database already holds
+  starts to grant. No skill teaches `*` as a collection today; when this is met, the design revision
+  of task 10.2 can also name it in `create-rbac` (row 20).
+- **F9. Cross-origin, when PP-28 is met** (ES-4, ES-11, task 10.5;
+  `cross-origin-provisioning-contract`, Decision 1, option (b)). `Authorization`, `Content-Type`,
+  `X-Tenant-Id` and the three Supabase client headers are always allowed, added to any stored
+  list. PP-28 now has an approved Engine shape and still waits to be implemented. The design
+  revision of task 10.5 can say that a browser may name the tenant on the sign-in and on an
+  anonymous read of a public file.
+- **F10. Any origin, never with credentials** (ES-15; `cross-origin-provisioning-contract`,
+  Decision 2, option (a)). Today credentials can be switched on while any origin is accepted, and
+  the Engine then reflects the caller's origin. When implemented, the Engine refuses to start with
+  that configuration, a settings write that would make it is refused with 400 `INVALID_PAYLOAD`,
+  and no answer carries `Access-Control-Allow-Credentials: true` while any origin is accepted.
+  ES-15 states the provisioned state and holds. No change.
+- **F11. Cross-origin settings inside a tenant** (ES-15; `cross-origin-provisioning-contract`,
+  Decision 3, option (a); the Studio's Decision P, option (b)). Today a tenant administrator's
+  write to `/api/settings/cors` is stored in the tenant and has no effect, and a read inside the
+  tenant shows the stored values, not the ones in force. When implemented, `PATCH` and
+  `PUT /api/settings/cors` inside a tenant answer 403 `FORBIDDEN`, `GET` answers the host's policy
+  in force, and the Studio does not offer the page inside a tenant. ES-15 ("change no cross-origin
+  setting") holds. No change.
+- **F12. Rate limiting by session** (row 22; `rate-limit-by-session`, Decision 1, option (a)).
+  Today the global limit is `RATE_LIMIT_RPS` (default 20) requests a second per client address, so
+  every request an application's server sends shares one allowance. When implemented, a request
+  with an accepted access token is counted against its session, and one with an accepted static
+  token against the token's account. A request with no credential, or one that is not accepted, is
+  counted against its address as today; a sign-in carries no session and still shares the server's
+  address. `create-tests` (its "Requests" and "Rate budget" lines and the Playwright reference)
+  states the per-address rule, which holds until then: a new Revalidation Trigger for that folder.
+- **F13. A refresh token presented again** (PP-35, Decision Y, task 10.3, C7;
+  `refresh-token-reuse-interval`, Decisions 1 and 2). Today a refresh token is single-use: a second
+  presentation answers 401 `INVALID_TOKEN` on `POST /api/auth/refresh` and 400 `invalid_grant` on
+  `POST /auth/v1/token?grant_type=refresh_token`, and a rotation revokes the access token it
+  replaces at once. When implemented, `AUTH_REFRESH_TOKEN_REUSE_INTERVAL` (seconds, default 10, `0`
+  off, at most 60) opens an interval after each rotation. Inside it, presenting the rotated token
+  again answers the rotation's refresh token and a newly signed access token for the same session,
+  several presentations at once make exactly one rotation, and the replaced access token keeps
+  working.
+- **F14. A refresh token presented late** (PP-35; `refresh-token-reuse-interval`, Decision 3,
+  option (b)). After the interval, a rotated token is refused as today, and the session it came
+  from is ended with every token its later rotations produced. A session ended inside the interval
+  stays ended. The design revision of task 10.3 must have the holders of one session renew within
+  the interval or not at all: a late duplicate renewal signs the user out.
+- **F15. Permission presets** (rows 20, 30, 35; EP-28, Issue 6, task 10.7;
+  `permission-presets-and-validation`, Requirement 1). Today `presets` are stored and reported by
+  `GET /api/permissions/me` and not applied on write, as the skills say. When implemented, a create
+  by a caller who is not an administrator stores, for each preset field the payload does not carry,
+  the merged preset of the caller's `create` rules, with its variables resolved. The payload's
+  value wins, `null` included. This applies through a batch, a nested create, the MCP item tools
+  and an import.
+- **F16. Permission validation** (rows 20, 30, 35; EP-28, task 10.7;
+  `permission-presets-and-validation`, Decisions 1 and 2). When implemented, a create or update by
+  a caller who is not an administrator is checked against the merged `validation` of the caller's
+  rule. Only the members the payload carries are checked. A failure answers 400 with the new code
+  `FAILED_VALIDATION` (not `VALIDATION_FAILED`) and `extensions.field` naming the first field that
+  fails, and writes nothing. One failing item refuses a whole batch, and an operator the row filter
+  does not support refuses the write. Task 10.7 then revises the "not applied" facts in
+  `create-rbac`, `relational-permissions` and `create-form-builder`, and adds the code to the error
+  table of `daas-platform/references/daas-api.instructions.md`.
+- **F17. The six MCP tools** (PP-29, task 10.4; `mcp-starter-kit-tools`, Requirement 1). Today the
+  Engine serves none of them. When implemented, it serves `cron`, `services`, `extensions`,
+  `cors-settings`, `smtp-settings` and `module_access_keys`, each with an `action` argument and
+  answering `{"raw": ...}`. Each is listed and served to an administrator only (`Admin access
+  required for this tool` otherwise, so a worker's MCP configuration sees none of them). Each
+  `delete` is gated by `mcp_allow_deletes`, and a change takes effect as the REST write of the same
+  body does. Task 10.4's table names three of the six; its design revision covers all six. The guard's
+  `cors-mcp` and `missing-mcp` patterns, which refuse the other three by name, are part of the
+  shared contract, so changing them is a Revalidation Trigger in both repositories.
+- **F18. Four Studio actions left out** (PP-29, task 10.4; `mcp-starter-kit-tools`, Decision 1,
+  option (c)). The Studio's `cron` actions `stats` and `recent_history`, `services` `run_test` (one
+  named test) and `smtp-settings` `send` are not advertised and are answered as an unknown action.
+  The actions served are: `cron` `list`, `read`, `create`, `update`, `delete`, `activate`,
+  `deactivate`, `clone`, `run_now`, `history`; `services` `list`, `read`, `create`, `update`,
+  `delete`, `run_tests`, `activate`, `deactivate`; `extensions` `list`, `read`, `create`,
+  `update`, `delete`, `activate`, `deactivate`, `clone`; `cors-settings` and `smtp-settings` `get`
+  and `update`, and `test` on `smtp-settings`; `module_access_keys` `create`, `read`, `update`,
+  `delete`. The Engine MCP steps of task 10.4 use none of the four; where a skill's Supabase text
+  uses one, that step stays Supabase-only.
+- **F19. MCP creates keep the `schema` block** (ES-8, Issue 6, task 10.7;
+  `mcp-starter-kit-tools`, Requirement 2). Today the MCP `fields` create drops a field's `schema`
+  block, and the `collections` create keeps each initial field's name and type only. When
+  implemented, both keep what `POST /api/fields/:collection` and `POST /api/collections` keep. A
+  collection create is one change that leaves nothing behind when a field is refused, and the
+  error names the field. Task 10.7 then drops ES-8's last sentence and the matching facts in
+  `create-collection`, `daas-platform` and `add-i18n`.
+- **F20. Shared administrator accounts cannot enrol a second factor** (ES-6;
+  `shared-account-factor-refusal`, Decisions 1 and 2). When implemented, an operator marks the
+  accounts that may not enrol a factor, the project's shared administrator accounts among them.
+  `POST /api/auth/mfa/enroll`, and `POST /api/auth/mfa/verify` for a factor not yet verified,
+  answer 403 `MFA_ENROLMENT_FORBIDDEN` for those accounts, and `GET /api/users/:id/mfa-status`
+  reports the mark. ES-6 holds for the application's own users. A new Revalidation Trigger: when
+  this is met, the skills that teach enrolment (rows 5, 12, 20, 24) say to try it with a user of
+  the project, not with a shared administrator account.
+- **F21. Operator-side facts** (`serving-readiness-and-version`, `unattended-project-setup`,
+  `least-privilege-database-logins`, `database-replacement-contract`). Every Engine image now
+  reports version `1.0.0`; when implemented, `GET /api/server/info` reports the build's version as
+  `project.version` (`0.0.0-dev` for a build given none). The host administrator's password comes
+  from the provisioner and is never reset by a rerun. An operator command sets a static token,
+  with its kind, without a session. A project's tenant keeps its name exactly as sent. The Engine
+  runs as database logins that are not superusers, and a dump and restore that keep tenant
+  isolation are documented. No skill tells an application developer to depend on any of these:
+  `add-microapp` reads the Engine version from the project detail and does not use it. No change.
+
+**Skill text changed** (Engine text only; the Supabase view of every file is unchanged, so no
+change-file entry is written):
+
+- **SF1** (F1). `create-project/references/environment.instructions.md`, Engine "Setup Steps"
+  step 1 and the "Unauthorized" check: the health route says only that the Engine is up, and
+  `GET /api/server/info` with `X-Tenant-Id` says whether the project's tenant is served, with its
+  200, 403 and 503 answers.
+- **SF2** (F2). `debugging-and-error-recovery/SKILL.md`, the Engine cross-origin paragraph: a
+  browser also blocks a call that carries a header the Engine does not accept from another origin,
+  `X-Tenant-Id` among them, so that header is sent only from the application's server route.
 
 ## Design review gate
 Run on the revision of 16 October 2026; the second pass found nothing to repair.
