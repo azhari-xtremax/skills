@@ -165,7 +165,7 @@
   - Note 16 October 2026: between 2.9 and 3.1, `check.mjs` on the tree reports only R11's two
     findings (the README lacks the `#v1.0.0` command and `add-microfrontend-zones`); every other
     rule exits 0 there. 3.1 clears them.
-- [ ] 2.10 Add the CI workflow `.github/workflows/repo-check.yml`
+- [x] 2.10 Add the CI workflow `.github/workflows/repo-check.yml`
   - Triggers: `pull_request` to `main`, `push` to `main`, and `push` of tags `v*`. Uses
     `permissions: contents: read` and no secret, and does not use `pull_request_target`.
   - Job `check`: `actions/checkout@v4` with `fetch-depth: 0`, then `actions/setup-node@v4` with
@@ -179,6 +179,11 @@
     `feat/backend-aware-skills-repo-check`; both jobs' commands pass locally on Node 24 (the
     `baseline` command exits 0). Left unticked: the Done-when needs the pull request's CI run on
     Node 22, which no one has opened yet.
+  - Note 18 October 2026: ticked. The pull request of tasks 2 and 3 (#22) targeted the spec
+    branch, so the workflow, which runs on pull requests to `main`, did not run on it. The commits
+    of tasks 2 and 3 reached `main` in pull request #28, where both jobs, `check` and `baseline`,
+    ran on Node 22 and ended green. They have ended green on every pull request to `main` since
+    (#29 to #33), on each push to `main`, and on the push of tag `v2.0.0`.
 
 - [ ] 3. Write the README, CONTRIBUTING and the first CHANGELOG, and land the check green on the unconverted tree (same pull request as task 2)
 - [x] 3.1 Rewrite `README.md` for the two kinds of project
@@ -219,7 +224,14 @@
     `git diff --stat v1.0.0 HEAD` lists only `tools/`, `.github/`, `README.md`, `CONTRIBUTING.md`,
     `CHANGELOG.md` and `.kiro/`. Left unticked: CI on the pull request and the merge are still to
     come.
-- [ ] 3.4 Make `check` and `baseline` required status checks on `main` (maintainer, repository setting)
+  - Note 18 October 2026: still unticked, because one part of the Done-when cannot now be met.
+    The pull request (#22) was merged on 17 October 2026, into the spec branch, and its commits
+    reached `main` in #28. The three commands exited 0 locally on the baseline text (note above),
+    and in CI on #28. But #28 also carried the converted folders of tasks 4 to 8 (44 `converted/`
+    files), so CI never ran on the baseline text alone, as the Done-when asks ("all three exit 0
+    locally and in CI" on a branch with no `converted/` file). The maintainer may accept the local
+    run and tick this task, or leave it as the record of that gap.
+- [x] 3.4 Make `check` and `baseline` required status checks on `main` (maintainer, repository setting)
   - Done when: the branch-protection settings for `main` list both checks as required. The design's
     "T-0.3" is this task.
   - _Requirements: 7.1_
@@ -227,6 +239,9 @@
     require are the two jobs of `.github/workflows/repo-check.yml`, named `check` and `baseline`
     (shown in GitHub as `repo-check / check` and `repo-check / baseline`). They can be chosen
     once they have run on the pull request of tasks 2 and 3.
+  - Note 18 October 2026: ticked. The branch protection of `main`, read through the GitHub API,
+    lists `check` and `baseline` as required status checks, with one approving review required and
+    force pushes not allowed.
 
 - [ ] 4. Convert the data and access Skills (design Group 3; after task 3; before tasks 7 and 8; parallel with tasks 5 and 6)
 - [x] 4.1 (P) Convert `add-i18n` (row 7, BP)
@@ -982,6 +997,12 @@
   | PP-28 `X-Tenant-Id` cross-origin (Engine, infra Decision 7; not in Dependencies) | ES-4, ES-11 server-side sign-in, signed URLs | browser may name the tenant | every folder carrying ES-4/ES-11 | 10.5 |
   | PP-21, PP-34, PP-36 (`buildpad-ui`) | ES-16 | generated modules usable | folders carrying ES-16 | 10.6 |
   | EP-21, EP-24, EP-28, MCP `schema` block (Engine; not in Dependencies, Issue 6) | facts in rows 6, 15, 16, 20, 30; ES-8 | facts revised | those rows | 10.7 |
+
+  - Note 18 October 2026: the design's [Engine-fact corrections, 18 October 2026](design.md#engine-fact-corrections-18-october-2026)
+    give the approved Engine shape of PP-30 and PP-16 (F6 to F8, for 10.2), PP-35 (F13 and F14,
+    for 10.3), PP-29 (F17 and F18, for 10.4: six tools, four Studio actions left out), PP-28 (F9,
+    for 10.5), EP-28 (F15 and F16, for 10.7) and the MCP `schema` block (F19, for 10.7). None is
+    implemented at `buildpad-daas-go` `3a00669b`, so every sub-task stays blocked.
 
 - [ ] 10.1 Switch ES-13n to ES-13m once the scheduler is listed available
   - Blocked until: row Decision P is recorded as met (a creation path runs the scheduler, infra
