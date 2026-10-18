@@ -184,12 +184,14 @@ MCP_ENABLED=true
 1. **Check that the Engine answers first**:
 
    ```bash
-   curl <Engine_URL>/api/server/info
    curl <Engine_URL>/api/health
    # a local Engine: curl http://localhost:8080/api/health
+   curl -H "X-Tenant-Id: <the project's tenant id>" <Engine_URL>/api/server/info
    ```
 
    Both routes answer without a session. If neither answers, ask the developer to start the Engine or to give the right Engine_URL.
+
+   `/api/health` says only that the Engine is up; it answers 200 before the Engine serves the project. `/api/server/info` with `X-Tenant-Id` says whether the Engine serves the project's tenant: `200` when it does, `403` (`FORBIDDEN`) when that tenant is not served yet or the id is wrong (the two give the same answer), and `503` when the Engine cannot read its tenants. On a `403`, check `NEXT_PUBLIC_BUILDPAD_TENANT_ID` against the project's tenant id, then wait and ask again. Without the header, `/api/server/info` answers for the Engine itself, not for the project.
 
 2. **Configure Frontend App**:
    ```bash
@@ -210,7 +212,7 @@ MCP_ENABLED=true
 
 ### "Unauthorized" or 401 errors
 
-- Check that the Engine answers: `GET <Engine_URL>/api/server/info` or `GET <Engine_URL>/api/health`
+- Check that the Engine serves the project: `GET <Engine_URL>/api/server/info` with the header `X-Tenant-Id: <the project's tenant id>` answers `200` (Setup Steps, step 1)
 - Verify `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` both hold the Engine_URL
 - Ensure user is authenticated: the data API serves no request without a session. The code `UNAUTHENTICATED` means no token was sent; check that `DaaSProvider` has the token
 - The code `TOKEN_INVALID` means the token sent did not verify, for example a session that went stale: sign in again
