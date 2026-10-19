@@ -699,6 +699,7 @@ microfrontend Skills while PP-35 is unmet.
 | `subagent-delegation` | wording only | reworded to be true for both | small |
 | `buildpad-steering` | none | reworded to be true for both | small |
 | `worker-messaging` | none | both paths, chosen by backend, with an Engine passage only (amended 16 October 2026) | small |
+| `add-mobile-app` | none | new skill, true for both kinds of project (wraps the deployed web app; no backend-specific step) | small |
 
 Unchanged, with no dependence found (20): `amplify-env-vars`, `buildpad-debug`, `buildpad-discovery`, `buildpad-impl`, `buildpad-review`, `buildpad-spec-batch`, `buildpad-spec-design`, `buildpad-spec-init`, `buildpad-spec-quick`, `buildpad-spec-requirements`, `buildpad-spec-status`, `buildpad-spec-tasks`, `buildpad-validate-design`, `buildpad-validate-gap`, `buildpad-validate-impl`, `buildpad-verify-completion`, `code-simplification`, `create-component`, `generate-docs`, `git-workflow-and-versioning`.
 
