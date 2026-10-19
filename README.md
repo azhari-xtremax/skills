@@ -133,6 +133,7 @@ The core methodology: every feature is specified as `requirements.md` (EARS) →
 | [add-multitenancy](add-multitenancy) | Multi-tenancy (delegates to manage-scope) |
 | [add-external-oauth](add-external-oauth) | Supabase projects only: external OAuth/OIDC identity provider integration with PKCE proxy flow; stops on an Engine project |
 | [add-i18n](add-i18n) | Internationalization: `app/[lang]` routing, middleware locale negotiation, dictionaries + I18nProvider, LanguageSwitcher, DaaS content translations |
+| [add-mobile-app](add-mobile-app) | Wrap the web app as iOS/Android with Capacitor (server-URL mode), plus when to use platform-managed mobile builds / Expo mobile microapps; SSO, push, geofencing, emulator gotchas |
 | [worker-messaging](worker-messaging) | Offload long-running work to a Buildpad runtime worker over RabbitMQ (topic-exchange job convention; Next.js producer + worker consumer/chaining; connection via Platform MCP) |
 
 ### DaaS platform reference
