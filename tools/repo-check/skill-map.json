@@ -43,6 +43,7 @@
   {"folder":"subagent-delegation","dependence":"wording only","treatment":"reworded to be true for both","size":"small","plan":"RW"},
   {"folder":"buildpad-steering","dependence":"none","treatment":"reworded to be true for both","size":"small","plan":"RW+G"},
   {"folder":"worker-messaging","dependence":"none","treatment":"both paths, chosen by backend, with an Engine passage only (amended 16 October 2026)","size":"small","plan":"BP"},
+  {"folder":"add-mobile-app","dependence":"none","treatment":"new skill, true for both kinds of project (wraps the deployed web app; no backend-specific step)","size":"small","plan":"RW"},
   {"folder":"amplify-env-vars","dependence":"none","treatment":"unchanged","size":"none","plan":"UC"},
   {"folder":"buildpad-debug","dependence":"none","treatment":"unchanged","size":"none","plan":"UC"},
   {"folder":"buildpad-discovery","dependence":"none","treatment":"unchanged","size":"none","plan":"UC"},

@@ -205,9 +205,16 @@ test('the baseline job: a git archive of v1.0.0 checked with R4, R5 and R6a', ()
   const args = ['--root', archive, '--baseline-ref', 'v1.0.0', '--only', 'R4,R5,R6a', '--skill-map', 'tools/repo-check/skill-map.json'];
   const r = run(root, args);
   assert.equal(r.code, 0, r.stdout + r.stderr);
-  // A Skill added to the current map but absent from the baseline is a row without a folder.
-  writeFileSync(path.join(root, 'tools/repo-check/skill-map.json'), JSON.stringify([...MAP, row('later-skill', 'BP')]));
-  assert.equal(run(root, args).code, 1);
+  // A Skill added to the current map after the baseline has no folder there: not a finding.
+  const mapPath = path.join(root, 'tools/repo-check/skill-map.json');
+  writeFileSync(mapPath, JSON.stringify([...MAP, row('later-skill', 'BP')]));
+  const later = run(root, args);
+  assert.equal(later.code, 0, later.stdout + later.stderr);
+  // A baseline folder without a row still is.
+  writeFileSync(mapPath, JSON.stringify([...MAP.slice(1), row('later-skill', 'BP')]));
+  const missing = run(root, args);
+  assert.equal(missing.code, 1);
+  assert.match(missing.stdout, /folder-without-row/);
 });
 
 test('R12: the contract test and every shared case, exit 0; one changed expectation, exit 1', () => {

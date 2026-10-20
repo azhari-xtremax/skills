@@ -36,9 +36,11 @@ export function validateSkillMap(rows) {
 
 /**
  * R4: `folders` are the checked set's top-level folders; `markers` maps a folder to the marker
- * lines found in it ([{path, line}]).
+ * lines found in it ([{path, line}]). `olderTree` is set when the folders come from the baseline
+ * tree and the map is the current one: a row for a Skill added since then names no folder there,
+ * so only a folder without a row is reported (the `check` job holds every row to the current tree).
  */
-export function mapIssues(skillMap, folders, markers) {
+export function mapIssues(skillMap, folders, markers, { olderTree = false } = {}) {
   const findings = [];
   const rows = new Map(skillMap.map((r, i) => [r.folder, { ...r, index: i }]));
   for (const folder of folders) {
@@ -48,7 +50,7 @@ export function mapIssues(skillMap, folders, markers) {
   }
   const present = new Set(folders);
   for (const r of rows.values()) {
-    if (!present.has(r.folder)) {
+    if (!present.has(r.folder) && !olderTree) {
       findings.push({ rule: 'R4', path: SKILL_MAP_PATH, line: rowLine(r.index), code: 'row-without-folder', message: `the row for ${r.folder} names a missing folder` });
     }
     if (r.dependence === 'wording only') {

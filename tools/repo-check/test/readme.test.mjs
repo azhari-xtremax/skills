@@ -44,7 +44,7 @@ test('R11: the README lacking the baseline command', () => {
   assert.deepEqual(show(readmeIssues(null, ['a'])), ['R11 README.md:1 readme-missing']);
 });
 
-// This repository's README (task 3.1): all 62 Skills once, and the v1.0.0 command.
+// This repository's README (task 3.1): all 63 Skills once, and the v1.0.0 command.
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -52,6 +52,6 @@ import path from 'node:path';
 test('R11 passes on this repository README', () => {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
   const skills = readdirSync(root).filter((d) => existsSync(path.join(root, d, 'SKILL.md')));
-  assert.equal(skills.length, 62);
+  assert.equal(skills.length, 63);
   assert.deepEqual(readmeIssues(readFileSync(path.join(root, 'README.md'), 'utf8'), skills), []);
 });
