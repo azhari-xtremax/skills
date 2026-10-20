@@ -119,7 +119,7 @@ cd /path/to/my-project && pnpm install
 
 **Never mix both approaches.**
 
-On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`.
+On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes of the `external-oauth` module, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`. For My Apps sign-in the CLI installs the `external-oauth-engine` module in place of `external-oauth`; its routes are used as the `add-external-oauth` skill says.
 <!-- /buildpad-backend -->
 
 ## Spec-Driven Development (MANDATORY)
@@ -140,7 +140,7 @@ This skill delivers the project **foundation**. Every feature after that follows
 <!-- buildpad-backend: engine -->
 1. Project scaffolding (Next.js + TypeScript + Mantine v8)
 2. Environment config (`.env.local` with the Engine values of "Required Environment Variables")
-3. Auth proxy routes (login, logout, user) — installed by CLI. The CLI's OAuth callback route is not a deliverable on an Engine project: OAuth sign-in and code exchange are not available there
+3. Auth proxy routes (login, logout, user) — installed by CLI. An OAuth callback route is a deliverable on an Engine project only when My Apps sign-in is asked for: then the [add-external-oauth](../add-external-oauth/SKILL.md) skill adds it through the CLI's `external-oauth-engine` module. Sign-in with any other OAuth provider, and the Supabase client's code exchange, are not available there
 4. **`app/(authenticated)/layout.tsx`** with `DaaSProviderWrapper` + `ScopeProvider` (NOT in root layout)
 5. **`DaaSProviderWrapper`** using `onAuthStateChange` (not `getSession`) + `getHeaders` wired to scope cookie
 6. **Logout route** clears `daas_resource_uri` cookie
@@ -405,7 +405,7 @@ If any matches are found, **replace them with Buildpad equivalents before procee
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
 - **Auth via Proxy**: Login MUST call `/api/auth/login`, NEVER `supabase.auth.signInWithPassword()` directly. On an Engine project that server route names the tenant: it sends `X-Tenant-Id` with the value of `NEXT_PUBLIC_BUILDPAD_TENANT_ID`, which a browser cannot send to the Engine
-- **Supabase client for sign-in only**: On an Engine project the Supabase client is kept for sign-in only. Password sign-in, session refresh, reading the signed-in user and sign-out work through it, and its default sign-out ends the user's sessions on every device. An account that holds no role in the project's tenant is refused at sign-in. Not available on an Engine project: sign-up; OAuth sign-in; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; code exchange; and the Supabase administration API. The Platform's password-less handoff opens the Studio; it is not a way for an application to sign a user in.
+- **Supabase client for sign-in only**: On an Engine project the Supabase client is kept for sign-in only. Password sign-in, session refresh, reading the signed-in user and sign-out work through it, and its default sign-out ends the user's sessions on every device. An account that holds no role in the project's tenant is refused at password sign-in. My Apps sign-in also works through it while the project's My Apps connector is connected: the application's server gives the ID token from My Apps to `signInWithIdToken` with the provider `my-apps`, and ends the session of an account that holds no role yet (the `add-external-oauth` skill). Not available on an Engine project: sign-up; OAuth sign-in with any provider other than My Apps; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; the Supabase client's code exchange; and the Supabase administration API. The Platform's password-less handoff opens the Studio; it is not a way for an application to sign a user in.
 - **User token on every data call**: On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
 <!-- /buildpad-backend -->
 - **NEVER create files manually** in `components/ui/` or `lib/buildpad/` — CLI only

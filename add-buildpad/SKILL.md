@@ -85,7 +85,7 @@ node --version && pnpm --version && npx --version
 
 The CLI also writes the sign-in layer and the proxy routes (`lib/supabase/`, `middleware.ts`, `lib/api/auth-headers.ts`, `app/api/`). Do not write those by hand either.
 
-On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`.
+On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes of the `external-oauth` module, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`. For My Apps sign-in the CLI installs the `external-oauth-engine` module in place of `external-oauth`; its routes are used as the `add-external-oauth` skill says.
 <!-- /buildpad-backend -->
 
 ## Installation Commands
@@ -108,7 +108,7 @@ npx @buildpad/cli@latest add --all --with-api --cwd /path/to/project
 npx @buildpad/cli@latest add input select-dropdown datetime toggle --cwd /path/to/project
 ```
 
-`--with-api` (and `--all`) also installs the sign-in layer, the proxy routes and the OAuth routes. On an Engine project the files the note above names are among them: leave them in place, and do not call them.
+`--with-api` (and `--all`) also installs the sign-in layer, the proxy routes and the OAuth routes. On an Engine project the files the note above names are among them: leave them in place, and do not call them. A CLI that installs the `external-oauth-engine` module there in place of `external-oauth` (check `installedLib` in `buildpad.json`) writes OAuth routes for My Apps sign-in, which are used as the [add-external-oauth](../add-external-oauth/SKILL.md) skill says.
 <!-- /buildpad-backend -->
 
 ## Component Categories

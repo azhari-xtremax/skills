@@ -80,7 +80,7 @@ Security-first development practices for web applications. Treat every external 
 
 ### Ask First (Requires Human Approval)
 
-- Changing how the application signs users in (sign-up, OAuth sign-in, magic links and password recovery are not available on an Engine project: tell the developer so instead of building one)
+- Changing how the application signs users in (sign-up, magic links, password recovery and OAuth sign-in with any provider other than My Apps are not available on an Engine project: tell the developer so instead of building one; My Apps sign-in follows the `add-external-oauth` skill)
 <!-- /buildpad-backend -->
 - Storing new categories of sensitive data (PII, payment info)
 - Adding new external service integrations
@@ -151,7 +151,7 @@ NEXT_PUBLIC_BUILDPAD_DAAS_URL=...
 
 On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
 
-On an Engine project the Supabase client is kept for sign-in only. Password sign-in, session refresh, reading the signed-in user and sign-out work through it, and its default sign-out ends the user's sessions on every device. An account that holds no role in the project's tenant is refused at sign-in. Not available on an Engine project: sign-up; OAuth sign-in; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; code exchange; and the Supabase administration API. The Platform's password-less handoff opens the Studio; it is not a way for an application to sign a user in.
+On an Engine project the Supabase client is kept for sign-in only. Password sign-in, session refresh, reading the signed-in user and sign-out work through it, and its default sign-out ends the user's sessions on every device. An account that holds no role in the project's tenant is refused at password sign-in. My Apps sign-in also works through it while the project's My Apps connector is connected: the application's server gives the ID token from My Apps to `signInWithIdToken` with the provider `my-apps`, and ends the session of an account that holds no role yet (the `add-external-oauth` skill). Not available on an Engine project: sign-up; OAuth sign-in with any provider other than My Apps; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; the Supabase client's code exchange; and the Supabase administration API. The Platform's password-less handoff opens the Studio; it is not a way for an application to sign a user in.
 
 ### Environment Variables
 
@@ -218,7 +218,7 @@ export async function POST(req: NextRequest) {
 - [ ] The application stores no password; the Engine holds them, and an administrator resets one in the Studio's Users module
 - [ ] The application's own session cookies are httpOnly, secure, sameSite; calls to the Engine carry `Authorization: Bearer`, never a cookie
 - [ ] Login has rate limiting
-- [ ] No sign-up, OAuth sign-in, magic link or password-recovery flow is offered (not available on an Engine project)
+- [ ] No sign-up, magic link or password-recovery flow, and no OAuth sign-in with a provider other than My Apps, is offered (not available on an Engine project)
 
 ### Authorization
 - [ ] Every endpoint forwards the user's own access token, so the Engine applies the user's roles, policies and permissions

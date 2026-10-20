@@ -16,7 +16,7 @@ test('skill-map.json: 65 rows with the marking plan counts', () => {
   assert.equal(skillMap.length, 65);
   const counts = {};
   for (const r of skillMap) counts[r.plan] = (counts[r.plan] ?? 0) + 1;
-  assert.deepEqual(counts, { BP: 21, EF: 3, US: 2, NY: 2, RW: 15, 'RW+G': 2, UC: 20 });
+  assert.deepEqual(counts, { BP: 22, EF: 3, US: 1, NY: 2, RW: 15, 'RW+G': 2, UC: 20 });
   assert.deepEqual(validateSkillMap(skillMap), []);
   assert.deepEqual(Object.keys(skillMap[0]), ['folder', 'dependence', 'treatment', 'size', 'plan']);
 });

@@ -4,5 +4,11 @@
     "kind": "text",
     "reason": "Reworded so every statement is true for both kinds of project: the cross-origin setup is qualified as a Supabase-project step, and Engine-project sentences on static tokens, cross-origin and creating users with a role in the tenant are added; the Supabase steps are unchanged.",
     "release": "v2.0.0"
+  },
+  {
+    "path": "add-users/SKILL.md",
+    "kind": "text",
+    "reason": "Engine statement ES-7 reworded: an administrator creates every user who signs in with a password, and a user's first My Apps sign-in creates an account without a role; the Supabase steps are unchanged.",
+    "release": "unreleased"
   }
 ]
