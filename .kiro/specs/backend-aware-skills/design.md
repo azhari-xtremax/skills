@@ -3,6 +3,7 @@
 > **Approved 16 October 2026** (with all three repositories' designs; see `spec.json`, `design_approval_note`). The status note below records how the document was written.
 > **Engine-fact corrections, 17 October 2026.** Ten Engine facts that tasks 4 to 8 found while converting differ from this design or extend it. They are recorded in [Engine-fact corrections, 17 October 2026](#engine-fact-corrections-17-october-2026); the rest of the document is unchanged.
 > **Engine-fact corrections, 18 October 2026.** Twenty-one Engine facts from the Engine and Studio specifications approved on 17 October 2026. Two facts that already hold were missing from two skills, whose Engine text is fixed (SF1, SF2); the others leave the skills true or fix the shape of a dependency before it is met. They are recorded in [Engine-fact corrections, 18 October 2026](#engine-fact-corrections-18-october-2026); the rest of the document is unchanged.
+> **Engine-fact corrections, 20 October 2026.** My Apps sign-in is now served on an Engine project. ES-4, ES-5, ES-7 and ES-16 are reworded so that only My Apps sign-in is available and every other OAuth provider stays unavailable; recorded in [Engine-fact corrections, 20 October 2026](#engine-fact-corrections-20-october-2026); the rest of the document is unchanged.
 > **Status.** Not approved. Phase 2 of a gated spec, written against the **approved** requirements
 > of this folder (7 requirements, 68 criteria, 66 live, 2 withdrawn; SD-1 and SD-2 settled; Skill
 > map amended 16 October 2026 with the maintainer's approval). Revised 16 October 2026 to close
@@ -1302,6 +1303,58 @@ change-file entry is written):
 - **SF2** (F2). `debugging-and-error-recovery/SKILL.md`, the Engine cross-origin paragraph: a
   browser also blocks a call that carries a header the Engine does not accept from another origin,
   `X-Tenant-Id` among them, so that header is sent only from the application's server route.
+
+## Engine-fact corrections, 20 October 2026
+
+Written on 20 October 2026, at the maintainer's request. The Engine now serves My Apps sign-in:
+the `id_token` grant on `/auth/v1/token`, which the Supabase client's `signInWithIdToken` sends,
+for the provider `my-apps`, in a project whose My Apps connector is connected (the Platform then
+registers the application's client with My Apps and tells the Engine to trust it). The Buildpad
+CLI gains the module `external-oauth-engine`, which `add external-oauth`, `add --with-api` and
+`bootstrap` install on an Engine project in place of `external-oauth`. The `add-external-oauth`
+Skill's Engine part, which held S7-A, now adds My Apps sign-in (pull request #37).
+Four Engine statements said that no OAuth sign-in, or none of the CLI's OAuth routes, can be used
+on an Engine project; this section rewords them. Every other OAuth provider, the magic link and the
+one-time code, the Supabase administration API and the service-role key stay unavailable on an
+Engine project. The text above is left as it was approved.
+
+**Corrections**:
+
+- **G1. ES-4.** My Apps sign-in also takes its tenant from `X-Tenant-Id`: the application's server
+  route sends it, as it does for the password sign-in.
+- **G2. ES-5.** OAuth sign-in with My Apps works through the Supabase client; OAuth sign-in with
+  any other provider does not. The Engine refuses an account without a role at password sign-in
+  only: a user's first My Apps sign-in gives a session to an account that holds no role, and the
+  application ends that session. The "code exchange" that is not available is the Supabase
+  client's; My Apps sign-in exchanges its code with My Apps, on the application's server.
+- **G3. ES-7.** A user's first My Apps sign-in creates the account, with no role. An administrator
+  still creates every user who signs in with a password, and gives every role.
+- **G4. ES-16.** The OAuth routes that cannot be used are those of the `external-oauth` module.
+  Those of `external-oauth-engine` are used for My Apps sign-in. The rest of ES-16 is unchanged,
+  and task 10.6 still switches it.
+
+The four statements now read, and are copied verbatim (in `CONTRIBUTING.md`, in every folder that
+carries them and in `test/guard.test.mjs`):
+
+| Id | Text |
+|---|---|
+| ES-4 | On an Engine project the data API serves no request without a session; only the sign-in, `GET /api/server/info` and the Engine's password routes (which ES-5 says not to use) are served without one. The requests that take their tenant from the header `X-Tenant-Id` are the password sign-in, My Apps sign-in and anonymous reads of public files. A browser cannot send `X-Tenant-Id` to the Engine until the Engine allows that header from another origin, which it does not yet do: so the request that names the tenant is the sign-in made through the application's own server route, which sends `X-Tenant-Id` with the value of `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. A public file shown in a browser is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read. A request without a session that names no tenant is served from the Engine's host plane, not from the project. A request with a session takes its tenant from the session. |
+| ES-5 | On an Engine project the Supabase client is kept for sign-in only. Password sign-in, session refresh, reading the signed-in user and sign-out work through it, and its default sign-out ends the user's sessions on every device. An account that holds no role in the project's tenant is refused at password sign-in. My Apps sign-in also works through it while the project's My Apps connector is connected: the application's server gives the ID token from My Apps to `signInWithIdToken` with the provider `my-apps`, and ends the session of an account that holds no role yet (the `add-external-oauth` skill). Not available on an Engine project: sign-up; OAuth sign-in with any provider other than My Apps; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; the Supabase client's code exchange; and the Supabase administration API. The Platform's password-less handoff opens the Studio; it is not a way for an application to sign a user in. |
+| ES-7 | On an Engine project an administrator creates every user who signs in with a password, through the Engine's user API (`POST /api/users` with an administrator's session) or the Studio's Users module, and gives the user a role in the project's tenant (`POST /api/users/:id/roles` with `role_id`, or the Users module). A user's first My Apps sign-in creates that user's account, which holds no role until an administrator gives it one in the same way. An administrator resets a user's password, in the Studio's Users module. |
+| ES-16 | On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes of the `external-oauth` module, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`. For My Apps sign-in the CLI installs the `external-oauth-engine` module in place of `external-oauth`; its routes are used as the `add-external-oauth` skill says. |
+
+**Not changed here.** Requirement 4 criterion 5 names "OAuth sign-in" among the features each
+sign-in Skill names as unavailable, and the requirements' Skill map gives `add-external-oauth` the
+treatment "says unavailable on the Engine and stops". The Skills now name OAuth sign-in with any
+provider other than My Apps, and `tools/repo-check/skill-map.json` gives `add-external-oauth` both
+paths (plan `BP`). Rewording the criterion and the requirements' row needs a dated amendment of the
+requirements that the maintainer approves.
+
+**Skill text changed** besides the verbatim copies (the Engine sign-in text, and the shared text
+that names an Engine project): `add-buildpad`, `add-i18n`, `agents`, `authentication-proxy`,
+`create-api-route`, `create-project`, `references`, `security-and-hardening` and
+`subagent-delegation`, and the README catalogue row of `add-external-oauth`. Where a changed
+sentence stands in shared text, the folder's change file lists it.
 
 ## Design review gate
 Run on the revision of 16 October 2026; the second pass found nothing to repair.

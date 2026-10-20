@@ -1003,6 +1003,10 @@
     for 10.3), PP-29 (F17 and F18, for 10.4: six tools, four Studio actions left out), PP-28 (F9,
     for 10.5), EP-28 (F15 and F16, for 10.7) and the MCP `schema` block (F19, for 10.7). None is
     implemented at `buildpad-daas-go` `3a00669b`, so every sub-task stays blocked.
+  - Note 20 October 2026: the design's [Engine-fact corrections, 20 October 2026](design.md#engine-fact-corrections-20-october-2026)
+    reword ES-4, ES-5, ES-7 and ES-16 for My Apps sign-in (G1 to G4). ES-16 no longer counts the
+    OAuth routes of the CLI's `external-oauth-engine` module among the files that cannot be used;
+    10.6 still switches the rest of ES-16 and stays blocked.
 
 - [ ] 10.1 Switch ES-13n to ES-13m once the scheduler is listed available
   - Blocked until: row Decision P is recorded as met (a creation path runs the scheduler, infra
