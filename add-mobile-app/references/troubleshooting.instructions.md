@@ -28,34 +28,44 @@ its host is covered by an `allowNavigation` entry.
    Found: `policyAction=Ignore` — Capacitor's own navigation delegate was
    explicitly rejecting the navigation, confirming the config *was* being read
    and still rejected. Not a caching or syntax issue.
-5. Root cause: the navigation was being triggered via `window.location.href =
-   url`. WKWebView classifies that as navigation type `.other`. Capacitor's
-   `allowNavigation` check only appears to honor `.linkActivated` (a real `<a>`
-   click) on iOS. Switching to a real, programmatically-clicked anchor element
-   fixed it — confirmed via the same log capture, now showing `policyAction=Use`
-   for the identical host.
+5. The navigation was being triggered via `window.location.href = url`.
+   Switching to a real, programmatically-clicked anchor element fixed it —
+   confirmed via the same log capture, now showing `policyAction=Use` for the
+   identical host. The working theory was that WKWebView classifies the
+   `location.href` assignment as navigation type `.other` and Capacitor honors
+   `allowNavigation` only for `.linkActivated`. Capacitor 8's iOS source does not
+   support that theory: `WebViewDelegationHandler` checks `allowNavigation` by
+   host before it looks at the navigation type, and server redirects (also
+   `.other`) stay in the WebView when their hosts are listed. The cause of the
+   rejection is not confirmed; the anchor click is what was shown to work.
 6. Retested `'*'` (the documented "allow everything" form, confirmed real and
    working on Android — Android's `HostMask`/`Util.matches` source explicitly
    special-cases a bare `*`) **after** the real-click fix, expecting it to now
    work on iOS too. **It still bounced to Safari on iOS, while the exact same
-   config worked correctly on Android.** This is a genuine platform divergence —
-   not the navigation-type bug, not a stale build, not a config scope issue.
-   iOS's `allowNavigation` matcher does not appear to treat `'*'` (or the
-   `*.domain` wildcard form) the same way Android's documented implementation
-   does. **Exact hostnames are the only form confirmed to work identically on
-   both platforms.**
+   config worked correctly on Android.** Capacitor 8's iOS matcher (`doesHost`
+   in `CAPInstanceConfiguration.swift`) returns true for a bare `'*'`, so check
+   the synced `ios/App/App/capacitor.config.json` and the build before blaming
+   the matcher. What the source does show: on iOS a `*` stands for exactly one
+   label, so `*.domain.com` matches `a.domain.com` but not `domain.com` or
+   `a.b.domain.com`. **Exact hostnames are the only form confirmed to work
+   identically on both platforms.**
 
 ## The window.open / location.href navigation-type bug, in full
 
-Any code path that opens a link — not just an app launcher — can hit this if it
-uses `window.open(url, '_blank')` or a bare `location.href = url` assignment
-instead of a real click.
+Any code path that opens a link — not just an app launcher — can hit this.
+`window.open(url, '_blank')` asks for a new window, and Capacitor's iOS
+`createWebViewWith` opens every new window in the system browser, whatever
+`allowNavigation` says. A bare `location.href = url` was rejected in testing for
+an allowed host (cause not confirmed, see above). A real click was accepted.
 
 ```ts
-// Does NOT reliably get allowNavigation applied on iOS:
+// Leaves the app on iOS (a new window goes to the system browser):
+window.open(url, '_blank');
+
+// Was rejected in testing for an allowed host on iOS:
 window.location.href = url;
 
-// Does:
+// Worked on both platforms:
 const link = document.createElement('a');
 link.href = url;
 link.rel = 'noopener noreferrer';
@@ -66,7 +76,7 @@ link.remove();
 ```
 
 The element must be briefly attached to the DOM — a `.click()` on a detached
-anchor was not confirmed to get the same navigation-type classification.
+anchor was not confirmed to behave the same.
 
 **Do not "fix" this by switching to `@capacitor/browser`'s `Browser.open()`**
 in-app sheet. It visually looks like it stays "in the app," but
@@ -177,19 +187,19 @@ log only contains it.
    after launch `adb logcat | grep "Capacitor/Plugin.*PushNotifications"` shows
    `createChannel`, `checkPermissions`, `register`.
 2. Confirm the token was saved (the `registration` listener posts it to the server;
-   read the table with a service token).
+   read the table as the signed-in user, or as an administrator in the Studio).
 3. Prove the *sender* separately from the app: sign a service-account JWT, exchange
    it at `oauth2.googleapis.com/token`, `POST fcm.googleapis.com/v1/projects/<id>/messages:send`
    to the saved token. 200 + a `name` means Firebase accepted it.
 4. Prove the *device* side: foreground → `pushNotificationReceived` → your handler;
    background → a `FCM-Notification` record. A notification record's `when=` is the
    time it was posted, so `when` minus the send time is the delivery latency.
-5. A DaaS cron that calls the server route can be exercised with `run_now` and read
-   with `history` (the log shows the route's `{devices, sent, failed, pruned}`).
+5. A cron job that calls the server route can be run by hand and its run history
+   read (the log shows the route's `{devices, sent, failed, pruned}`).
 
-DaaS note: the static service token **overwrites `user_created`** on writes (rows come
-back owned by the service account), so create/update user-owned rows with the
-user's own JWT and use the static token only to read across users or delete.
+Ownership note: a write sets `user_created` to the account whose token made it, so
+create and update user-owned rows (such as a device token) with the signed-in user's
+own access token, never an administrator or service token.
 
 ## Testing a geofence on the emulator
 

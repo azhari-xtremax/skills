@@ -1,7 +1,7 @@
 # Native back navigation after a launched app replaces the WebView
 
-In server-URL mode with no `allowNavigation` wrapping, a launched link navigates
-the **same** WebView in place — there's no separate browser window, no address
+In server-URL mode, a launched link whose host is listed in `allowNavigation`
+navigates the **same** WebView in place — there's no separate browser window, no address
 bar, no back button. That's the point (it's what makes this feel like one app
 instead of a browser tab), but it also means there is no way back to the app's
 own home screen except relaunching, unless something restores it.
@@ -67,7 +67,7 @@ class MainViewController: CAPBridgeViewController {
     private let titleLabel = UILabel()
     private var urlObservation: NSKeyValueObservation?
     private var titleObservation: NSKeyValueObservation?
-    private var homeHost: String?
+    private var homeURL: URL?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -85,8 +85,8 @@ class MainViewController: CAPBridgeViewController {
 
     private func updateHeaderVisibility(for url: URL?) {
         guard let url = url else { return }
-        if homeHost == nil { homeHost = url.host }
-        let isHomeHost = url.host == homeHost
+        if homeURL == nil { homeURL = url }
+        let isHomeHost = url.host == homeURL?.host
         let path = url.path
         let isDashboardPath = path == Self.dashboardPath || path.isEmpty || path == "/"
         headerBar.isHidden = isHomeHost && isDashboardPath
@@ -97,7 +97,11 @@ class MainViewController: CAPBridgeViewController {
         if webView.canGoBack {
             webView.goBack()
         } else {
-            webView.evaluateJavaScript("window.location.href = '/dashboard';")
+            // Resolve against the app's own first URL, not the launched page:
+            // a relative '/dashboard' here would load the launched host's path.
+            if let home = homeURL, let dashboard = URL(string: Self.dashboardPath, relativeTo: home) {
+                webView.load(URLRequest(url: dashboard))
+            }
         }
     }
 }
@@ -119,14 +123,26 @@ public class MainActivity extends BridgeActivity {
     private TextView titleLabel;
     private final Handler pollHandler = new Handler(Looper.getMainLooper());
     private String lastUrl;
-    private String homeHost;
+    private Uri homeUri;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupHeaderBar();  // add headerBar as a child of android.R.id.content,
                            // WRAP_CONTENT height, padded by the status-bar inset
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         pollHandler.postDelayed(this::pollWebView, POLL_INTERVAL_MS);
+    }
+
+    @Override
+    public void onPause() {
+        // Stop polling while the app is in the background.
+        pollHandler.removeCallbacksAndMessages(null);
+        super.onPause();
     }
 
     private void pollWebView() {
@@ -146,9 +162,9 @@ public class MainActivity extends BridgeActivity {
 
     private void updateHeaderVisibility(String url) {
         Uri uri = Uri.parse(url);
-        String host = uri.getHost();
-        if (homeHost == null) homeHost = host;
-        boolean isHomeHost = homeHost != null && homeHost.equals(host);
+        if (homeUri == null) homeUri = uri;
+        String homeHost = homeUri.getHost();
+        boolean isHomeHost = homeHost != null && homeHost.equals(uri.getHost());
         String path = uri.getPath();
         boolean isDashboardPath = path == null || path.isEmpty() || path.equals("/") || path.equals(DASHBOARD_PATH);
         headerBar.setVisibility(isHomeHost && isDashboardPath ? View.GONE : View.VISIBLE);
@@ -160,20 +176,24 @@ public class MainActivity extends BridgeActivity {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            webView.evaluateJavascript("window.location.href = '/dashboard';", null);
+            // Resolve against the app's own first URL, not the launched page:
+            // a relative '/dashboard' here would load the launched host's path.
+            if (homeUri != null) {
+                webView.loadUrl(homeUri.buildUpon().encodedPath(DASHBOARD_PATH)
+                        .clearQuery().fragment(null).build().toString());
+            }
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        pollHandler.removeCallbacksAndMessages(null);
-        super.onDestroy();
     }
 }
 ```
 
-`onDestroy()` must stay `public` — overriding it `protected` is a compile error
-(`BridgeActivity.onDestroy()` is public).
+`onResume()` and `onPause()` must stay `public` — overriding them `protected` is a
+compile error (`BridgeActivity` declares them public).
+
+This is the same `MainActivity` class as the cookie-flushing asset
+(`assets/android/MainActivity.java`, Critical Rule 11). An app that needs both
+keeps one class: add this header's fields and methods to the asset's class, and
+in `onResume()` / `onPause()` start and stop both the flush loop and the poll.
 
 Polling (not overriding `WebViewClient`/`WebChromeClient`) for the same reason
 as iOS's KVO choice: Capacitor's Android bridge sets up its own WebViewClient

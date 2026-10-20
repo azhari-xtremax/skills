@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core';
+import { isNative } from '../native/platform';
 
 /**
  * Opens an external/launched-app URL.
@@ -6,16 +6,16 @@ import { Capacitor } from '@capacitor/core';
  * On the web this is `window.open(url, '_blank')`, same as always.
  *
  * Inside the Capacitor native shell (iOS/Android), `window.open('_blank')`
- * either no-ops or gets routed differently than a normal link click, so we
- * navigate via a real, programmatically-clicked `<a>` element instead of
- * `window.location.href = url`. That distinction matters: WKWebView
- * classifies a bare script-driven `location.href` assignment as navigation
- * type `.other`, and Capacitor's `server.allowNavigation` allowlist check
- * does NOT honor `.other` navigations — even for an exact-hostname allowlist
- * entry. A genuine anchor `click()` is classified as `.linkActivated`, which
- * does get the allowlist check applied. See
+ * asks for a new window, which Capacitor always hands to the system browser
+ * (iOS `createWebViewWith`), whatever `server.allowNavigation` says. So we
+ * navigate this same WebView instead, via a real, programmatically-clicked
+ * `<a>` element. In device testing on iOS that click was accepted where a bare
+ * `window.location.href = url` was rejected for the same allowed host.
+ * Capacitor 8's iOS source checks `allowNavigation` by host before it looks at
+ * the navigation type, so the cause of that rejection is not confirmed; the
+ * anchor click works on both platforms, so keep it. See
  * references/troubleshooting.instructions.md in the add-mobile-app skill for
- * the device-log evidence behind this.
+ * the device-log evidence.
  *
  * - A URL whose entire redirect chain stays within `server.allowNavigation`
  *   (first-party hosts that integrate with this app's own SSO) stays in this
@@ -30,14 +30,13 @@ import { Capacitor } from '@capacitor/core';
  * the destinations where preserving it is the whole point.
  */
 export function launchAppUrl(url: string): void {
-  if (Capacitor.isNativePlatform()) {
+  if (isNative()) {
     const link = document.createElement('a');
     link.href = url;
     link.rel = 'noopener noreferrer';
     link.style.display = 'none';
-    // Briefly attached to the DOM — WebKit's `.linkActivated` navigation-type
-    // classification needs a real click on an attached anchor, unlike a bare
-    // `location.href` assignment or a click on a detached element.
+    // Briefly attached to the DOM — the tested form was a click on an attached
+    // anchor; a click on a detached element was not confirmed to behave the same.
     document.body.appendChild(link);
     link.click();
     link.remove();

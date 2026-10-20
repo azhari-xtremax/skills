@@ -49,7 +49,7 @@ iOS 110 min), audit events are written. **Out of scope:** signed `.ipa` / TestFl
 (needs Apple signing), and no iOS build had been run end to end at merge time. If a user
 asks "is iOS/App Store ready?", say no.
 
-**Release status check (answer for "sudah ada rilis?"):** the feature is merged and
+**Release status check (when asked whether it is released):** the feature is merged and
 deployed on dev (`release/dev`). Production needs the iOS builder AMI copied to the prod
 account, the infra PR (xrad-cloudformation #9: state machines, Lambdas, builder stack)
 deployed there, the migrations run, and an explicit go. Until then it is enabled per
@@ -57,7 +57,7 @@ project by flag. Verify current state in the platform repo (`git log --grep=mobi
 "Mobile Apps" section of the Platform Guide rather than trusting this paragraph.
 
 **Mobile microapp rules** (from the generated starter's `AGENTS.md`):
-- The starter ships on **Expo SDK 55** (platform commit c1a8ee0, which also added the iOS bundle identifier). Expo changes every SDK: read the `expo` major in `package.json` and the matching
+- The starter ships on **Expo SDK 55** at the time of writing. Expo changes every SDK: read the `expo` major in `package.json` and the matching
   `https://docs.expo.dev/versions/v<major>.0.0/` docs; never answer from memory.
 - Add libraries with `npx expo install <pkg>`, never `npm install <pkg>`.
 - The app calls only its **own** API (`apiJson` in `lib/api.ts`). Secrets live in
@@ -111,22 +111,30 @@ path**. Mobile microapps follow the generated starter instead.
    Capacitor's WebView only loads `server.url`'s own host inside the app by
    default; any other host (an OAuth redirect to `login.microsoftonline.com`, an
    SSO handoff to another product) gets bounced to the system browser unless
-   listed. **Confirmed by hands-on testing: `*.domain.com` and even the documented
-   `'*'` "allow everything" form are unreliable on iOS** — a config that correctly
-   keeps navigation in-WebView on Android bounced out on iOS under the identical
-   config. Android's wildcard matcher is real and documented; iOS's apparently
-   doesn't honor it the same way. List every host explicitly. See
+   listed. On iOS a `*` stands for exactly one label: `*.domain.com` matches
+   `a.domain.com` but not `domain.com` or `a.b.domain.com` (`doesHost` in
+   Capacitor's `CAPInstanceConfiguration.swift`). In hands-on testing even `'*'`
+   bounced out on iOS while the identical config kept navigation in-WebView on
+   Android, although Capacitor 8's iOS source matches a bare `'*'`; if you see
+   this, first check that `npx cap sync` copied the config into
+   `ios/App/App/capacitor.config.json` and that the app was rebuilt. Either way,
+   list every host explicitly. See
    [references/troubleshooting.instructions.md](references/troubleshooting.instructions.md#allownavigation-wildcards-are-not-reliable-on-ios)
    for the device-log evidence.
-4. **A script-driven navigation (`window.open(...)`, `location.href = url`) does
-   not reliably get the `allowNavigation` check applied on iOS — only a real
-   `<a>` click does.** WKWebView classifies these as different navigation types
-   (`.other` vs `.linkActivated`), and only `.linkActivated` honors the allowlist.
-   Any link that needs to stay in-WebView (not just bounce to the system browser)
-   must be triggered via a real, programmatically-clicked anchor element — see
-   `assets/lib/apps/launch-url.ts`. Do not reach for `@capacitor/browser`'s in-app
-   sheet as a "fix" for this: it opens an **isolated cookie jar**, which silently
-   breaks SSO/session continuity instead (see Critical Rule 5).
+4. **Open a launched link in the same WebView with a real anchor click, never
+   `window.open(...)`.** In the native shell `window.open(url, '_blank')` asks for
+   a new window, and Capacitor hands every new window to the system browser
+   whatever `allowNavigation` says. A same-window navigation goes through the
+   `allowNavigation` check: a listed host stays in the WebView (server redirects
+   in an SSO chain included, Rule 10), any other host goes to the system browser.
+   Use `assets/lib/apps/launch-url.ts`, which clicks a real, attached `<a>`
+   element. In device testing on iOS a bare `location.href = url` was rejected for
+   an allowed host where the anchor click was accepted; Capacitor 8's iOS source
+   checks `allowNavigation` by host before the navigation type, so that cause is
+   not confirmed, but the anchor click worked on both platforms. Do not reach for
+   `@capacitor/browser`'s in-app sheet as a "fix": it opens an **isolated cookie
+   jar**, which silently breaks SSO/session continuity instead (see Critical
+   Rule 5).
 5. **An isolated in-app browser view does not share the main WebView's session
    cookies.** If a destination needs the user's existing login session (an SSO
    handoff through this app's own IdP, for instance), it must stay in the *same*
@@ -182,10 +190,10 @@ path**. Mobile microapps follow the generated starter instead.
     `document.cookie`, not `Set-Cookie` headers, so it does not help. Symptom:
     log in, swipe the app away, reopen → login page again, even though the
     session cookie is persistent (e.g. Supabase's 400-day `sb-*-auth-token`).
-    Copy `assets/android/MainActivity.java` (flush every 2 s while visible plus on
-    pause/stop). Verify with the cookie-database recipe in
+    Copy `assets/android/MainActivity.java` (flush on pause, plus every 2 s on a
+    background thread while visible). Verify with the cookie-database recipe in
     [references/troubleshooting.instructions.md](references/troubleshooting.instructions.md#inspecting-the-webviews-cookies-on-a-debug-build).
-    No web-code change is needed — this is not specific to SSO/My Apps.
+    No web-code change is needed — this is not specific to SSO.
 12. **Capacitor 8 needs JDK 21 with Gradle 8.14 — 17 and 25 both fail.**
     JDK 17: `error: invalid source release: 21`. JDK 25 (what current Android
     Studio bundles as its JBR): `Unsupported class file major version 69` at
@@ -245,11 +253,14 @@ path**. Mobile microapps follow the generated starter instead.
     `pushNotificationReceived` and show it yourself (e.g. via Local Notifications).
     In the background/killed state the Firebase SDK shows it (record tag
     `FCM-Notification:<id>` in `dumpsys notification`).
-19. **Don't build the FCM sender inside a sandboxed scheduler.** DaaS cron/extension
-    code can `fetch` and has `crypto`, but its env is whitelisted (no secrets) and
-    `require`/`import` are blocked. Keep the sender in the server app (sign the
-    Google OAuth JWT with `jose` — no Firebase SDK needed) and let the scheduler
-    just POST to a secret-guarded route.
+19. **Don't build the FCM sender inside a sandboxed scheduler.** Stored code (cron
+    jobs, hooks) gets no secrets in its environment unless the operator names them,
+    and cannot `require` or `import` a library. Keep the sender in the server app
+    (sign the Google OAuth JWT with `jose` — no Firebase SDK needed) and let the
+    scheduled job just POST to a secret-guarded route, through whatever outbound
+    request its runtime allows. On an Engine project the scheduler does not run yet:
+    a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled
+    runs are not available on an Engine project yet.
 20. **Testing push on an emulator: delivery can lag by minutes after the app has
     been idle in the background.** Observed: instant right after backgrounding, but
     ~2m20s late after a 4-minute idle (FCM returned 200 both times; the standby
@@ -289,7 +300,7 @@ path**. Mobile microapps follow the generated starter instead.
     "Geofence Manager" section says "unregistered").
 23. **Background location needs a Play Console declaration and an in-app
     disclosure.** Explain *before* the first system prompt what the location is used
-    for and that no history is kept (see `OfficeCard.tsx` in the todo app). Store only
+    for and that no history is kept. Store only
     the saved place, never a track.
 
 ## Step-by-step setup
@@ -381,7 +392,9 @@ every plugin), plus `node_modules/@capacitor/<plugin>` for each new plugin. Miss
 - `assets/lib/native/platform.ts` — the `isNative()` / `platform()` detection
   helper every other mobile-aware code path builds on.
 - `assets/lib/apps/launch-url.ts` — the real-anchor-click navigation helper
-  (Critical Rule 4), with the web fallback preserved.
+  (Critical Rule 4), with the web fallback preserved. It imports `isNative()` from
+  `../native/platform`, so copy both files, keeping `lib/apps/` and `lib/native/`
+  side by side.
 - `assets/android/MainActivity.java` — cookie-flushing activity (Critical Rule 11);
   replaces the generated `android/app/src/main/java/<appId path>/MainActivity.java`
   (fix the `package` line to your appId).
