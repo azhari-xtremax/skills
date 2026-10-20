@@ -14,25 +14,38 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
-## Unreleased
+## v2.1.0
 
-Text for Engine projects only. The release that carries it is a MINOR release.
+One skill is added, and two Engine-project texts are corrected. Install it with
+`npx skills add buildpad-ai/skills#v2.1.0`.
 
-- `create-project/references/environment.instructions.md`: to check that the Engine serves the
-  project, send `GET /api/server/info` with the header `X-Tenant-Id`. It answers `200` when the
-  project's tenant is served, `403` when that tenant is not served yet or the id is wrong, and
-  `503` when the Engine cannot read its tenants. `/api/health` says only that the Engine is up.
-- `debugging-and-error-recovery/SKILL.md`: a browser also blocks a call to the Engine that carries
-  a header the Engine does not accept from another origin, such as `X-Tenant-Id`. Send that header
-  only from the application's own server route.
+- New skill `add-mobile-app`: wraps the deployed web app as an iOS and Android app with Capacitor
+  in server-URL mode, and says when to use platform-managed mobile builds or an Expo mobile
+  microapp. It holds for both kinds of project and has no step for one backend only.
+- Text for Engine projects only:
+  - `create-project/references/environment.instructions.md`: to check that the Engine serves the
+    project, send `GET /api/server/info` with the header `X-Tenant-Id`. It answers `200` when the
+    project's tenant is served, `403` when that tenant is not served yet or the id is wrong, and
+    `503` when the Engine cannot read its tenants. `/api/health` says only that the Engine is up.
+  - `debugging-and-error-recovery/SKILL.md`: a browser also blocks a call to the Engine that carries
+    a header the Engine does not accept from another origin, such as `X-Tenant-Id`. Send that header
+    only from the application's own server route.
 
-Both follow the Engine-fact corrections of 18 October 2026 (F1 and F2) in
-`.kiro/specs/backend-aware-skills/design.md`, which also record what changes for Engine projects
-when the Engine's approved specifications are implemented.
+  Both follow the Engine-fact corrections of 18 October 2026 (F1 and F2) in
+  `.kiro/specs/backend-aware-skills/design.md`, which also record what changes for Engine projects
+  when the Engine's approved specifications are implemented.
 
 ### Supabase projects
 
-No change.
+No existing file changes. The skill `add-mobile-app` is new, with these files:
+
+- `add-mobile-app/SKILL.md` (new-file)
+- `add-mobile-app/assets/android/MainActivity.java` (new-file)
+- `add-mobile-app/assets/lib/apps/launch-url.ts` (new-file)
+- `add-mobile-app/assets/lib/native/platform.ts` (new-file)
+- `add-mobile-app/references/limitations.instructions.md` (new-file)
+- `add-mobile-app/references/native-back-navigation.instructions.md` (new-file)
+- `add-mobile-app/references/troubleshooting.instructions.md` (new-file)
 
 ## v2.0.0
 
