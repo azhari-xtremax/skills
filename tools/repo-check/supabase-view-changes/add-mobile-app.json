@@ -3,42 +3,42 @@
     "path": "add-mobile-app/SKILL.md",
     "kind": "new-file",
     "reason": "New skill add-mobile-app: wrap the web app as iOS/Android with Capacitor in server-URL mode.",
-    "release": "unreleased"
+    "release": "v2.1.0"
   },
   {
     "path": "add-mobile-app/assets/android/MainActivity.java",
     "kind": "new-file",
     "reason": "New skill add-mobile-app: wrap the web app as iOS/Android with Capacitor in server-URL mode.",
-    "release": "unreleased"
+    "release": "v2.1.0"
   },
   {
     "path": "add-mobile-app/assets/lib/apps/launch-url.ts",
     "kind": "new-file",
     "reason": "New skill add-mobile-app: wrap the web app as iOS/Android with Capacitor in server-URL mode.",
-    "release": "unreleased"
+    "release": "v2.1.0"
   },
   {
     "path": "add-mobile-app/assets/lib/native/platform.ts",
     "kind": "new-file",
     "reason": "New skill add-mobile-app: wrap the web app as iOS/Android with Capacitor in server-URL mode.",
-    "release": "unreleased"
+    "release": "v2.1.0"
   },
   {
     "path": "add-mobile-app/references/limitations.instructions.md",
     "kind": "new-file",
     "reason": "New skill add-mobile-app: wrap the web app as iOS/Android with Capacitor in server-URL mode.",
-    "release": "unreleased"
+    "release": "v2.1.0"
   },
   {
     "path": "add-mobile-app/references/native-back-navigation.instructions.md",
     "kind": "new-file",
     "reason": "New skill add-mobile-app: wrap the web app as iOS/Android with Capacitor in server-URL mode.",
-    "release": "unreleased"
+    "release": "v2.1.0"
   },
   {
     "path": "add-mobile-app/references/troubleshooting.instructions.md",
     "kind": "new-file",
     "reason": "New skill add-mobile-app: wrap the web app as iOS/Android with Capacitor in server-URL mode.",
-    "release": "unreleased"
+    "release": "v2.1.0"
   }
 ]
