@@ -9,6 +9,6 @@
     "path": "add-users/SKILL.md",
     "kind": "text",
     "reason": "Engine statement ES-7 reworded: an administrator creates every user who signs in with a password, and a user's first My Apps sign-in creates an account without a role; the Supabase steps are unchanged.",
-    "release": "unreleased"
+    "release": "v3.0.0"
   }
 ]
