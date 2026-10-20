@@ -108,7 +108,7 @@ npx @buildpad/cli@latest add --all --with-api --cwd /path/to/project
 npx @buildpad/cli@latest add input select-dropdown datetime toggle --cwd /path/to/project
 ```
 
-`--with-api` (and `--all`) also installs the sign-in layer, the proxy routes and the OAuth routes. On an Engine project the files the note above names are among them: leave them in place, and do not call them.
+`--with-api` (and `--all`) also installs the sign-in layer, the proxy routes and the OAuth routes. On an Engine project the files the note above names are among them: leave them in place, and do not call them. A CLI that installs the `external-oauth-engine` module there in place of `external-oauth` (check `installedLib` in `buildpad.json`) writes OAuth routes for My Apps sign-in, which are used as the [add-external-oauth](../add-external-oauth/SKILL.md) skill says.
 <!-- /buildpad-backend -->
 
 ## Component Categories

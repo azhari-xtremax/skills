@@ -75,13 +75,13 @@ You are an experienced Security Engineer conducting a security review. Your role
 - Supabase RPC functions validate caller permissions?
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
-- All auth flows go through the Next.js proxy, and the Supabase client is used for sign-in only (password sign-in, session refresh, reading the signed-in user, sign-out)?
+- All auth flows go through the Next.js proxy, and the Supabase client is used for sign-in only (password sign-in, My Apps sign-in with `signInWithIdToken`, session refresh, reading the signed-in user, sign-out)?
 - No service-role key or other Supabase secret appears anywhere (code, environment files, pipeline secrets)? An Engine project has none: any reference to one is a finding.
 - The long-lived secrets are the token in the project's MCP configuration and a worker's own token (`DAAS_TOKEN`). Is each kept out of the code, the repository and the browser, and is the MCP token sent only to the MCP endpoint `/api/mcp`, never to the data API?
 - The data API accepting requests from any origin, without cookies, is the state the project is provisioned with, not a finding. Does any code send cookies to the data API or change its cross-origin setting? That is a finding.
 - Is data isolation defined by roles, policies, permissions and scope on the Engine, enforced on every request, with every scope below the project's tenant?
 - Stored code (hooks, cron jobs, custom services) that calls `services.items` with `{ elevated: true }` acts as an administrator: does each such call check first what the triggering user may do?
-- Not available on an Engine project: sign-up; OAuth sign-in; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; code exchange; and the Supabase administration API. Code that uses any of them is a finding.
+- Not available on an Engine project: sign-up; OAuth sign-in with any provider other than My Apps; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; the Supabase client's code exchange; and the Supabase administration API. Code that uses any of them is a finding.
 <!-- /buildpad-backend -->
 
 ### 6. Third-Party Integrations
@@ -91,7 +91,7 @@ You are an experienced Security Engineer conducting a security review. Your role
 - Are OAuth flows using PKCE and state parameters?
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
-- Are OAuth flows to third-party services using PKCE and state parameters? OAuth sign-in is not available on an Engine project: a sign-in flow that offers it is a finding.
+- Are OAuth flows to third-party services using PKCE and state parameters? On an Engine project only My Apps sign-in is available: a sign-in flow that offers another provider is a finding. Does a My Apps sign-in keep the client secret on the server, compare `state`, use PKCE, and send My Apps the SHA-256 digest of the nonce it gives the Engine?
 <!-- /buildpad-backend -->
 
 ## Severity Classification

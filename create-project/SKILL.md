@@ -140,7 +140,7 @@ This skill delivers the project **foundation**. Every feature after that follows
 <!-- buildpad-backend: engine -->
 1. Project scaffolding (Next.js + TypeScript + Mantine v8)
 2. Environment config (`.env.local` with the Engine values of "Required Environment Variables")
-3. Auth proxy routes (login, logout, user) — installed by CLI. The CLI's OAuth callback route is not a deliverable on an Engine project: OAuth sign-in and code exchange are not available there
+3. Auth proxy routes (login, logout, user) — installed by CLI. An OAuth callback route is a deliverable on an Engine project only when My Apps sign-in is asked for: then the [add-external-oauth](../add-external-oauth/SKILL.md) skill adds it through the CLI's `external-oauth-engine` module. Sign-in with any other OAuth provider, and the Supabase client's code exchange, are not available there
 4. **`app/(authenticated)/layout.tsx`** with `DaaSProviderWrapper` + `ScopeProvider` (NOT in root layout)
 5. **`DaaSProviderWrapper`** using `onAuthStateChange` (not `getSession`) + `getHeaders` wired to scope cookie
 6. **Logout route** clears `daas_resource_uri` cookie

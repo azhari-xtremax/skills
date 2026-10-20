@@ -225,6 +225,6 @@ MCP_ENABLED=true
 ### Auth not working
 
 - Verify the four values of "Required Environment Variables" are set
-- The account must hold a role in the project's tenant: an account that holds no role in the project's tenant is refused at sign-in. An administrator gives it one in the Studio's Users module or through `POST /api/users/:id/roles` with `role_id` (see the [add-users](../../add-users/SKILL.md) skill)
-- Sign-up, OAuth sign-in, magic link, one-time code and password recovery are not available on an Engine project, so there are no redirect URLs to configure
+- The account must hold a role in the project's tenant: an account that holds no role in the project's tenant is refused at password sign-in, and a My Apps sign-in of such an account ends on the pending-access page. An administrator gives it one in the Studio's Users module or through `POST /api/users/:id/roles` with `role_id` (see the [add-users](../../add-users/SKILL.md) skill)
+- Sign-up, OAuth sign-in with any provider other than My Apps, magic link, one-time code and password recovery are not available on an Engine project, so there are no redirect URLs to configure for them. The Platform registers My Apps sign-in's redirect URLs when the project's My Apps connector is connected (see the [add-external-oauth](../../add-external-oauth/SKILL.md) skill)
 <!-- /buildpad-backend -->

@@ -80,7 +80,7 @@ Security-first development practices for web applications. Treat every external 
 
 ### Ask First (Requires Human Approval)
 
-- Changing how the application signs users in (sign-up, OAuth sign-in, magic links and password recovery are not available on an Engine project: tell the developer so instead of building one)
+- Changing how the application signs users in (sign-up, magic links, password recovery and OAuth sign-in with any provider other than My Apps are not available on an Engine project: tell the developer so instead of building one; My Apps sign-in follows the `add-external-oauth` skill)
 <!-- /buildpad-backend -->
 - Storing new categories of sensitive data (PII, payment info)
 - Adding new external service integrations
@@ -218,7 +218,7 @@ export async function POST(req: NextRequest) {
 - [ ] The application stores no password; the Engine holds them, and an administrator resets one in the Studio's Users module
 - [ ] The application's own session cookies are httpOnly, secure, sameSite; calls to the Engine carry `Authorization: Bearer`, never a cookie
 - [ ] Login has rate limiting
-- [ ] No sign-up, OAuth sign-in, magic link or password-recovery flow is offered (not available on an Engine project)
+- [ ] No sign-up, magic link or password-recovery flow, and no OAuth sign-in with a provider other than My Apps, is offered (not available on an Engine project)
 
 ### Authorization
 - [ ] Every endpoint forwards the user's own access token, so the Engine applies the user's roles, policies and permissions

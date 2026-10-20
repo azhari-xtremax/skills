@@ -10,5 +10,17 @@
     "kind": "text",
     "reason": "Reworded so every statement is true for both kinds of project: the diagram and the environment block are named as a Supabase project's, and the Engine-project address, cross-origin, sign-in and environment sentences (ES-1, ES-3, ES-5) are added with an Engine environment block; the Supabase steps are unchanged.",
     "release": "v2.0.0"
+  },
+  {
+    "path": "authentication-proxy/SKILL.md",
+    "kind": "text",
+    "reason": "The Engine-project sentences now say that My Apps sign-in is available there through the CLI's external-oauth-engine module and signInWithIdToken, and that every other OAuth provider is not (ES-4 and ES-5 reworded); the Supabase routes and the external OAuth section are unchanged.",
+    "release": "unreleased"
+  },
+  {
+    "path": "authentication-proxy/references/authentication-proxy.instructions.md",
+    "kind": "text",
+    "reason": "The Engine-project sentences now say that My Apps sign-in is available there, with its callback redirect, and that every other OAuth provider is not (ES-5 reworded); the Supabase text is unchanged.",
+    "release": "unreleased"
   }
 ]

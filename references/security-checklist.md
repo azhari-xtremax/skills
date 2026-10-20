@@ -57,7 +57,7 @@ Quick reference for web application security. Use alongside the `security-and-ha
 - [ ] An expired session is refreshed through the Supabase client, or the user signs in again
 - [ ] Rate limiting on the application's sign-in route (≤10 attempts per 15 minutes)
 - [ ] No password recovery flow and no password change through the Supabase client: neither is available on an Engine project, and an administrator resets a user's password in the Studio's Users module
-- [ ] An account that holds no role in the project's tenant is refused at sign-in: every user is given a role there when it is created
+- [ ] An account that holds no role in the project's tenant is refused at password sign-in, and the application ends a My Apps session of such an account: every user is given a role there when it is created, and an administrator gives one to each account that My Apps sign-in creates
 - [ ] Account lockout after repeated failures (optional, with notification)
 <!-- /buildpad-backend -->
 

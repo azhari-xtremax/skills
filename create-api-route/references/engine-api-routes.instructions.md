@@ -201,7 +201,7 @@ export async function GET() {
 }
 ```
 
-Write no `app/api/auth/callback/route.ts` and no OAuth provider route: code exchange and OAuth sign-in are not available on an Engine project. New users are created by an administrator (see the `add-users` skill).
+These templates need no `app/api/auth/callback/route.ts` and no OAuth provider route: the Supabase client's code exchange is not available on an Engine project, and OAuth sign-in is available only with My Apps, whose callback and provider routes the CLI's `external-oauth-engine` module writes (see the `add-external-oauth` skill). An administrator creates every user who signs in with a password (see the `add-users` skill); a user's first My Apps sign-in creates an account without a role.
 
 ## Items
 
