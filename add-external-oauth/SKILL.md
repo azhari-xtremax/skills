@@ -1,6 +1,6 @@
 ---
 name: add-external-oauth
-description: Add external OAuth/OIDC identity provider integration on a Supabase project, where Next.js acts as the OAuth client. Creates OAuth proxy flow with PKCE, user provisioning via Supabase Admin API with default DaaS role assignment, and session management. Required for self-hosted Supabase without deployment access. Supabase projects only — stops on an Engine project, where OAuth sign-in is not available.
+description: Add external OAuth/OIDC identity provider sign-in, where Next.js acts as the OAuth client. On a Supabase project it creates the OAuth proxy flow with PKCE, user provisioning via Supabase Admin API with default DaaS role assignment, and session management (required for self-hosted Supabase without deployment access). On an Engine project only My Apps sign-in is available, through the Engine's ID-token sign-in with signInWithIdToken; other providers stop.
 user-invokable: true
 ---
 
@@ -38,14 +38,191 @@ something is not available, tell the developer so and stop: do not build a subst
 <!-- backend-gate:end -->
 
 <!-- buildpad-backend: engine -->
-## On an Engine project: not available
+## On an Engine project: My Apps sign-in only
 
-External OAuth sign-in is not available on an Engine project. The Engine signs users in with an
-email and a password only: it has no OAuth or one-time-code exchange, no route that turns an outside
-identity into a session, and no administration API for accounts. Write no file for this request.
-Tell the developer that OAuth sign-in is not available on an Engine project and stop. The Platform's
-password-less handoff is for opening the Studio and is not a way for an application to sign a user
-in. Users of an Engine project are created by an administrator: see the `add-users` skill.
+Of the external sign-ins, an Engine project offers only **My Apps sign-in**, and only while the
+project's My Apps connector is connected. The application's server finishes the OpenID Connect
+authorization-code flow with My Apps, then gives the ID token to the project's Engine through the
+Supabase client's `signInWithIdToken`. The Engine checks the token and answers with an ordinary
+session. Sign-in with any other provider (Azure AD, Google, Okta, Auth0 or another OIDC provider)
+is not available on an Engine project: tell the developer so and stop.
+
+On an Engine project these are not available, and My Apps sign-in uses none of them: a service-role
+key, the Supabase administration API, a session made from a magic link or a one-time code, and a
+role assignment that the application writes. The Platform's password-less handoff is for opening
+the Studio and is not a way for an application to sign a user in.
+
+### Step 1: Check the My Apps connector
+
+1. Call the `get_project_detail` MCP tool.
+2. Find the `my-apps` entry in `connectors`. My Apps sign-in is available only when its status is
+   `connected` and it lists `externalSignIn` and its `OAUTH_*` variables. Then the Platform has
+   registered the application's OIDC client with My Apps, for the deployed app's
+   `/api/auth/callback` and for `http://localhost:3000/api/auth/callback`, and has told the Engine
+   to trust that client.
+3. If there is no such connector, tell the developer to connect My Apps on the project's Connectors
+   page and stop. The application cannot register the client or make the Engine trust it.
+
+### Step 2: Set the environment
+
+From the connector, take `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OAUTH_AUTHORIZATION_URL`,
+`OAUTH_TOKEN_URL`, `OAUTH_USERINFO_URL`, `OAUTH_JWKS_URI` and `OAUTH_ISSUER`. Write them into
+`.env.local` for local development. If the deployed app does not have them, set them with the
+`amplify-env-vars` skill and redeploy.
+
+On an Engine project the environment is: `NEXT_PUBLIC_SUPABASE_URL=<Engine_URL>`, `NEXT_PUBLIC_BUILDPAD_DAAS_URL=<Engine_URL>`, `NEXT_PUBLIC_SUPABASE_ANON_KEY=buildpad-engine-public-anon-key` (a fixed value that is not a secret; the Engine does not read it, the Supabase client needs one), and `NEXT_PUBLIC_BUILDPAD_TENANT_ID=<the project's tenant id>`. There is no service-role key on an Engine project: add none.
+
+Keep `OAUTH_CLIENT_SECRET` on the application's server only, in a variable whose name does not
+begin `NEXT_PUBLIC_`, and never send it to the Engine. My Apps sign-in needs no state secret and no
+default role variable.
+
+### Step 3: Install the files with the Buildpad CLI
+
+```bash
+npx @buildpad/cli@latest add external-oauth --cwd /path/to/project
+```
+
+The CLI reads `.buildpad/project.json`. On an Engine project it installs the module
+`external-oauth-engine` in place of `external-oauth`, and `bootstrap` does the same. Check that
+`buildpad.json` lists `external-oauth-engine` in `installedLib`. If it lists `external-oauth`
+instead, the CLI is older than the Engine variant: do not use its OAuth routes, update the CLI and
+run the command again. The module writes:
+
+| File | What it does |
+|---|---|
+| `lib/oauth/engine.ts` | The flow cookie, the nonce digest, the Engine sign-in client, the role check and the error codes |
+| `app/api/auth/oauth/[provider]/route.ts` | `GET /api/auth/oauth/my-apps`: starts the flow and redirects to My Apps |
+| `app/api/auth/callback/route.ts` | Exchanges the code, signs in to the Engine, sets the session cookies |
+| `components/auth/OAuthLoginButtons.tsx` | The "Continue with My Apps" button, and the message for each error code |
+| `app/[lang]/auth/pending-access/page.tsx` | The page for an account that has no role yet |
+| `lib/oauth/config.ts`, `pkce.ts`, `validate.ts`, `index.ts` | The shared OAuth helpers; the routes use the generic `OAUTH_*` configuration |
+
+The CLI replaces the copies of these files that an earlier `external-oauth` install wrote, if they
+are unchanged. It keeps a changed copy and warns: then compare it with the Engine version, or run
+the command again with `--overwrite`.
+
+Other skills say that the CLI's OAuth callback and provider routes cannot be used on an Engine
+project. Those are the files of the `external-oauth` module. The files of `external-oauth-engine`
+are the ones this part describes.
+
+### Step 4: Add the button to the login page
+
+In `app/[lang]/login/page.tsx`, import `OAuthLoginButtons` from
+`@/components/auth/OAuthLoginButtons` and render `<OAuthLoginButtons showDivider />` below the
+password form, inside a React `Suspense` boundary (the component reads the page's search
+parameters). Keep the password form: administrators and existing password users sign in with it.
+
+### How the sign-in works
+
+1. `GET /api/auth/oauth/my-apps` makes a random `state`, a random raw nonce and a PKCE verifier. It
+   keeps them in one httpOnly, `SameSite=Lax` cookie for ten minutes, and redirects to
+   `OAUTH_AUTHORIZATION_URL` with `nonce` set to the lower-case hex SHA-256 digest of the raw nonce
+   and `code_challenge` set to the S256 challenge of the verifier.
+2. My Apps redirects to `/api/auth/callback?code=…&state=…`. The callback reads the cookie and
+   compares `state`.
+3. The callback exchanges the code at `OAUTH_TOKEN_URL` from the server, with `OAUTH_CLIENT_SECRET`
+   and the PKCE verifier, and takes the `id_token` from the answer.
+4. It calls `signInWithIdToken({ provider: 'my-apps', token: id_token, nonce: rawNonce })` on a
+   Supabase server client for the Engine_URL that sends `X-Tenant-Id` with the value of
+   `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. `nonce` is the raw nonce: the Engine refuses a token whose
+   nonce claim is not the SHA-256 digest of it. The provider name `my-apps` is fixed: it is the
+   name the Engine knows My Apps by.
+5. It asks `GET <Engine_URL>/api/users/me` with the new access token whether the account holds a
+   role (see "Accounts and roles" below).
+6. It sets the session cookies that the Supabase client wrote, in the format `lib/supabase/server.ts`
+   and the middleware read, and redirects to the `returnTo` path. Every answer of the callback
+   clears the flow cookie.
+
+The core of the callback, for a project that cannot run the CLI:
+
+```typescript
+// app/api/auth/callback/route.ts (core of the Engine version)
+import { type NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+
+type CookieToSet = { name: string; value: string; options?: Record<string, unknown> };
+
+// After the state check and the code exchange, with `idToken` from My Apps and
+// `rawNonce` from the flow cookie:
+async function signInToEngine(request: NextRequest, idToken: string, rawNonce: string, returnTo: string) {
+  const engineUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!; // the Engine_URL
+  const sessionCookies: CookieToSet[] = [];
+  const supabase = createServerClient(engineUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    global: { headers: { "X-Tenant-Id": process.env.NEXT_PUBLIC_BUILDPAD_TENANT_ID! } },
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: (list: CookieToSet[]) => { sessionCookies.push(...list); },
+    },
+  });
+
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: "my-apps",
+    token: idToken,
+    nonce: rawNonce, // My Apps received its SHA-256 hex digest
+  });
+  if (error || !data.session) {
+    // Log the status and code only, never a token.
+    const code = error?.code === "invalid_credentials" ? "sign_in_refused"
+      : error?.code === "user_banned" ? "account_disabled"
+      : (error?.status ?? 0) >= 500 ? "engine_unavailable" : "sign_in_failed";
+    return NextResponse.redirect(new URL(`/login?error=${code}`, request.nextUrl.origin));
+  }
+
+  const me = await fetch(`${engineUrl}/api/users/me`, {
+    headers: { Authorization: `Bearer ${data.session.access_token}` },
+  }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  if (me?.data && me.data.roles?.length === 0 && !me.data.admin_access) {
+    await supabase.auth.signOut(); // no cookie reaches the browser
+    return NextResponse.redirect(new URL("/auth/pending-access", request.nextUrl.origin));
+  }
+
+  const response = NextResponse.redirect(new URL(returnTo, request.nextUrl.origin));
+  for (const { name, value, options } of sessionCookies) response.cookies.set(name, value, options);
+  return response;
+}
+```
+
+Build the redirects from the app's public origin, as the CLI's `lib/origin.ts` does, and accept
+only a relative `returnTo` path.
+
+### Accounts and roles
+
+- A user's first sign-in creates an account in the project's tenant that holds **no role**. The
+  account can sign in but reads only what the project grants every caller, until an administrator
+  gives it a role in the Studio (see the [`add-users`](../add-users/SKILL.md) skill). The application
+  writes no role. The callback therefore ends a role-less session and shows
+  `/auth/pending-access`, which tells the user that their account waits for access and that they
+  sign in again once they have it. Do not let a role-less session into pages that the Engine will
+  refuse.
+- The Engine refuses some accounts: an account that holds a host role or administers the tenant,
+  and an account that already exists with the same email but is not linked to this My Apps
+  identity. It also refuses a token it does not trust, or an email that My Apps does not mark as
+  verified. It gives every refusal the same answer as a wrong password, on purpose, so the
+  application cannot tell them apart. Show one message (`sign_in_refused`) that tells the user to
+  sign in with their email and password if they have one.
+- A disabled account is answered `user_banned` (`account_disabled`). An Engine that cannot reach
+  what it needs answers 503 (`engine_unavailable`).
+- Signing out through the Supabase client ends the Engine session. It does not end the user's
+  session at My Apps.
+
+### Security
+
+- Never log the ID token, the access token, the Engine session, the client secret or a session
+  cookie. Log a status and an error code only.
+- Send My Apps the SHA-256 hex digest of the nonce and give the Engine the raw nonce. Compare
+  `state` before the code exchange, and use PKCE (S256).
+- Keep the flow cookie httpOnly and single-use. In production the CLI names it with the `__Host-`
+  prefix, which needs `Secure` and `Path=/`.
+
+### Troubleshooting
+
+| Code in `/login?error=` | Cause |
+|---|---|
+| `sign_in_refused` for every user | The connector is not `connected` (the Engine does not trust the client id), or the `nonce` sent to My Apps is not the digest of the nonce given to the Engine |
+| `sign_in_refused` for one user | One of the refused accounts above; that user signs in with their password |
+| `sign_in_failed` | The code exchange failed (check `OAUTH_CLIENT_SECRET` and that the redirect URI is registered), or the project's Engine has no My Apps sign-in enabled: ask the Buildpad Platform administrator |
+| `sign_in_expired` | The flow cookie is missing: more than ten minutes passed, or the sign-in started in another browser or on another host name |
+| `configuration_error` | An `OAUTH_*` variable or one of the Engine variables of Step 2 is missing |
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: supabase -->
 Implements external OAuth2/OIDC identity provider integration where **Next.js acts as the OAuth client**. This is the **required approach** for Buildpad DaaS applications since Supabase is self-hosted and deployment configuration is not accessible.

@@ -4,5 +4,11 @@
     "kind": "description",
     "reason": "The description names the kind of project: it says the Skill is for Supabase projects only and stops on an Engine project, where OAuth sign-in is not available.",
     "release": "v2.0.0"
+  },
+  {
+    "path": "add-external-oauth/SKILL.md",
+    "kind": "description",
+    "reason": "The description is true for both kinds of project: on an Engine project the Skill now adds My Apps sign-in through the Engine's ID-token sign-in, and stops for any other provider.",
+    "release": "unreleased"
   }
 ]
