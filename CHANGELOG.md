@@ -14,6 +14,72 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## v3.0.0
+
+Engine projects can now sign users in with **My Apps**. Install it with
+`npx skills add buildpad-ai/skills#v3.0.0`.
+
+This is a MAJOR release because some of the changed sentences stand in text that a Supabase
+project's agent also reads (see **Supabase projects** below). The steps for a Supabase project do
+not change. No skill is added, removed or renamed, and the "Establish the backend first" procedure
+stays at version 1.
+
+- `add-external-oauth`: on an Engine project the skill no longer stops for every request. While
+  the project's My Apps connector is connected, it adds My Apps sign-in. The application's server
+  finishes the OpenID Connect authorization-code flow with My Apps (PKCE, `state`, and a nonce
+  whose SHA-256 digest goes to My Apps), then signs in to the Engine with the Supabase client's
+  `signInWithIdToken` (provider `my-apps`). The skill covers the connector check, the environment,
+  the Buildpad CLI's `external-oauth-engine` module (`@buildpad/cli` 3.4.0 and later install it on
+  an Engine project in place of `external-oauth`), the login button, accounts that hold no role
+  yet (a pending-access page; an administrator gives the role), security and troubleshooting.
+  Sign-in with any other provider is still not available on an Engine project, and the skill
+  stops.
+- The Engine statements ES-4, ES-5, ES-7 and ES-16 in [CONTRIBUTING](CONTRIBUTING.md) are reworded
+  for My Apps sign-in, and every folder that carries them has the new text:
+  - ES-4: My Apps sign-in also takes its tenant from `X-Tenant-Id`, sent by the application's own
+    server route.
+  - ES-5: My Apps sign-in works through the Supabase client; OAuth sign-in with any other provider
+    does not. An account that holds no role is refused at password sign-in; after a My Apps
+    sign-in the application ends that account's session. The code exchange that is not available
+    is the Supabase client's.
+  - ES-7: a user's first My Apps sign-in creates the account, with no role. An administrator still
+    creates every user who signs in with a password, and gives every role.
+  - ES-16: the OAuth routes that cannot be used are those of the CLI's `external-oauth` module.
+    The routes of `external-oauth-engine` serve My Apps sign-in.
+- Other text for Engine projects only, which now names My Apps sign-in where it said that an
+  Engine project has no OAuth sign-in:
+  - `add-buildpad`: a CLI that installs `external-oauth-engine` (check `installedLib` in
+    `buildpad.json`) writes OAuth routes for My Apps sign-in.
+  - `add-i18n`: `/auth/pending-access` is a public route when My Apps sign-in is installed; its
+    callback lies under `/api/auth`.
+  - `agents/security-auditor.md`: a sign-in flow that offers a provider other than My Apps is a
+    finding, and a My Apps sign-in must keep the client secret on the server, compare `state`, use
+    PKCE and send My Apps the digest of the nonce it gives the Engine.
+  - `create-api-route`: My Apps sign-in has its own callback route, written by the CLI.
+  - `create-project`: an OAuth callback route is a deliverable only when My Apps sign-in is asked
+    for, and the Platform registers its redirect URLs when the My Apps connector is connected.
+  - `references/security-checklist.md` and `security-and-hardening`: the checks name OAuth sign-in
+    with any provider other than My Apps, and roles for the accounts My Apps sign-in creates.
+- The README catalogue row of `add-external-oauth` and the README's list of what an Engine project
+  lacks now name My Apps sign-in. In `tools/repo-check/skill-map.json`, `add-external-oauth` has
+  both paths (plan `BP`).
+
+These follow the Engine-fact corrections of 20 October 2026 (G1 to G4) in
+`.kiro/specs/backend-aware-skills/design.md`.
+
+### Supabase projects
+
+The Supabase steps, routes and guidance do not change. These files change because an
+Engine-project sentence, or a description, stands in text that both kinds of project read. Each
+change, with its reason:
+
+- `add-external-oauth/SKILL.md` (description): The description is true for both kinds of project: on an Engine project the Skill now adds My Apps sign-in through the Engine's ID-token sign-in, and stops for any other provider.
+- `add-users/SKILL.md` (text): Engine statement ES-7 reworded: an administrator creates every user who signs in with a password, and a user's first My Apps sign-in creates an account without a role; the Supabase steps are unchanged.
+- `authentication-proxy/SKILL.md` (text): The Engine-project sentences now say that My Apps sign-in is available there through the CLI's external-oauth-engine module and signInWithIdToken, and that every other OAuth provider is not (ES-4 and ES-5 reworded); the Supabase routes and the external OAuth section are unchanged.
+- `authentication-proxy/references/authentication-proxy.instructions.md` (text): The Engine-project sentences now say that My Apps sign-in is available there, with its callback redirect, and that every other OAuth provider is not (ES-5 reworded); the Supabase text is unchanged.
+- `create-feature/SKILL.md` (text): Engine statement ES-16 reworded: the OAuth routes that cannot be used on an Engine project are those of the external-oauth module, and the external-oauth-engine module's routes serve My Apps sign-in; the Supabase guidance is unchanged.
+- `subagent-delegation/SKILL.md` (text): On an Engine project the OAuth review covers My Apps sign-in, the only OAuth sign-in there, instead of saying there is none; the Supabase routing is unchanged.
+
 ## v2.1.0
 
 One skill is added, and two Engine-project texts are corrected. Install it with

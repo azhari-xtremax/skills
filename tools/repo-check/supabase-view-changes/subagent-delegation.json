@@ -9,6 +9,6 @@
     "path": "subagent-delegation/SKILL.md",
     "kind": "text",
     "reason": "On an Engine project the OAuth review covers My Apps sign-in, the only OAuth sign-in there, instead of saying there is none; the Supabase routing is unchanged.",
-    "release": "unreleased"
+    "release": "v3.0.0"
   }
 ]

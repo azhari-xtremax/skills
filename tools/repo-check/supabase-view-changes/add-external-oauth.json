@@ -9,6 +9,6 @@
     "path": "add-external-oauth/SKILL.md",
     "kind": "description",
     "reason": "The description is true for both kinds of project: on an Engine project the Skill now adds My Apps sign-in through the Engine's ID-token sign-in, and stops for any other provider.",
-    "release": "unreleased"
+    "release": "v3.0.0"
   }
 ]
