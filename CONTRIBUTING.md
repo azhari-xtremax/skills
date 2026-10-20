@@ -248,7 +248,7 @@ has no `converted/<folder>` file (rule R13).
 | R1 | In a converted folder, a guard pattern in the Engine view (with file and line) |
 | R2 | A marker error (the codes above), in any folder |
 | R3 | In a converted folder, a missing, misplaced or altered Gate or Pointer; a link from another skill into `assets/`; a link to a comment-less `*-only` file from another skill or from text of another kind |
-| R4 | A folder without a row in `skill-map.json`, a row without a folder, a marker in a `wording only` folder |
+| R4 | A folder without a row in `skill-map.json`, a row without a folder (not on the `v1.0.0` tree of the `baseline` job, where a Skill added later has none), a marker in a `wording only` folder |
 | R5 | A `SKILL.md` or persona without `name` or `description` in the raw file or either view; a `name` that differs from `v1.0.0` |
 | R6a | A link from one skill to another that does not resolve in a view that holds it |
 | R6b | In a converted folder, any relative link that does not resolve in a view that holds it, apart from the recorded breaks in `backend-contract.json` |

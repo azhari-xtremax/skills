@@ -254,7 +254,8 @@ function runCheck(opts, { stdout, env }) {
         markers.get(f.top).push({ path: f.path, line: i + 1 });
       });
     }
-    add(mapIssues(skillMap, folders, markers));
+    // Not a work tree: the checked set is the baseline's (the `baseline` job), older than the map.
+    add(mapIssues(skillMap, folders, markers, { olderTree: !workTree }));
     for (const c of converted) {
       if (!rows.has(c)) findings.push({ rule: 'R4', path: `${CONVERTED_DIR}/${c}`, line: 1, code: 'converted-without-row', message: `${c} has a converted file but no row in ${SKILL_MAP_PATH}` });
     }

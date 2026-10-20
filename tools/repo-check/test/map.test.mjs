@@ -36,6 +36,11 @@ test('R4: a folder without a row and a row without a folder', () => {
   assert.match(f[1].message, /gone/);
 });
 
+test('R4 on the baseline tree: a row for a later Skill is not a finding, a folder without a row is', () => {
+  const f = mapIssues([row('a'), row('later')], ['a', 'unmapped'], new Map(), { olderTree: true });
+  assert.deepEqual(show(f), ['R4 unmapped/SKILL.md:1 folder-without-row']);
+});
+
 test('R4: agents and references need rows too', () => {
   const f = mapIssues([row('a')], ['a', 'agents', 'references'], new Map());
   assert.deepEqual(show(f), ['R4 agents:1 folder-without-row', 'R4 references:1 folder-without-row']);

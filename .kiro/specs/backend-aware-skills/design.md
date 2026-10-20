@@ -654,6 +654,9 @@ Criterion 7.7: the CI job `baseline` runs R4, R5 (front matter only) and R6a on 
 `v1.0.0`, with the current `skill-map.json`, building the checked set from `git ls-tree` (Scope and
 views); all three pass there today (no Skill-to-Skill link is broken at `7ed910f`; the only breaks
 lead to `references/`, outside the repository, or to placeholder files inside `generate-docs`).
+Amended 20 October 2026, for the first Skill added after `v1.0.0` (`add-mobile-app`): on the
+baseline tree, R4 reports a folder without a row but not a row without a folder, since a row for a
+Skill added later names no folder in `v1.0.0`. The `check` job holds every row to the current tree.
 
 ### Interface
 ```text
