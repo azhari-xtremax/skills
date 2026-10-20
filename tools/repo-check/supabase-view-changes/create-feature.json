@@ -10,5 +10,11 @@
     "kind": "text",
     "reason": "Names where the collection schema is stored on each kind of project (the DaaS, or the Engine).",
     "release": "v2.0.0"
+  },
+  {
+    "path": "create-feature/SKILL.md",
+    "kind": "text",
+    "reason": "Engine statement ES-16 reworded: the OAuth routes that cannot be used on an Engine project are those of the external-oauth module, and the external-oauth-engine module's routes serve My Apps sign-in; the Supabase guidance is unchanged.",
+    "release": "unreleased"
   }
 ]

@@ -44,7 +44,7 @@ For each collection in the feature, answer these questions during the design sta
 - [ ] **Needs capability/role gating?** → Plan Module-Level Access Keys (`grant-module-access` skill): register key in `daas_module_access_keys`, grant on policy `module_access` JSONB, check in React with `usePermissions().hasModuleAccess(key)`. **NEVER check role names directly** — this applies to every button, section, page, or nav item that is conditionally shown/hidden based on role.
 - [ ] **Needs audit/change tracking?** → Already built-in via `GET /api/activity` (do NOT build custom)
 
-On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`.
+On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes of the `external-oauth` module, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`. For My Apps sign-in the CLI installs the `external-oauth-engine` module in place of `external-oauth`; its routes are used as the `add-external-oauth` skill says.
 
 ## Buildpad Component Selection
 
