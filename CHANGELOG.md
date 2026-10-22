@@ -14,6 +14,54 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## v4.0.0
+
+The identity provider that the skills called **My Apps** is now named **XAppHub**. Install it with
+`npx skills add buildpad-ai/skills#v4.0.0`.
+
+This is a MAJOR release because the new name stands in text that a Supabase project's agent also
+reads (see **Supabase projects** below). Only the display name changes. The steps for both kinds
+of project do not change. No skill is added, removed or renamed, and the "Establish the backend
+first" procedure stays at version 1.
+
+- The skills, the agent personas, the checklists, the README and [CONTRIBUTING](CONTRIBUTING.md)
+  now say XAppHub where they said My Apps.
+- No identifier changes. The provider and the connector are still `my-apps`, the Buildpad CLI
+  modules are still `external-oauth` and `external-oauth-engine`, and environment names, example
+  code, folder names and URLs stay as they were. An application that already signs users in with
+  My Apps keeps working, and you do not have to change it.
+- `add-external-oauth`: the naming note says that XAppHub was formerly called My Apps, and that
+  its connector and provider are still named `my-apps`. It still keeps XAppHub apart from
+  Microsoft's "My Apps" portal. A request for "SSO via XAppHub" or "SSO via MyApps" (with no
+  mention of Azure, Entra ID or Microsoft) goes to the XAppHub steps.
+- The Engine statements ES-4, ES-5, ES-7 and ES-16 in [CONTRIBUTING](CONTRIBUTING.md) change only
+  in the name, and every folder that carries them has the new text.
+- Other text for Engine projects only, which now names XAppHub: `add-buildpad`, `add-i18n`,
+  `agents/security-auditor.md`, `agents/test-engineer.md`, `create-api-route`, `create-project`,
+  `create-rbac`, `create-tests`, `daas-platform`, `grant-module-access`, `manage-scope`,
+  `references/module-access-checklist.md`, `references/security-checklist.md` and
+  `security-and-hardening`.
+- The README catalogue row of `add-external-oauth`, the README's note on what an Engine project
+  lacks, and the `add-external-oauth` row of `tools/repo-check/skill-map.json` now name XAppHub.
+
+The released sections of this file and the released change-file entries keep the name My Apps, as
+they were written. The rename is recorded in `.kiro/specs/backend-aware-skills/design.md`
+(Product rename, 22 October 2026).
+
+### Supabase projects
+
+The Supabase steps, routes and guidance do not change. These files change because a sentence
+that names the identity provider stands in text that both kinds of project read. Each change,
+with its reason:
+
+- `add-external-oauth/SKILL.md` (description): The description names the identity provider product XAppHub (formerly My Apps); the provider id my-apps and what the Skill does are unchanged.
+- `add-external-oauth/SKILL.md` (text): The identity provider product formerly called My Apps is now named XAppHub, and the naming note says so and keeps Microsoft's My Apps portal apart; the connector and provider id my-apps and the Supabase steps are unchanged.
+- `add-users/SKILL.md` (text): Engine statement ES-7 names the identity provider product XAppHub (formerly My Apps); the Supabase steps are unchanged.
+- `authentication-proxy/SKILL.md` (text): The Engine-project sentences, ES-4 and ES-5 among them, name the identity provider product XAppHub (formerly My Apps); the provider id my-apps, the Supabase routes and the external OAuth section are unchanged.
+- `authentication-proxy/references/authentication-proxy.instructions.md` (text): The Engine-project sentences, ES-5 among them, name the identity provider product XAppHub (formerly My Apps); the Supabase text is unchanged.
+- `create-feature/SKILL.md` (text): Engine statement ES-16 names the identity provider product XAppHub (formerly My Apps); the module names and the Supabase guidance are unchanged.
+- `subagent-delegation/SKILL.md` (text): The Engine-project OAuth review names the identity provider product XAppHub (formerly My Apps); the Supabase routing is unchanged.
+
 ## v3.0.0
 
 Engine projects can now sign users in with **My Apps**. Install it with

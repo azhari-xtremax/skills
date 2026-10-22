@@ -21,6 +21,6 @@
     "path": "create-feature/SKILL.md",
     "kind": "text",
     "reason": "Engine statement ES-16 names the identity provider product XAppHub (formerly My Apps); the module names and the Supabase guidance are unchanged.",
-    "release": "unreleased"
+    "release": "v4.0.0"
   }
 ]

@@ -15,6 +15,6 @@
     "path": "add-users/SKILL.md",
     "kind": "text",
     "reason": "Engine statement ES-7 names the identity provider product XAppHub (formerly My Apps); the Supabase steps are unchanged.",
-    "release": "unreleased"
+    "release": "v4.0.0"
   }
 ]
