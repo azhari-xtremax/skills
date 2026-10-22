@@ -10,5 +10,11 @@
     "kind": "text",
     "reason": "Engine statement ES-7 reworded: an administrator creates every user who signs in with a password, and a user's first My Apps sign-in creates an account without a role; the Supabase steps are unchanged.",
     "release": "v3.0.0"
+  },
+  {
+    "path": "add-users/SKILL.md",
+    "kind": "text",
+    "reason": "Engine statement ES-7 names the identity provider product XAppHub (formerly My Apps); the Supabase steps are unchanged.",
+    "release": "unreleased"
   }
 ]

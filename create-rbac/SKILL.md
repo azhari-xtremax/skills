@@ -337,7 +337,7 @@ export async function GET(request: NextRequest) {
 
 This route forwards `GET /api/permissions/me` to the Engine with the signed-in user's access token as `Authorization: Bearer`, so Buildpad components can resolve CRUD permissions. The Engine answers `data` (the permissions), `isAdmin` and `moduleAccess`.
 
-On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes of the `external-oauth` module, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`. For My Apps sign-in the CLI installs the `external-oauth-engine` module in place of `external-oauth`; its routes are used as the `add-external-oauth` skill says.
+On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes of the `external-oauth` module, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`. For XAppHub sign-in the CLI installs the `external-oauth-engine` module in place of `external-oauth`; its routes are used as the `add-external-oauth` skill says.
 <!-- /buildpad-backend -->
 
 ## Required: Module-Level Access Keys (ALWAYS include with RBAC)

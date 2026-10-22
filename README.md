@@ -15,7 +15,7 @@ The skills serve two kinds of Buildpad project: **Engine projects**, whose backe
 3. Otherwise it looks for a Supabase project folder (`supabase/config.toml`, or SQL files in `supabase/migrations/`).
 4. Otherwise it asks the developer once, and records the answer in `.buildpad/backend-answer.json` (commit that file).
 
-Then it follows only the parts for that backend. Where the Engine has no counterpart (for example database migrations, or external sign-in with a provider other than My Apps), the skill says so and stops.
+Then it follows only the parts for that backend. Where the Engine has no counterpart (for example database migrations, or external sign-in with a provider other than XAppHub), the skill says so and stops.
 
 Starters downloaded from the Platform carry only their project's text: the other backend's parts are removed when the starter is assembled.
 
@@ -131,7 +131,7 @@ The core methodology: every feature is specified as `requirements.md` (EARS) →
 | [add-microfrontend](add-microfrontend) | The composition mechanism: iframe host, postMessage bridge, auth/URL/scope syncing, CSP (load second). Supabase projects only for now: not yet available on an Engine project |
 | [add-microfrontend-zones](add-microfrontend-zones) | Path-based composition with Next.js Multi-Zones: one origin, one shared session, no iframes. Supabase projects only for now: not yet available on an Engine project |
 | [add-multitenancy](add-multitenancy) | Multi-tenancy (delegates to manage-scope) |
-| [add-external-oauth](add-external-oauth) | External OAuth/OIDC identity provider sign-in with a PKCE proxy flow on a Supabase project; on an Engine project, My Apps sign-in only, through `signInWithIdToken`, and it stops for any other provider |
+| [add-external-oauth](add-external-oauth) | External OAuth/OIDC identity provider sign-in with a PKCE proxy flow on a Supabase project; on an Engine project, XAppHub sign-in only, through `signInWithIdToken`, and it stops for any other provider |
 | [add-i18n](add-i18n) | Internationalization: `app/[lang]` routing, middleware locale negotiation, dictionaries + I18nProvider, LanguageSwitcher, DaaS content translations |
 | [add-mobile-app](add-mobile-app) | Wrap the web app as iOS/Android with Capacitor (server-URL mode), plus when to use platform-managed mobile builds / Expo mobile microapps; SSO, push, geofencing, emulator gotchas |
 | [worker-messaging](worker-messaging) | Offload long-running work to a Buildpad runtime worker over RabbitMQ (topic-exchange job convention; Next.js producer + worker consumer/chaining; connection via Platform MCP) |

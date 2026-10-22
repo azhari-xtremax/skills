@@ -15,7 +15,7 @@ user-invokable: false
 ✅ Browser → /api/items/* → DaaS Backend (proxied server-side, to NEXT_PUBLIC_BUILDPAD_DAAS_URL)
 ```
 
-The rule holds for both kinds of project. On a Supabase project the data backend is the DaaS application and sign-in goes to Supabase Auth. On an Engine project the data API's address is the Engine_URL, which both `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` hold. The Studio's address is an administration interface: send no data call to it. On an Engine project the data API serves no request without a session; only the sign-in, `GET /api/server/info` and the Engine's password routes are served without one (an application must not use them: on an Engine project an administrator resets a user's password). The requests that take their tenant from the header `X-Tenant-Id` are the password sign-in, My Apps sign-in and anonymous reads of public files. A browser cannot send `X-Tenant-Id` to the Engine until the Engine allows that header from another origin, which it does not yet do: so the request that names the tenant is the sign-in made through the application's own server route, which sends `X-Tenant-Id` with the value of `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. A public file shown in a browser is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read. A request without a session that names no tenant is served from the Engine's host plane, not from the project. A request with a session takes its tenant from the session.
+The rule holds for both kinds of project. On a Supabase project the data backend is the DaaS application and sign-in goes to Supabase Auth. On an Engine project the data API's address is the Engine_URL, which both `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` hold. The Studio's address is an administration interface: send no data call to it. On an Engine project the data API serves no request without a session; only the sign-in, `GET /api/server/info` and the Engine's password routes are served without one (an application must not use them: on an Engine project an administrator resets a user's password). The requests that take their tenant from the header `X-Tenant-Id` are the password sign-in, XAppHub sign-in and anonymous reads of public files. A browser cannot send `X-Tenant-Id` to the Engine until the Engine allows that header from another origin, which it does not yet do: so the request that names the tenant is the sign-in made through the application's own server route, which sends `X-Tenant-Id` with the value of `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. A public file shown in a browser is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read. A request without a session that names no tenant is served from the Engine's host plane, not from the project. A request with a session takes its tenant from the session.
 
 ## Auth Routes
 
@@ -24,12 +24,12 @@ The rule holds for both kinds of project. On a Supabase project the data backend
 | Login          | `/api/auth/login`            | POST `{ email, password }`                     |
 | Logout         | `/api/auth/logout`           | POST                                           |
 | Get user       | `/api/auth/user`             | GET                                            |
-| OAuth callback | `/api/auth/callback`         | GET (handles both Supabase and external OAuth on a Supabase project; My Apps sign-in only on an Engine project) |
+| OAuth callback | `/api/auth/callback`         | GET (handles both Supabase and external OAuth on a Supabase project; XAppHub sign-in only on an Engine project) |
 | External OAuth | `/api/auth/oauth/[provider]` | GET (initiates external SSO; on an Engine project the provider `my-apps` only) |
 
-These routes are installed by the CLI (`pnpm cli add --all` or `--with-api`). On an Engine project the login, logout and get-user routes are used, and the OAuth callback and provider routes only as the CLI's `external-oauth-engine` module writes them, for My Apps sign-in: those of the `external-oauth` module cannot be used there.
+These routes are installed by the CLI (`pnpm cli add --all` or `--with-api`). On an Engine project the login, logout and get-user routes are used, and the OAuth callback and provider routes only as the CLI's `external-oauth-engine` module writes them, for XAppHub sign-in: those of the `external-oauth` module cannot be used there.
 
-On an Engine project the Supabase client is kept for sign-in only. Password sign-in, session refresh, reading the signed-in user and sign-out work through it, and its default sign-out ends the user's sessions on every device. An account that holds no role in the project's tenant is refused at password sign-in. My Apps sign-in also works through it while the project's My Apps connector is connected: the application's server gives the ID token from My Apps to `signInWithIdToken` with the provider `my-apps`, and ends the session of an account that holds no role yet (the `add-external-oauth` skill). Not available on an Engine project: sign-up; OAuth sign-in with any provider other than My Apps; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; the Supabase client's code exchange; and the Supabase administration API. The Platform's password-less handoff opens the Studio; it is not a way for an application to sign a user in.
+On an Engine project the Supabase client is kept for sign-in only. Password sign-in, session refresh, reading the signed-in user and sign-out work through it, and its default sign-out ends the user's sessions on every device. An account that holds no role in the project's tenant is refused at password sign-in. XAppHub sign-in also works through it while the project's XAppHub connector is connected: the application's server gives the ID token from XAppHub to `signInWithIdToken` with the provider `my-apps`, and ends the session of an account that holds no role yet (the `add-external-oauth` skill). Not available on an Engine project: sign-up; OAuth sign-in with any provider other than XAppHub; magic link and one-time code; password recovery; changing a password, an email or a profile through the Supabase client; the Supabase client's code exchange; and the Supabase administration API. The Platform's password-less handoff opens the Studio; it is not a way for an application to sign a user in.
 
 On an Engine project multi-factor enrolment, challenge and verification are not served through the Supabase client. The Engine's own routes, each called with the user's session, are `POST /api/auth/mfa/enroll`, `GET /api/auth/mfa/factors`, `POST /api/auth/mfa/verify` and `POST /api/auth/mfa/unenroll`; a session that still needs its second factor is accepted elsewhere only after `POST /api/auth/mfa/verify`.
 
@@ -98,7 +98,7 @@ On an Engine project every data call carries the signed-in user's access token a
 
 ## External OAuth (SSO)
 
-This section is for a Supabase project only. On an Engine project only My Apps sign-in is available, while the project's My Apps connector is connected: the application's server signs in to the Engine with `signInWithIdToken` (provider `my-apps`), through the CLI's `external-oauth-engine` module, as [add-external-oauth](../add-external-oauth/SKILL.md) says. Sign-in with any other provider is not available there: tell the developer so and stop, and build no substitute.
+This section is for a Supabase project only. On an Engine project only XAppHub sign-in is available, while the project's XAppHub connector is connected: the application's server signs in to the Engine with `signInWithIdToken` (provider `my-apps`), through the CLI's `external-oauth-engine` module, as [add-external-oauth](../add-external-oauth/SKILL.md) says. Sign-in with any other provider is not available there: tell the developer so and stop, and build no substitute.
 
 For external identity providers (Azure AD, Okta, Auth0, Google, custom OIDC), on a Supabase project:
 
@@ -114,7 +114,7 @@ const handleSSOLogin = () => {
 await supabase.auth.signInWithOAuth({ provider: "azure" });
 ```
 
-See [add-external-oauth](../add-external-oauth/SKILL.md) for full implementation details (on an Engine project that skill adds My Apps sign-in only).
+See [add-external-oauth](../add-external-oauth/SKILL.md) for full implementation details (on an Engine project that skill adds XAppHub sign-in only).
 
 Key points:
 
@@ -125,4 +125,4 @@ Key points:
 ## References
 
 - [Authentication proxy details](references/authentication-proxy.instructions.md)
-- [External OAuth implementation](../add-external-oauth/SKILL.md) (on an Engine project, My Apps sign-in only)
+- [External OAuth implementation](../add-external-oauth/SKILL.md) (on an Engine project, XAppHub sign-in only)

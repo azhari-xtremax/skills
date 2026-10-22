@@ -98,7 +98,7 @@ For every function or component:
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
 - Test roles, policies, permissions and scope with users that hold different roles
-- On an Engine project an administrator creates every user who signs in with a password, through the Engine's user API (`POST /api/users` with an administrator's session) or the Studio's Users module, and gives the user a role in the project's tenant (`POST /api/users/:id/roles` with `role_id`, or the Users module). A user's first My Apps sign-in creates that user's account, which holds no role until an administrator gives it one in the same way. An administrator resets a user's password, in the Studio's Users module.
+- On an Engine project an administrator creates every user who signs in with a password, through the Engine's user API (`POST /api/users` with an administrator's session) or the Studio's Users module, and gives the user a role in the project's tenant (`POST /api/users/:id/roles` with `role_id`, or the Users module). A user's first XAppHub sign-in creates that user's account, which holds no role until an administrator gives it one in the same way. An administrator resets a user's password, in the Studio's Users module.
 - Use `auth.setup.ts` to provision test users that way, each with a role in the project's tenant: an account with no role there is refused at sign-in
 <!-- /buildpad-backend -->
 

@@ -220,7 +220,7 @@ The route returns the Engine's answer as it came:
 
 ## Sign-in Routes
 
-Sign-in uses the Supabase client against the Engine_URL. The login route names the project's tenant with the header `X-Tenant-Id`; logout and the current user need no header, because a request with a session takes its tenant from the session. These sign-in routes need no callback route: the Supabase client's code exchange is not available on an Engine project. My Apps sign-in, the only OAuth sign-in there, has its own callback route, which the CLI's `external-oauth-engine` module writes (see [add-external-oauth](../add-external-oauth/SKILL.md)). The three templates, and what sign-in can and cannot do there, are under "Sign-in Routes" in [Engine API routes](references/engine-api-routes.instructions.md).
+Sign-in uses the Supabase client against the Engine_URL. The login route names the project's tenant with the header `X-Tenant-Id`; logout and the current user need no header, because a request with a session takes its tenant from the session. These sign-in routes need no callback route: the Supabase client's code exchange is not available on an Engine project. XAppHub sign-in, the only OAuth sign-in there, has its own callback route, which the CLI's `external-oauth-engine` module writes (see [add-external-oauth](../add-external-oauth/SKILL.md)). The three templates, and what sign-in can and cannot do there, are under "Sign-in Routes" in [Engine API routes](references/engine-api-routes.instructions.md).
 
 ## Input Validation (Zod)
 

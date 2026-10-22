@@ -10,5 +10,17 @@
     "kind": "description",
     "reason": "The description is true for both kinds of project: on an Engine project the Skill now adds My Apps sign-in through the Engine's ID-token sign-in, and stops for any other provider.",
     "release": "v3.0.0"
+  },
+  {
+    "path": "add-external-oauth/SKILL.md",
+    "kind": "description",
+    "reason": "The description names the identity provider product XAppHub (formerly My Apps); the provider id my-apps and what the Skill does are unchanged.",
+    "release": "unreleased"
+  },
+  {
+    "path": "add-external-oauth/SKILL.md",
+    "kind": "text",
+    "reason": "The identity provider product formerly called My Apps is now named XAppHub, and the naming note says so and keeps Microsoft's My Apps portal apart; the connector and provider id my-apps and the Supabase steps are unchanged.",
+    "release": "unreleased"
   }
 ]
