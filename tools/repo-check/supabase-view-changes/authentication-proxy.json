@@ -27,12 +27,12 @@
     "path": "authentication-proxy/SKILL.md",
     "kind": "text",
     "reason": "The Engine-project sentences, ES-4 and ES-5 among them, name the identity provider product XAppHub (formerly My Apps); the provider id my-apps, the Supabase routes and the external OAuth section are unchanged.",
-    "release": "unreleased"
+    "release": "v4.0.0"
   },
   {
     "path": "authentication-proxy/references/authentication-proxy.instructions.md",
     "kind": "text",
     "reason": "The Engine-project sentences, ES-5 among them, name the identity provider product XAppHub (formerly My Apps); the Supabase text is unchanged.",
-    "release": "unreleased"
+    "release": "v4.0.0"
   }
 ]

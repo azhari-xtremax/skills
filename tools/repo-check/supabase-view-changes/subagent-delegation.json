@@ -15,6 +15,6 @@
     "path": "subagent-delegation/SKILL.md",
     "kind": "text",
     "reason": "The Engine-project OAuth review names the identity provider product XAppHub (formerly My Apps); the Supabase routing is unchanged.",
-    "release": "unreleased"
+    "release": "v4.0.0"
   }
 ]

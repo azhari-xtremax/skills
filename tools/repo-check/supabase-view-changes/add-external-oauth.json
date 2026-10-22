@@ -15,12 +15,12 @@
     "path": "add-external-oauth/SKILL.md",
     "kind": "description",
     "reason": "The description names the identity provider product XAppHub (formerly My Apps); the provider id my-apps and what the Skill does are unchanged.",
-    "release": "unreleased"
+    "release": "v4.0.0"
   },
   {
     "path": "add-external-oauth/SKILL.md",
     "kind": "text",
     "reason": "The identity provider product formerly called My Apps is now named XAppHub, and the naming note says so and keeps Microsoft's My Apps portal apart; the connector and provider id my-apps and the Supabase steps are unchanged.",
-    "release": "unreleased"
+    "release": "v4.0.0"
   }
 ]
