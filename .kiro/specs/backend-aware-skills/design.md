@@ -4,6 +4,7 @@
 > **Engine-fact corrections, 17 October 2026.** Ten Engine facts that tasks 4 to 8 found while converting differ from this design or extend it. They are recorded in [Engine-fact corrections, 17 October 2026](#engine-fact-corrections-17-october-2026); the rest of the document is unchanged.
 > **Engine-fact corrections, 18 October 2026.** Twenty-one Engine facts from the Engine and Studio specifications approved on 17 October 2026. Two facts that already hold were missing from two skills, whose Engine text is fixed (SF1, SF2); the others leave the skills true or fix the shape of a dependency before it is met. They are recorded in [Engine-fact corrections, 18 October 2026](#engine-fact-corrections-18-october-2026); the rest of the document is unchanged.
 > **Engine-fact corrections, 20 October 2026.** My Apps sign-in is now served on an Engine project. ES-4, ES-5, ES-7 and ES-16 are reworded so that only My Apps sign-in is available and every other OAuth provider stays unavailable; recorded in [Engine-fact corrections, 20 October 2026](#engine-fact-corrections-20-october-2026); the rest of the document is unchanged.
+> **Product rename, 22 October 2026.** The identity provider product called My Apps above is named XAppHub in the skills' text, by the maintainer's decision; recorded in [Product rename, 22 October 2026](#product-rename-22-october-2026). The text above is left as it was written.
 > **Status.** Not approved. Phase 2 of a gated spec, written against the **approved** requirements
 > of this folder (7 requirements, 68 criteria, 66 live, 2 withdrawn; SD-1 and SD-2 settled; Skill
 > map amended 16 October 2026 with the maintainer's approval). Revised 16 October 2026 to close
@@ -1355,6 +1356,25 @@ that names an Engine project): `add-buildpad`, `add-i18n`, `agents`, `authentica
 `create-api-route`, `create-project`, `references`, `security-and-hardening` and
 `subagent-delegation`, and the README catalogue row of `add-external-oauth`. Where a changed
 sentence stands in shared text, the folder's change file lists it.
+
+## Product rename, 22 October 2026
+
+Written on 22 October 2026, at the maintainer's request. The identity provider product that the
+section above calls My Apps is now named **XAppHub**. The maintainer's decision is "display text
+only", spelled exactly `XAppHub`:
+
+- Prose in the skills, the personas, the checklists, `README.md`, `CONTRIBUTING.md` and
+  `tools/repo-check/skill-map.json` names XAppHub where it named My Apps. ES-4, ES-5, ES-7 and
+  ES-16 change only in that name, and stay copied verbatim in `CONTRIBUTING.md`, in every folder
+  that carries them and in `test/guard.test.mjs`.
+- No identifier changes: the provider `my-apps`, the connector `my-apps`, the CLI modules
+  `external-oauth` and `external-oauth-engine`, environment names, code in examples, folder
+  names and URLs stay as they are. The naming note of `add-external-oauth` says that XAppHub was
+  formerly called My Apps, and keeps it apart from Microsoft's My Apps portal.
+- History stays as written: the released sections of `CHANGELOG.md`, the released change-file
+  entries, the dated notes of this document and of `tasks.md`, and the shared contract fixtures.
+- The Supabase view of six files changes (the name only), and each has an `unreleased`
+  change-file entry: so the next release is MAJOR.
 
 ## Design review gate
 Run on the revision of 16 October 2026; the second pass found nothing to repair.
