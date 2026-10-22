@@ -1,5 +1,5 @@
 [
-  {"folder":"add-external-oauth","dependence":"core","treatment":"both paths, chosen by backend; on the Engine, My Apps sign-in only, and it stops for any other provider","size":"small","plan":"BP"},
+  {"folder":"add-external-oauth","dependence":"core","treatment":"both paths, chosen by backend; on the Engine, XAppHub sign-in only, and it stops for any other provider","size":"small","plan":"BP"},
   {"folder":"create-api-route","dependence":"core","treatment":"a separate Engine file set","size":"large","plan":"EF"},
   {"folder":"create-migration","dependence":"core","treatment":"says unavailable on the Engine and stops","size":"small","plan":"US"},
   {"folder":"add-buildpad","dependence":"partial","treatment":"both paths, chosen by backend","size":"small","plan":"BP"},
