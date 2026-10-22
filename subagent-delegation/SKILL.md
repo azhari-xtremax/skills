@@ -55,7 +55,7 @@ Map (review at scale):  one code-reviewer subagent per changed module, in parall
 ## DaaS / Buildpad Notes
 
 - Route Buildpad-First and proxy-pattern compliance checks to `code-reviewer`.
-- Route CORS, access-rule (RLS on a Supabase project) and secret-handling checks to `security-auditor`, and OAuth checks on a Supabase project; on an Engine project the only OAuth sign-in is My Apps, so the OAuth review there covers My Apps sign-in only.
+- Route CORS, access-rule (RLS on a Supabase project) and secret-handling checks to `security-auditor`, and OAuth checks on a Supabase project; on an Engine project the only OAuth sign-in is XAppHub, so the OAuth review there covers XAppHub sign-in only.
 - Route Playwright coverage and RBAC test design to `test-engineer`.
 - Give research subagents the MCP context they need (project detail, collection schemas) in the brief — they start with a clean context.
 

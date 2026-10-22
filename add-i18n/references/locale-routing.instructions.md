@@ -239,7 +239,7 @@ On Next.js 16 with `proxy.ts`, the body is identical: `export default async func
 
 ### 2c. Session middleware — `lib/supabase/middleware.ts`
 
-Only the route-gating block changes (`@buildpad/origin: supabase/middleware`). Everything above `supabase.auth.getUser()` stays exactly as scaffolded. On an Engine project the Supabase client there reads the signed-in user from the Engine, and the public routes are the sign-in page and the app's own sign-in routes only, and the pending-access page when My Apps sign-in is installed: an Engine project has no sign-up page, and its only OAuth callback, My Apps sign-in's, is one of the app's own sign-in routes under `/api/auth`.
+Only the route-gating block changes (`@buildpad/origin: supabase/middleware`). Everything above `supabase.auth.getUser()` stays exactly as scaffolded. On an Engine project the Supabase client there reads the signed-in user from the Engine, and the public routes are the sign-in page and the app's own sign-in routes only, and the pending-access page when XAppHub sign-in is installed: an Engine project has no sign-up page, and its only OAuth callback, XAppHub sign-in's, is one of the app's own sign-in routes under `/api/auth`.
 
 ```ts
 import { defaultLocale, getLocaleFromPathname, stripLocale } from "@/lib/i18n/config";

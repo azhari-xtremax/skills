@@ -127,7 +127,7 @@ Two files change; both are in the reference:
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
 - **`middleware.ts` (or `proxy.ts`)** — before calling `updateSession`, redirect any non-`/api` request whose first segment is not a locale to `/<negotiated-locale>/<path>`, preserving the query string and using `publicOrigin(request)` for the absolute `Location`. Negotiation order: `NEXT_LOCALE` cookie → `Accept-Language` (Negotiator + `@formatjs/intl-localematcher`) → `defaultLocale`. The redirect returns **before** the session client is created, so no refreshed session cookie is lost.
-- **`lib/supabase/middleware.ts`** — compare `publicRoutes` against `stripLocale(pathname)` and redirect unauthenticated users to `/<locale>/login` instead of `/login`. On an Engine project the public routes are `/login` and `/api/auth` only, and `/auth/pending-access` when My Apps sign-in is installed: there is no sign-up page, and My Apps sign-in's callback, the only OAuth callback route there, lies under `/api/auth`. Without this every locale-prefixed request bounces to an unprefixed `/login` that no longer exists.
+- **`lib/supabase/middleware.ts`** — compare `publicRoutes` against `stripLocale(pathname)` and redirect unauthenticated users to `/<locale>/login` instead of `/login`. On an Engine project the public routes are `/login` and `/api/auth` only, and `/auth/pending-access` when XAppHub sign-in is installed: there is no sign-up page, and XAppHub sign-in's callback, the only OAuth callback route there, lies under `/api/auth`. Without this every locale-prefixed request bounces to an unprefixed `/login` that no longer exists.
 <!-- /buildpad-backend -->
 
 ## Step 3 — Route tree

@@ -1,6 +1,6 @@
 ---
 name: add-external-oauth
-description: Add external OAuth/OIDC identity provider sign-in, where Next.js acts as the OAuth client. On a Supabase project it creates the OAuth proxy flow with PKCE, user provisioning via Supabase Admin API with default DaaS role assignment, and session management (required for self-hosted Supabase without deployment access). On an Engine project only My Apps sign-in is available, through the Engine's ID-token sign-in with signInWithIdToken; other providers stop.
+description: Add external OAuth/OIDC identity provider sign-in, where Next.js acts as the OAuth client. On a Supabase project it creates the OAuth proxy flow with PKCE, user provisioning via Supabase Admin API with default DaaS role assignment, and session management (required for self-hosted Supabase without deployment access). On an Engine project only XAppHub sign-in is available, through the Engine's ID-token sign-in with signInWithIdToken; other providers stop.
 user-invokable: true
 ---
 
@@ -38,29 +38,29 @@ something is not available, tell the developer so and stop: do not build a subst
 <!-- backend-gate:end -->
 
 <!-- buildpad-backend: engine -->
-## On an Engine project: My Apps sign-in only
+## On an Engine project: XAppHub sign-in only
 
-Of the external sign-ins, an Engine project offers only **My Apps sign-in**, and only while the
-project's My Apps connector is connected. The application's server finishes the OpenID Connect
-authorization-code flow with My Apps, then gives the ID token to the project's Engine through the
+Of the external sign-ins, an Engine project offers only **XAppHub sign-in**, and only while the
+project's XAppHub connector is connected. The application's server finishes the OpenID Connect
+authorization-code flow with XAppHub, then gives the ID token to the project's Engine through the
 Supabase client's `signInWithIdToken`. The Engine checks the token and answers with an ordinary
 session. Sign-in with any other provider (Azure AD, Google, Okta, Auth0 or another OIDC provider)
 is not available on an Engine project: tell the developer so and stop.
 
-On an Engine project these are not available, and My Apps sign-in uses none of them: a service-role
+On an Engine project these are not available, and XAppHub sign-in uses none of them: a service-role
 key, the Supabase administration API, a session made from a magic link or a one-time code, and a
 role assignment that the application writes. The Platform's password-less handoff is for opening
 the Studio and is not a way for an application to sign a user in.
 
-### Step 1: Check the My Apps connector
+### Step 1: Check the XAppHub connector
 
 1. Call the `get_project_detail` MCP tool.
-2. Find the `my-apps` entry in `connectors`. My Apps sign-in is available only when its status is
+2. Find the `my-apps` entry in `connectors`. XAppHub sign-in is available only when its status is
    `connected` and it lists `externalSignIn` and its `OAUTH_*` variables. Then the Platform has
-   registered the application's OIDC client with My Apps, for the deployed app's
+   registered the application's OIDC client with XAppHub, for the deployed app's
    `/api/auth/callback` and for `http://localhost:3000/api/auth/callback`, and has told the Engine
    to trust that client.
-3. If there is no such connector, tell the developer to connect My Apps on the project's Connectors
+3. If there is no such connector, tell the developer to connect XAppHub on the project's Connectors
    page and stop. The application cannot register the client or make the Engine trust it.
 
 ### Step 2: Set the environment
@@ -73,7 +73,7 @@ From the connector, take `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OAUTH_AUTHOR
 On an Engine project the environment is: `NEXT_PUBLIC_SUPABASE_URL=<Engine_URL>`, `NEXT_PUBLIC_BUILDPAD_DAAS_URL=<Engine_URL>`, `NEXT_PUBLIC_SUPABASE_ANON_KEY=buildpad-engine-public-anon-key` (a fixed value that is not a secret; the Engine does not read it, the Supabase client needs one), and `NEXT_PUBLIC_BUILDPAD_TENANT_ID=<the project's tenant id>`. There is no service-role key on an Engine project: add none.
 
 Keep `OAUTH_CLIENT_SECRET` on the application's server only, in a variable whose name does not
-begin `NEXT_PUBLIC_`, and never send it to the Engine. My Apps sign-in needs no state secret and no
+begin `NEXT_PUBLIC_`, and never send it to the Engine. XAppHub sign-in needs no state secret and no
 default role variable.
 
 ### Step 3: Install the files with the Buildpad CLI
@@ -91,9 +91,9 @@ run the command again. The module writes:
 | File | What it does |
 |---|---|
 | `lib/oauth/engine.ts` | The flow cookie, the nonce digest, the Engine sign-in client, the role check and the error codes |
-| `app/api/auth/oauth/[provider]/route.ts` | `GET /api/auth/oauth/my-apps`: starts the flow and redirects to My Apps |
+| `app/api/auth/oauth/[provider]/route.ts` | `GET /api/auth/oauth/my-apps`: starts the flow and redirects to XAppHub |
 | `app/api/auth/callback/route.ts` | Exchanges the code, signs in to the Engine, sets the session cookies |
-| `components/auth/OAuthLoginButtons.tsx` | The "Continue with My Apps" button, and the message for each error code |
+| `components/auth/OAuthLoginButtons.tsx` | The XAppHub sign-in button, and the message for each error code |
 | `app/[lang]/auth/pending-access/page.tsx` | The page for an account that has no role yet |
 | `lib/oauth/config.ts`, `pkce.ts`, `validate.ts`, `index.ts` | The shared OAuth helpers; the routes use the generic `OAUTH_*` configuration |
 
@@ -118,7 +118,7 @@ parameters). Keep the password form: administrators and existing password users 
    keeps them in one httpOnly, `SameSite=Lax` cookie for ten minutes, and redirects to
    `OAUTH_AUTHORIZATION_URL` with `nonce` set to the lower-case hex SHA-256 digest of the raw nonce
    and `code_challenge` set to the S256 challenge of the verifier.
-2. My Apps redirects to `/api/auth/callback?code=…&state=…`. The callback reads the cookie and
+2. XAppHub redirects to `/api/auth/callback?code=…&state=…`. The callback reads the cookie and
    compares `state`.
 3. The callback exchanges the code at `OAUTH_TOKEN_URL` from the server, with `OAUTH_CLIENT_SECRET`
    and the PKCE verifier, and takes the `id_token` from the answer.
@@ -126,7 +126,7 @@ parameters). Keep the password form: administrators and existing password users 
    Supabase server client for the Engine_URL that sends `X-Tenant-Id` with the value of
    `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. `nonce` is the raw nonce: the Engine refuses a token whose
    nonce claim is not the SHA-256 digest of it. The provider name `my-apps` is fixed: it is the
-   name the Engine knows My Apps by.
+   name the Engine knows XAppHub by.
 5. It asks `GET <Engine_URL>/api/users/me` with the new access token whether the account holds a
    role (see "Accounts and roles" below).
 6. It sets the session cookies that the Supabase client wrote, in the format `lib/supabase/server.ts`
@@ -142,7 +142,7 @@ import { createServerClient } from "@supabase/ssr";
 
 type CookieToSet = { name: string; value: string; options?: Record<string, unknown> };
 
-// After the state check and the code exchange, with `idToken` from My Apps and
+// After the state check and the code exchange, with `idToken` from XAppHub and
 // `rawNonce` from the flow cookie:
 async function signInToEngine(request: NextRequest, idToken: string, rawNonce: string, returnTo: string) {
   const engineUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!; // the Engine_URL
@@ -158,7 +158,7 @@ async function signInToEngine(request: NextRequest, idToken: string, rawNonce: s
   const { data, error } = await supabase.auth.signInWithIdToken({
     provider: "my-apps",
     token: idToken,
-    nonce: rawNonce, // My Apps received its SHA-256 hex digest
+    nonce: rawNonce, // XAppHub received its SHA-256 hex digest
   });
   if (error || !data.session) {
     // Log the status and code only, never a token.
@@ -195,21 +195,21 @@ only a relative `returnTo` path.
   sign in again once they have it. Do not let a role-less session into pages that the Engine will
   refuse.
 - The Engine refuses some accounts: an account that holds a host role or administers the tenant,
-  and an account that already exists with the same email but is not linked to this My Apps
-  identity. It also refuses a token it does not trust, or an email that My Apps does not mark as
+  and an account that already exists with the same email but is not linked to this XAppHub
+  identity. It also refuses a token it does not trust, or an email that XAppHub does not mark as
   verified. It gives every refusal the same answer as a wrong password, on purpose, so the
   application cannot tell them apart. Show one message (`sign_in_refused`) that tells the user to
   sign in with their email and password if they have one.
 - A disabled account is answered `user_banned` (`account_disabled`). An Engine that cannot reach
   what it needs answers 503 (`engine_unavailable`).
 - Signing out through the Supabase client ends the Engine session. It does not end the user's
-  session at My Apps.
+  session at XAppHub.
 
 ### Security
 
 - Never log the ID token, the access token, the Engine session, the client secret or a session
   cookie. Log a status and an error code only.
-- Send My Apps the SHA-256 hex digest of the nonce and give the Engine the raw nonce. Compare
+- Send XAppHub the SHA-256 hex digest of the nonce and give the Engine the raw nonce. Compare
   `state` before the code exchange, and use PKCE (S256).
 - Keep the flow cookie httpOnly and single-use. In production the CLI names it with the `__Host-`
   prefix, which needs `Secure` and `Path=/`.
@@ -218,9 +218,9 @@ only a relative `returnTo` path.
 
 | Code in `/login?error=` | Cause |
 |---|---|
-| `sign_in_refused` for every user | The connector is not `connected` (the Engine does not trust the client id), or the `nonce` sent to My Apps is not the digest of the nonce given to the Engine |
+| `sign_in_refused` for every user | The connector is not `connected` (the Engine does not trust the client id), or the `nonce` sent to XAppHub is not the digest of the nonce given to the Engine |
 | `sign_in_refused` for one user | One of the refused accounts above; that user signs in with their password |
-| `sign_in_failed` | The code exchange failed (check `OAUTH_CLIENT_SECRET` and that the redirect URI is registered), or the project's Engine has no My Apps sign-in enabled: ask the Buildpad Platform administrator |
+| `sign_in_failed` | The code exchange failed (check `OAUTH_CLIENT_SECRET` and that the redirect URI is registered), or the project's Engine has no XAppHub sign-in enabled: ask the Buildpad Platform administrator |
 | `sign_in_expired` | The flow cookie is missing: more than ten minutes passed, or the sign-in started in another browser or on another host name |
 | `configuration_error` | An `OAUTH_*` variable or one of the Engine variables of Step 2 is missing |
 <!-- /buildpad-backend -->
@@ -231,7 +231,7 @@ Implements external OAuth2/OIDC identity provider integration where **Next.js ac
 
 Use this skill when:
 - Adding SSO/OAuth login to a DaaS application
-- Integrating with My Apps, Azure AD, Okta, Auth0, Google, or any OAuth2/OIDC provider
+- Integrating with XAppHub, Azure AD, Okta, Auth0, Google, or any OAuth2/OIDC provider
 - Self-hosted Supabase without access to deployment configuration
 - Need JIT (Just-In-Time) user provisioning from external IDP
 
@@ -240,15 +240,16 @@ Use this skill when:
 > the integration is not done until Step 6 (default role assignment) is
 > implemented and verified with a brand-new IDP account.
 
-> **Naming note**: "My Apps" here refers to a separate OIDC identity
-> provider — not a Microsoft product. Do not confuse it with Microsoft's
-> "My Apps" portal (`myapplications.microsoft.com`, part of Entra ID/Azure
-> AD app assignment). If asked to integrate "SSO via MyApps" or "the IDP
-> from MyApps" with no mention of Azure/Entra ID/Microsoft, treat it as
-> this My Apps IDP and go to **Step 0** below — do not default to Azure
-> AD/Entra ID.
+> **Naming note**: "XAppHub" here refers to a separate OIDC identity
+> provider — not a Microsoft product. It was formerly called "My Apps",
+> and its connector and provider are still named `my-apps`. Do not confuse
+> it with Microsoft's "My Apps" portal (`myapplications.microsoft.com`,
+> part of Entra ID/Azure AD app assignment). If asked to integrate "SSO via
+> XAppHub", "SSO via MyApps" or "the IDP from MyApps" with no mention of
+> Azure/Entra ID/Microsoft, treat it as this XAppHub IDP and go to
+> **Step 0** below — do not default to Azure AD/Entra ID.
 
-My Apps is the only IDP here with a fully automated registration path —
+XAppHub is the only IDP here with a fully automated registration path —
 see **Step 0** below before doing any manual setup.
 
 ## Architecture Overview
@@ -444,7 +445,7 @@ select role_id from daas_user_roles where user_id = '<auth-user-uuid>';
 
 **Do this before Step 2/Step 3 below, regardless of whether you use the CLI or
 manual path.** Buildpad's Connectors system can auto-provision an OIDC client
-(e.g. for My Apps) before you're even asked to build this
+(e.g. for XAppHub) before you're even asked to build this
 feature — if that already happened, the credentials exist and you don't need
 to ask the user for anything or register a redirect URI yourself.
 
@@ -469,7 +470,7 @@ to ask the user for anything or register a redirect URI yourself.
    > it alongside the connector env vars — SSO logins fail without it.
 4. If no such connector is `connected` yet, tell the user they may be able to
    enable one from the project's Connectors settings page (auto-provision,
-   one click — e.g. for My Apps) instead of manually registering with an
+   one click — e.g. for XAppHub) instead of manually registering with an
    IDP — then fall back to the fully manual Steps 2–3 below only if they want
    to proceed without it, or are integrating a provider with no Connectors
    auto-provision option (Azure/Google/Okta/Auth0/other).
@@ -517,7 +518,7 @@ pnpm add jose
 
 ### Step 2: Add Environment Variables
 
-Skip this if **Step 0** already found a connected My Apps connector — use its
+Skip this if **Step 0** already found a connected XAppHub connector — use its
 `envVars` instead of the placeholder values below.
 
 ```env
@@ -567,7 +568,7 @@ OAUTH_SCOPES=openid email profile
 
 ### Step 3: Register Redirect URI with IDP
 
-Skip this for My Apps if **Step 0** found a connected connector — the
+Skip this for XAppHub if **Step 0** found a connected connector — the
 redirect URI was already registered automatically when the connector was
 provisioned.
 

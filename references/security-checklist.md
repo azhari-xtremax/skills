@@ -57,7 +57,7 @@ Quick reference for web application security. Use alongside the `security-and-ha
 - [ ] An expired session is refreshed through the Supabase client, or the user signs in again
 - [ ] Rate limiting on the application's sign-in route (≤10 attempts per 15 minutes)
 - [ ] No password recovery flow and no password change through the Supabase client: neither is available on an Engine project, and an administrator resets a user's password in the Studio's Users module
-- [ ] An account that holds no role in the project's tenant is refused at password sign-in, and the application ends a My Apps session of such an account: every user is given a role there when it is created, and an administrator gives one to each account that My Apps sign-in creates
+- [ ] An account that holds no role in the project's tenant is refused at password sign-in, and the application ends an XAppHub session of such an account: every user is given a role there when it is created, and an administrator gives one to each account that XAppHub sign-in creates
 - [ ] Account lockout after repeated failures (optional, with notification)
 <!-- /buildpad-backend -->
 
@@ -188,5 +188,5 @@ res.status(500).json({
 - [ ] No service-role key or Supabase secret appears anywhere (code, `NEXT_PUBLIC_*` or other environment variables, pipeline secrets): an Engine project has none
 - [ ] The data API's cross-origin setting is the provisioned any-origin-without-credentials, unchanged
 - [ ] Access is enforced by roles, policies and permissions on every request, not by client-side gating
-- [ ] On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes of the `external-oauth` module, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`. For My Apps sign-in the CLI installs the `external-oauth-engine` module in place of `external-oauth`; its routes are used as the `add-external-oauth` skill says.
+- [ ] On an Engine project some files the Buildpad CLI generates cannot be used yet: `lib/supabase/admin.ts`, the OAuth callback and provider routes of the `external-oauth` module, the server-side enforcer and session modules, and `lib/module-access/enforce.ts`. Do not call them; check module access by forwarding the user's token to `GET <Engine_URL>/api/permissions/me` and reading `isAdmin` and `moduleAccess`. For XAppHub sign-in the CLI installs the `external-oauth-engine` module in place of `external-oauth`; its routes are used as the `add-external-oauth` skill says.
 <!-- /buildpad-backend -->

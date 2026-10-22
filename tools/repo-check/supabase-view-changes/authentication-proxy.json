@@ -22,5 +22,17 @@
     "kind": "text",
     "reason": "The Engine-project sentences now say that My Apps sign-in is available there, with its callback redirect, and that every other OAuth provider is not (ES-5 reworded); the Supabase text is unchanged.",
     "release": "v3.0.0"
+  },
+  {
+    "path": "authentication-proxy/SKILL.md",
+    "kind": "text",
+    "reason": "The Engine-project sentences, ES-4 and ES-5 among them, name the identity provider product XAppHub (formerly My Apps); the provider id my-apps, the Supabase routes and the external OAuth section are unchanged.",
+    "release": "unreleased"
+  },
+  {
+    "path": "authentication-proxy/references/authentication-proxy.instructions.md",
+    "kind": "text",
+    "reason": "The Engine-project sentences, ES-5 among them, name the identity provider product XAppHub (formerly My Apps); the Supabase text is unchanged.",
+    "release": "unreleased"
   }
 ]
