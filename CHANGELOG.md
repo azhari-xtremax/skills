@@ -14,10 +14,10 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
-## Unreleased
+## v5.1.0
 
-The Organisation Platform connector's guide is now part of the skills. No existing file changes,
-so this is a MINOR release.
+The Organisation Platform connector's guide is now part of the skills. Install it with
+`npx skills add buildpad-ai/skills#v5.1.0`. No existing file changes, so this is a MINOR release.
 
 - `create-service/references/organization-platform.instructions.md` is new. It tells the agent how
   to integrate with the Organisation Platform once a project has connected it on the Buildpad
