@@ -1418,8 +1418,17 @@ renumbered; the requirements' Dependencies record both rows as met (a dated note
   names both tools without that prefix (CONTRIBUTING, "Name an unavailable feature in plain
   words"). No Revalidation Trigger (S8) fires in either repository. Module access keys
   keep the `items` path as the documented one.
+- **H5. ES-9, the `scope` tool** (added later on 23 October 2026, read at the same commit). The
+  tool has two actions, both served to an administrator only: `assign_user_role` (arguments under
+  `assignment`) and `create_config` (the body of `POST /api/scope/collection-config` under
+  `config_data`, through the same service and checks; `add_fk` is accepted and ignored)
+  (`src/domain/mcp/feature/tools/parity_scope_tool.go`). Both are present from Engine
+  0.1.0-dev.1, so ES-9's "only assigns a role" was never true. ES-9 now names both actions, and
+  `daas-platform` (the tool table and `daas-mcp-tools`) and `create-rbac` (`rbac-setup`) say the
+  same. The tool still reads and edits no scope type or item.
 
-The two statements now read, and are copied verbatim (in `CONTRIBUTING.md`, in every folder that
+ES-9 now reads as `CONTRIBUTING.md` gives it, copied verbatim to every folder that carries it and
+to `test/guard.test.mjs`. The two statements of H1 and H2 now read, and are copied verbatim (in `CONTRIBUTING.md`, in every folder that
 carries them and in `test/guard.test.mjs`):
 
 | Id | Text |

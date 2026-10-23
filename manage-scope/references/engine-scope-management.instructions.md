@@ -38,7 +38,7 @@ something is not available, tell the developer so and stop: do not build a subst
 
 # Scope Management Instructions (Engine project)
 
-On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool only assigns a role to a user at a scope (`assign_user_role`).
+On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool, served to an administrator only, assigns a role to a user at a scope (`assign_user_role`) and registers a collection as tenanted (`create_config`, the body of `POST /api/scope/collection-config`).
 
 The Engine's scope system provides hierarchical data separation inside the project using `daas_scope_types` (hierarchy levels) and `daas_scope_items` (concrete nodes). The active scope of any request is the `X-Resource-Uri` header; a cookie on the app's origin never reaches the Engine. Every write below needs an administrator's session (`Authorization: Bearer <access token>`); never send the project's MCP token to these routes.
 

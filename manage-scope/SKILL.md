@@ -794,7 +794,7 @@ Create an order with O2M order_lines — both get `resource_uri` injected automa
 <!-- buildpad-backend: engine -->
 The Buildpad Engine's **scope system** is the standard way to separate data inside an Engine project: customers, regions, branches or departments, as one hierarchy. Scopes live in the Engine's own collections (`daas_scope_types`, `daas_scope_items`, `daas_scope_collection_config`) and the Engine enforces them on every request — no junction tables, no tenant filter on every permission.
 
-On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool only assigns a role to a user at a scope (`assign_user_role`).
+On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool, served to an administrator only, assigns a role to a user at a scope (`assign_user_role`) and registers a collection as tenanted (`create_config`, the body of `POST /api/scope/collection-config`).
 
 > **API first:** sign in as an administrator and call these routes with that session's access token as `Authorization: Bearer`. The token in the project's MCP configuration is accepted only on the MCP endpoint: never send it to these routes.
 

@@ -422,7 +422,8 @@ The platform resolves: active scope URI → match `scope_field` value → return
 }
 
 // 4. Configure collection to filter by scope — POST /api/scope/collection-config,
-//    with an administrator's session (the MCP scope tool only assigns roles)
+//    with an administrator's session, or this body as config_data of the MCP
+//    scope tool's create_config
 {
   "collection": "orders",
   "field_name": "resource_uri",
