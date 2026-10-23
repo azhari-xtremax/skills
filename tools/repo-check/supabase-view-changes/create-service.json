@@ -3,6 +3,6 @@
     "path": "create-service/references/organization-platform.instructions.md",
     "kind": "new-file",
     "reason": "New connector reference for the Organisation Platform, read when a project has that connector; it was shipped only in the Platform's vendored copy until now.",
-    "release": "unreleased"
+    "release": "v5.1.0"
   }
 ]
