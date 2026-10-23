@@ -192,7 +192,7 @@ Problem → Root Cause → Fix
 
 The Engine's log is at `GET <Engine_URL>/api/logs`, for an administrator or a user whose role grants the `system:logs` module key.
 
-On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere. When the browser blocks a call to the Engine, the call was sent with credentials included, or it carried a header that the Engine does not accept from another origin. `X-Tenant-Id` is such a header: the Engine does not accept it from a browser yet. Send the user's access token as `Authorization: Bearer` and no cookie, send `X-Tenant-Id` only from the application's own server route (the sign-in), and change no setting.
+On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere. When the browser blocks a call to the Engine, the call was sent with credentials included, or it carried a header that the Engine does not accept from another origin. The Engine accepts `Authorization`, `Content-Type`, `X-Tenant-Id` and the Supabase client's own headers from another origin. Send the user's access token as `Authorization: Bearer` and no cookie, send `X-Tenant-Id` only from the application's own server route (the sign-in), and change no setting.
 <!-- /buildpad-backend -->
 
 ### Build Failure Triage (Next.js)

@@ -228,8 +228,9 @@ On an Engine project the MCP server lets AI agents:
 - **Configure permissions** - Set up roles, policies, access grants and permission rules (admin only)
 - **Assign scoped roles** - Bind a role to a user at a scope (admin only)
 - **Run workflows** - Read workflow definitions and run a command on an instance
+- **Manage stored code and settings** - Cron jobs, custom services, hooks, mail settings and module access keys (admin only)
 
-Hooks and cron jobs are not managed through the MCP server on an Engine project: see [Hooks, cron jobs and logs on an Engine project](#hooks-cron-jobs-and-logs-on-an-engine-project).
+For hooks, cron jobs and the application log, see [Hooks, cron jobs and logs on an Engine project](#hooks-cron-jobs-and-logs-on-an-engine-project).
 
 ## DAAS MCP Endpoint
 
@@ -293,6 +294,14 @@ The caller's permissions decide what each call may read or write.
 | `access`      | Grant a policy to a role or a user, read the grants, revoke one (`create`, `read`, `delete`) |
 | `permissions` | Manage the permission rules inside a policy (CRUD)                                   |
 | `scope`       | Assign a role to a user, optionally at one scope (`assign_user_role` only)           |
+| `cron`        | `list`, `read`, `create`, `update`, `delete`, `activate`, `deactivate`, `clone`, `run_now` and `history` for cron jobs |
+| `services`    | `list`, `read`, `create`, `update`, `delete`, `run_tests`, `activate` and `deactivate` for custom services |
+| `extensions`  | `list`, `read`, `create`, `update`, `delete`, `activate`, `deactivate` and `clone` for hooks |
+| `smtp-settings` | `get` and `update` the mail settings, and `test` them                              |
+| `module_access_keys` | `create`, `read`, `update` and `delete` module access keys                    |
+| `cors-settings` | `get` and `update` the cross-origin settings: change nothing through it, as the project's cross-origin settings stay as provisioned |
+
+The last six take their fields at the top level of `arguments`, next to `action` and `id`. A change takes effect as the REST write of the same body does, and a `delete` is refused while the project's MCP deletes are off. They are served from Engine 0.1.0-dev.4: if `tools/list` does not list them, use the REST routes.
 
 On an Engine project collections, fields, relations, roles, policies and permissions are created through the Engine's API (`/api/collections`, `/api/fields/:collection`, `/api/relations`, `/api/roles`, `/api/policies`, `/api/access`, `/api/permissions`) or its MCP tools `collections`, `fields`, `relations`, `roles`, `policies`, `access` and `permissions`. Access is roles, policies and permissions: a permission belongs to a policy, and a policy is attached to a role or a user. The MCP `collections` and `fields` tools keep a field's name, type and `meta` but not its `schema` block (default, not-null, length): set those through `POST /api/fields/:collection` with an administrator's session.
 
@@ -308,7 +317,7 @@ On an Engine project collections, fields, relations, roles, policies and permiss
 
 The Engine also serves an older set of tools that name the operation in the tool, not in an `action` argument: `daas_read_items`, `daas_create_item`, `daas_update_item`, `daas_delete_item` (listed only while deletes are allowed), `daas_list_collections`, `daas_get_schema`, `daas_create_collection` (administrators only), `daas_list_files`, `daas_list_workflows` and `daas_trigger_transition`. The same permissions apply.
 
-The Engine's MCP server has no tool that returns a file's content, and none for runtime hooks, cron jobs or the application log. File content is served at `/api/files/assets/:id`, with a session or a signed token; hooks, cron jobs and the log are described in [Hooks, cron jobs and logs on an Engine project](#hooks-cron-jobs-and-logs-on-an-engine-project).
+The Engine's MCP server has no tool that returns a file's content, and none for the application log. File content is served at `/api/files/assets/:id`, with a session or a signed token; hooks, cron jobs and the log are described in [Hooks, cron jobs and logs on an Engine project](#hooks-cron-jobs-and-logs-on-an-engine-project).
 <!-- /buildpad-backend -->
 
 ---
@@ -1762,10 +1771,10 @@ Clear all logs from memory:
 <!-- buildpad-backend: engine -->
 ## Hooks, cron jobs and logs on an Engine project
 
-On an Engine project the MCP server has no tool for runtime hooks, for cron jobs or for the application log. Do not call one. Each capability is reached another way:
+On an Engine project an administrator manages hooks with the MCP tool `extensions` and cron jobs with the MCP tool `cron`, or through the Studio and the REST routes below. The MCP server has no tool for the application log: do not look for one.
 
-- **Hooks** run code in the Engine when an item is written: a `filter` hook runs before the write and may change the payload or abort it (validation, data transformation); an `action` hook runs after it (audit logging, notifications, external sync). Create and manage hooks in the Studio, or through `<Engine_URL>/api/extensions` with an administrator's session (`POST` to create, `PATCH` and `DELETE` on `/api/extensions/:id`, and `POST /api/extensions/:id/activate`, `/deactivate` and `/clone`). Event names are `items.create`, `items.update` and `items.delete`, or the same prefixed with a collection (`articles.items.create`). The [hooks-extensions](../../hooks-extensions/SKILL.md) skill has the code a hook may run.
-- **Cron jobs** run stored code on a schedule. Create and manage them in the Studio's Cron module, or through `<Engine_URL>/api/cron` with an administrator's session (`/api/cron/:id`, `POST /api/cron/:id/run`, `POST /api/cron/:id/clone`, `GET /api/cron/:id/history`). On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. The [create-cron](../../create-cron/SKILL.md) skill has the steps.
+- **Hooks** run code in the Engine when an item is written: a `filter` hook runs before the write and may change the payload or abort it (validation, data transformation); an `action` hook runs after it (audit logging, notifications, external sync). Create and manage hooks in the Studio, with the MCP tool `extensions`, or through `<Engine_URL>/api/extensions` with an administrator's session (`POST` to create, `PATCH` and `DELETE` on `/api/extensions/:id`, and `POST /api/extensions/:id/activate`, `/deactivate` and `/clone`). Event names are `items.create`, `items.update` and `items.delete`, or the same prefixed with a collection (`articles.items.create`). The [hooks-extensions](../../hooks-extensions/SKILL.md) skill has the code a hook may run.
+- **Cron jobs** run stored code on a schedule. Create and manage them in the Studio's Cron module, with the MCP tool `cron`, or through `<Engine_URL>/api/cron` with an administrator's session (`/api/cron/:id`, `POST /api/cron/:id/run`, `POST /api/cron/:id/clone`, `GET /api/cron/:id/history`). On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. The [create-cron](../../create-cron/SKILL.md) skill has the steps.
 - **Stored code** (hooks and cron jobs) runs in the Engine's runtime, which has no `fetch`, `process` or `require`; the two skills above say what it provides.
 - **Logs** are read with `GET <Engine_URL>/api/logs`, with the session of an administrator or of a user granted the `system:logs` module access. The parameters `level`, `source`, `extensionName` and `limit` narrow the answer (one value each). `GET /api/logs/stream` streams new entries, and `DELETE /api/logs` clears them (administrators only).
 
@@ -1932,7 +1941,7 @@ Always read schema before operating on collections:
 
 ### 2. Try Hooks on Scratch Data Before Relying on Them
 
-On an Engine project hooks are not managed through the MCP server, and no route test-runs a hook. Create the hook with `"status": "inactive"` in the Studio or through `POST <Engine_URL>/api/extensions`, activate it (`POST /api/extensions/:id/activate`), write a scratch item with the `items` tool, and check the result and the log (`GET /api/logs`). Deactivate it (`POST /api/extensions/:id/deactivate`) if it misbehaves. See the [hooks-extensions](../../hooks-extensions/SKILL.md) skill.
+On an Engine project no route or MCP action test-runs a hook. Create the hook with `"status": "inactive"` in the Studio, through `POST <Engine_URL>/api/extensions` or with the MCP tool `extensions` (administrators only), activate it (`POST /api/extensions/:id/activate`, or the tool's `activate`), write a scratch item with the `items` tool, and check the result and the log (`GET /api/logs`). Deactivate it (`POST /api/extensions/:id/deactivate`) if it misbehaves. See the [hooks-extensions](../../hooks-extensions/SKILL.md) skill.
 <!-- /buildpad-backend -->
 
 ### 3. Use Proper Permissions

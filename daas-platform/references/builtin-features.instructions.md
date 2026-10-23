@@ -241,7 +241,7 @@ DaaS Custom Services allow you to write reusable JavaScript modules that can be 
 
 The Engine provides comprehensive file management, including upload, direct-to-storage signed uploads for large files, metadata, signed URLs, and hierarchical folders.
 
-On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`: a browser cannot name the tenant on an anonymous read yet. Set no storage bucket option: the Engine stores files on its own disk or in S3.
+On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read: an `<img>` element or a link sends no `X-Tenant-Id`. Set no storage bucket option: the Engine stores files on its own disk or in S3.
 
 | What | How |
 |------|-----|
@@ -499,7 +499,7 @@ The Engine's project settings (SMTP, MCP, general) are kept in a single `daas_se
 | Read settings | `GET /api/settings` |
 | Update settings | `PATCH /api/settings` (administrator) |
 | Cross-origin settings | Change nothing (below) |
-| SMTP config | `GET/PATCH /api/settings/smtp` (administrator); there is no MCP tool for it |
+| SMTP config | `GET/PATCH /api/settings/smtp` (administrator), or the MCP tool `smtp-settings` (`get`, `update`, `test`; administrators only) |
 | MCP config | `GET/PATCH /api/settings/mcp` (administrator) |
 
 On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere.

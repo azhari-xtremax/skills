@@ -34,9 +34,9 @@ The diagram shows a Supabase project, where the right-hand column is the DaaS ba
 
 - **CORS**: The DaaS backend runs on a different port/domain. Browser requests to
   cross-origin servers trigger CORS preflight checks and cookie restrictions. On an Engine
-  project the data API accepts requests from any origin but never with cookies, and a browser
-  cannot send the tenant header `X-Tenant-Id` to it yet, so the sign-in that names the tenant is
-  made by the app's own server route, which sends `X-Tenant-Id` with the value of
+  project the data API accepts requests from any origin but never with cookies. A browser may
+  send the tenant header `X-Tenant-Id` to it, without credentials, but the sign-in that names the
+  tenant is still made by the app's own server route, which sends `X-Tenant-Id` with the value of
   `NEXT_PUBLIC_BUILDPAD_TENANT_ID`.
 - **Security**: Server-side proxy routes can forward auth tokens securely without
   exposing them to the browser.

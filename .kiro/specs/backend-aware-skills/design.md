@@ -1376,6 +1376,70 @@ only", spelled exactly `XAppHub`:
 - The Supabase view of six files changes (the name only), and each has an `unreleased`
   change-file entry: so the next release is MAJOR.
 
+## Engine-fact corrections, 23 October 2026
+
+Written on 23 October 2026, at the maintainer's request. Two dependencies are met, read at
+`buildpad-daas-go` `aws-dev/release/dev` `8966049b` (Engine 0.1.0-dev.7) with `git show` only:
+
+- **PP-28** (F9; `cross-origin-provisioning-contract`, Engine entry 157, since 0.1.0-dev.3).
+  `X-Tenant-Id` is in `CorsDefaultAllowedHeaders`, and `CorsEngineHeaders` (`Authorization`,
+  `Content-Type`, `X-Tenant-Id` and the three Supabase client headers) are added to any stored
+  list (`src/domain/governance/constant/constant.go`). The infrastructure sets neither
+  `CORS_ALLOWED_ORIGINS` nor `CORS_ALLOW_CREDENTIALS`, so a deployed Engine accepts any origin and
+  no credentials (ES-15 holds).
+- **PP-29** (F17 and F18; `mcp-starter-kit-tools`, Engine entry 162, since 0.1.0-dev.4).
+  `/api/mcp` serves `cron`, `services`, `extensions`, `cors-settings`, `smtp-settings` and
+  `module_access_keys`, all six in `AdminOnlyTools` (`src/domain/mcp/constant/constant.go`), with
+  the actions F18 lists. The token in a kit's MCP configuration is the Project_Administrator's, so
+  the agent can use them; a worker's is not, so it sees none. A project on 0.1.0-dev.1 to
+  0.1.0-dev.3 lacks the six. There is still no `logs`, `assets` or utilities tool.
+
+The text above is left as it was approved. No criterion is added, reworded, withdrawn or
+renumbered; the requirements' Dependencies record both rows as met (a dated note there).
+
+**Corrections**:
+
+- **H1. ES-4** (task 10.5). A browser can send `X-Tenant-Id` to the Engine from another origin,
+  without cookies or credentials. The recommendation does not change: the sign-in that names the
+  tenant is still made through the application's own server route.
+- **H2. ES-11** (task 10.5). A file shown in a browser is still loaded through a signed URL; the
+  reason is now that an `<img>` element or a link sends no `X-Tenant-Id`, not that a browser cannot
+  name the tenant.
+- **H3. The six MCP tools** (task 10.4). Engine text names each tool where it said there is none,
+  as listed and served to an administrator only, with its actions, the `mcp_allow_deletes` gate on
+  `delete`, and the Studio and REST paths kept for an older Engine. The `x-pp29-tool` patterns are
+  removed from `lib/guard.mjs` and `test/guard.test.mjs`.
+- **H4. Kept.** The agent changes no cross-origin setting (ES-15): Engine text names
+  `cors-settings` only to say so. The shared contract's `cors-mcp` and `missing-mcp` patterns are
+  unchanged, so Engine text names `cors-settings`, `smtp-settings` and `module_access_keys` without
+  the `mcp_daas_` prefix. Both tools now exist, so `missing-mcp` no longer marks a
+  missing tool. **Decided 23 October 2026 by the maintainer: the pattern is kept unchanged.** It
+  refuses only the `mcp_daas_` call names and a `"name"` member naming either tool; Engine text
+  names both tools without that prefix (CONTRIBUTING, "Name an unavailable feature in plain
+  words"). No Revalidation Trigger (S8) fires in either repository. Module access keys
+  keep the `items` path as the documented one.
+
+The two statements now read, and are copied verbatim (in `CONTRIBUTING.md`, in every folder that
+carries them and in `test/guard.test.mjs`):
+
+| Id | Text |
+|---|---|
+| ES-4 | On an Engine project the data API serves no request without a session; only the sign-in, `GET /api/server/info` and the Engine's password routes (which ES-5 says not to use) are served without one. The requests that take their tenant from the header `X-Tenant-Id` are the password sign-in, XAppHub sign-in and anonymous reads of public files. A browser can send `X-Tenant-Id` to the Engine from another origin, without cookies or credentials: the Engine allows that header from any origin and allows no credentialed cross-origin request. Even so, the request that names the tenant is the sign-in made through the application's own server route, which sends `X-Tenant-Id` with the value of `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. A public file shown in a browser is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read. A request without a session that names no tenant is served from the Engine's host plane, not from the project. A request with a session takes its tenant from the session. |
+| ES-11 | On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read: an `<img>` element or a link sends no `X-Tenant-Id` (ES-4). Set no storage bucket option: the Engine stores files on its own disk or in S3. |
+
+**Skill text changed** besides the verbatim copies. Browser: `add-buildpad` (Storybook token),
+`authentication-proxy` (reference), `create-project`, `debugging-and-error-recovery` (SF2's
+paragraph: the Engine accepts `X-Tenant-Id` cross-origin). MCP tools: `add-cron`, `add-microapp`,
+`context-engineering`, `create-cron`, `create-rbac`, `create-service`, `daas-platform`,
+`grant-module-access` and `hooks-extensions`. Four Supabase views change, each in a shared sentence
+that names the Engine, with an `unreleased` change-file entry: `authentication-proxy/SKILL.md`,
+`authentication-proxy/references/authentication-proxy.instructions.md`, `buildpad-reference/SKILL.md`
+and `context-engineering/SKILL.md`. So the next release is MAJOR.
+
+**Not changed here.** ES-13n still holds: `run_now` is a run by hand. The MCP `scope` tool at
+`8966049b` also has a `create_config` action, which ES-9 does not name; that is a separate
+correction.
+
 ## Design review gate
 Run on the revision of 16 October 2026; the second pass found nothing to repair.
 - **Traceability (mechanical):** 66 live ids extracted from `requirements.md`; 66 rows above, one

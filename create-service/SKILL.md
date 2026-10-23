@@ -113,7 +113,7 @@ Always create services as `draft` initially, add tests, verify, then activate.
 <!-- buildpad-backend: engine -->
 ### 1. Create a Custom Service (Draft First)
 
-Always create services as `draft` initially, add tests, verify, then activate. On an Engine project create a service in the Studio's Custom Services module, or through the Engine's REST API from a server-side script or route with an administrator's access token (a user whose role holds `create` on `daas_custom_services` may create one too). There is no MCP tool for custom services on an Engine project. An omitted `status` is stored as `draft`.
+Always create services as `draft` initially, add tests, verify, then activate. On an Engine project create a service in the Studio's Custom Services module, or through the Engine's REST API from a server-side script or route with an administrator's access token (a user whose role holds `create` on `daas_custom_services` may create one too), or with the Engine's MCP tool `services`, which is listed and served to an administrator only. An omitted `status` is stored as `draft`.
 
 On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
 
@@ -438,7 +438,7 @@ Services can depend on other services:
 <!-- buildpad-backend: engine -->
 ## REST Routes
 
-On an Engine project custom services are managed in the Studio's Custom Services module or through these routes, decided by the caller's grant on `daas_custom_services` (an administrator passes every check). There is no MCP tool for them.
+On an Engine project custom services are managed in the Studio's Custom Services module or through these routes, decided by the caller's grant on `daas_custom_services` (an administrator passes every check), or through the Engine's MCP tool `services` (administrators only).
 
 | Method   | Path                      | Needs                     | Description                          |
 | -------- | ------------------------- | ------------------------- | ------------------------------------ |

@@ -45,7 +45,7 @@ Set up scheduled background tasks using the DaaS cron system. Cron jobs run recu
 Cron jobs are stored in the database (`daas_cron_jobs`) and executed at runtime using the same JavaScript sandbox as [Runtime Extensions](../hooks-extensions/SKILL.md). They are managed via REST API or MCP.
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
-Cron jobs are stored in the Engine (`daas_cron_jobs`) and executed by the Engine's runtime, the same runtime as [Runtime Extensions](../hooks-extensions/SKILL.md). They are managed in the Studio's Cron module or through the Engine's REST API (`<Engine_URL>/api/cron`) with an administrator's session. On an Engine project there is no MCP tool for cron jobs: do not look for one.
+Cron jobs are stored in the Engine (`daas_cron_jobs`) and executed by the Engine's runtime, the same runtime as [Runtime Extensions](../hooks-extensions/SKILL.md). They are managed in the Studio's Cron module, through the Engine's REST API (`<Engine_URL>/api/cron`) with an administrator's session, or through the Engine's MCP tool `cron`, which is listed and served to an administrator only (see [Cron REST Routes](#cron-rest-routes)).
 
 On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
 
@@ -333,7 +333,7 @@ What a cron job's code has on the Engine, and what replaces what it lacks.
 
 ### Cron REST Routes
 
-On an Engine project cron jobs are managed through these routes (or the Studio's Cron module). There is no MCP tool for them.
+On an Engine project cron jobs are managed through these routes, the Studio's Cron module, or the Engine's MCP tool `cron`. The tool is listed and served to an administrator only, so the agent can use it when the project's MCP configuration carries an administrator's token. Its `action` is `list`, `read`, `create`, `update`, `delete`, `activate`, `deactivate`, `clone`, `run_now` or `history`; the job's fields (`name`, `schedule`, `timezone`, `code`, `status`, `timeout_ms`) and `id` stand at the top level of `arguments`, and a change takes effect as the route's write of the same body does. A `delete` is refused while the project's MCP deletes are off. If the tool is not listed, the project's Engine is older than 0.1.0-dev.4: use these routes.
 
 | Method   | Path                     | Needs on `daas_cron_jobs` | Purpose                          |
 | -------- | ------------------------ | ------------------------- | -------------------------------- |

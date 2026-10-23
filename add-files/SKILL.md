@@ -113,7 +113,7 @@ Size and MIME limits come from the Supabase bucket (Supabase Studio → bucket s
 **Never insert into `daas_files` directly, and never mint signed URLs from the app.** Bypassing DaaS skips its permission, size, type, bucket, and ownership checks, and the column default `storage = 'local'` names a bucket that does not exist — every later `/api/assets/:id` call then fails with `FILE_NOT_FOUND` ("Failed to retrieve file"). Through DaaS, `storage` comes from the upload token and defaults to the `files` bucket.
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
-On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`: a browser cannot name the tenant on an anonymous read yet. Set no storage bucket option: the Engine stores files on its own disk or in S3.
+On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read: an `<img>` element or a link sends no `X-Tenant-Id`. Set no storage bucket option: the Engine stores files on its own disk or in S3.
 
 The hook reaches the Engine through the proxy routes, in one of two ways:
 

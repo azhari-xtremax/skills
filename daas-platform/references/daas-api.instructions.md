@@ -148,7 +148,7 @@ On an Engine project there is **one way to authenticate a data call**: the signe
 
 On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
 
-On an Engine project the data API serves no request without a session; only the sign-in, `GET /api/server/info` and the Engine's password routes (which an application does not use: password recovery is not available on an Engine project) are served without one. The requests that take their tenant from the header `X-Tenant-Id` are the password sign-in, XAppHub sign-in and anonymous reads of public files. A browser cannot send `X-Tenant-Id` to the Engine until the Engine allows that header from another origin, which it does not yet do: so the request that names the tenant is the sign-in made through the application's own server route, which sends `X-Tenant-Id` with the value of `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. A public file shown in a browser is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read. A request without a session that names no tenant is served from the Engine's host plane, not from the project. A request with a session takes its tenant from the session.
+On an Engine project the data API serves no request without a session; only the sign-in, `GET /api/server/info` and the Engine's password routes (which an application does not use: password recovery is not available on an Engine project) are served without one. The requests that take their tenant from the header `X-Tenant-Id` are the password sign-in, XAppHub sign-in and anonymous reads of public files. A browser can send `X-Tenant-Id` to the Engine from another origin, without cookies or credentials: the Engine allows that header from any origin and allows no credentialed cross-origin request. Even so, the request that names the tenant is the sign-in made through the application's own server route, which sends `X-Tenant-Id` with the value of `NEXT_PUBLIC_BUILDPAD_TENANT_ID`. A public file shown in a browser is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read. A request without a session that names no tenant is served from the Engine's host plane, not from the project. A request with a session takes its tenant from the session.
 
 ### 1. Sign-in (Supabase client, sign-in only)
 
@@ -700,7 +700,7 @@ On an Engine project a relation is addressed by its collection and field, not by
 
 ### Files
 
-On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`: a browser cannot name the tenant on an anonymous read yet. Set no storage bucket option: the Engine stores files on its own disk or in S3.
+On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read: an `<img>` element or a link sends no `X-Tenant-Id`. Set no storage bucket option: the Engine stores files on its own disk or in S3.
 
 | Method | Endpoint                  | Description                                                              |
 | ------ | ------------------------- | ------------------------------------------------------------------------ |
@@ -972,7 +972,7 @@ On an Engine project the scheduler does not run yet: a cron job runs only when i
 | DELETE | `/api/services/:id`         | Delete custom service              |
 | POST   | `/api/services/:id/tests`   | Run the service's tests (admin)    |
 
-See the [create-service skill](../../create-service/SKILL.md). Cron jobs, custom services and hooks are managed with an administrator's session; the Engine's MCP server has no tool for them.
+See the [create-service skill](../../create-service/SKILL.md). Cron jobs, custom services and hooks are managed with an administrator's session, or by an administrator through the Engine's MCP tools `cron`, `services` and `extensions`.
 
 ### Utilities
 

@@ -153,7 +153,7 @@ Files and the Form Builder also need the DaaS proxy routes: `npx @buildpad/cli@l
 
 On an Engine project the data API's address is the Engine_URL, which both `NEXT_PUBLIC_BUILDPAD_DAAS_URL` and `NEXT_PUBLIC_SUPABASE_URL` hold. The Studio's address is an administration interface: send no data call to it.
 
-On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`: a browser cannot name the tenant on an anonymous read yet. Set no storage bucket option: the Engine stores files on its own disk or in S3. The generated `app/api/assets/[id]/route.ts` forwards to `/api/assets/:id`, a path the Engine does not serve: see [add-files](../add-files/SKILL.md) for what to do instead.
+On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read: an `<img>` element or a link sends no `X-Tenant-Id`. Set no storage bucket option: the Engine stores files on its own disk or in S3. The generated `app/api/assets/[id]/route.ts` forwards to `/api/assets/:id`, a path the Engine does not serve: see [add-files](../add-files/SKILL.md) for what to do instead.
 <!-- /buildpad-backend -->
 
 > The `ui.buildpad.ai` docs use the shorthand `buildpad add <targets>` (global install); `npx @buildpad/cli@latest add <targets>` is the equivalent no-install form.
