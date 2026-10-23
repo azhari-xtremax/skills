@@ -14,10 +14,10 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
-## Unreleased
+## v5.2.0
 
-One Engine statement was wrong. It stands only in text for Engine projects, so this is a MINOR
-release.
+One Engine statement was wrong. Install it with `npx skills add buildpad-ai/skills#v5.2.0`. The
+statement stands only in text for Engine projects, so this is a MINOR release.
 
 - **The Engine's MCP `scope` tool has two actions.** Besides `assign_user_role`, it serves
   `create_config`, which registers a collection as tenanted: it takes the body of
