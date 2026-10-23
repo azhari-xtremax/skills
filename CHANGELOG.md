@@ -14,6 +14,26 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## Unreleased
+
+The Organisation Platform connector's guide is now part of the skills. No existing file changes,
+so this is a MINOR release.
+
+- `create-service/references/organization-platform.instructions.md` is new. It tells the agent how
+  to integrate with the Organisation Platform once a project has connected it on the Buildpad
+  Platform's Connectors page: the `@xtremax/organisation-platform` package first, the raw external
+  API where the package does not apply, and the Automation > Role assignment (rules) screen in the
+  app's admin domain. The agent finds it as it finds every connector's guide, by the provider key
+  (`organization-platform`) in `get_project_detail`'s `connectors[]`.
+- The file was written on the Buildpad Platform and shipped only in its vendored copy of the
+  skills, so every sync of a release deleted it. Its text is unchanged.
+
+### Supabase projects
+
+No existing file changes. This file is new:
+
+- `create-service/references/organization-platform.instructions.md` (new-file)
+
 ## v5.0.0
 
 Two Engine statements were out of date. Install it with
