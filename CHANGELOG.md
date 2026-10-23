@@ -14,12 +14,14 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
-## Unreleased
+## v5.0.0
 
-Two Engine statements were out of date. The release that carries this is a MAJOR release, because
-four of the changed sentences stand in text that a Supabase project's agent also reads (see
-**Supabase projects** below). No skill is added, removed or renamed, and the "Establish the
-backend first" procedure stays at version 1.
+Two Engine statements were out of date. Install it with
+`npx skills add buildpad-ai/skills#v5.0.0`.
+
+This is a MAJOR release because four of the changed sentences stand in text that a Supabase
+project's agent also reads (see **Supabase projects** below). No skill is added, removed or
+renamed, and the "Establish the backend first" procedure stays at version 1.
 
 - **The Engine's MCP server serves cron jobs, hooks, custom services and settings.** From Engine
   0.1.0-dev.4 it serves the tools `cron`, `services`, `extensions`, `cors-settings`,
