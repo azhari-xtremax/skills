@@ -1007,6 +1007,10 @@
     reword ES-4, ES-5, ES-7 and ES-16 for My Apps sign-in (G1 to G4). ES-16 no longer counts the
     OAuth routes of the CLI's `external-oauth-engine` module among the files that cannot be used;
     10.6 still switches the rest of ES-16 and stays blocked.
+  - Note 23 October 2026: PP-29 and PP-28 are met (`buildpad-daas-go` `8966049b`), recorded in the
+    requirements' Dependencies. The design's [Engine-fact corrections, 23 October 2026](design.md#engine-fact-corrections-23-october-2026)
+    word 10.4 and 10.5 (H1 to H4), and both are done on branch `docs/engine-mcp-cors-statements`.
+    The contract's `missing-mcp` pattern is stale and waits for the maintainer (H4).
 
 - [ ] 10.1 Switch ES-13n to ES-13m once the scheduler is listed available
   - Blocked until: row Decision P is recorded as met (a creation path runs the scheduler, infra
@@ -1031,14 +1035,14 @@
   - Done when: the Engine views of both folders hold steps and no stop text, and both test runs and
     `check.mjs` exit 0.
   - _Requirements: 3.5, 4.7_
-- [ ] 10.4 Add the MCP-tool paths once PP-29 is met
+- [x] 10.4 Add the MCP-tool paths once PP-29 is met
   - Blocked until: row PP-29 is recorded as met for the `cron`, `services` or `extensions` tool, and
     the design revision below is approved.
   - First, a design revision words them. Then add eng MCP steps in the four folders, and remove the
     `x-pp29-tool` patterns from `lib/guard.mjs` and `test/guard.test.mjs` for the tools now served.
   - Done when: guard tests pass without those patterns, and both test runs and `check.mjs` exit 0.
   - _Requirements: 3.1, 4.7_
-- [ ] 10.5 Revise ES-4 and ES-11 once PP-28 is met
+- [x] 10.5 Revise ES-4 and ES-11 once PP-28 is met
   - Blocked until: the Dependencies gain a row for PP-28 (the Engine allowing `X-Tenant-Id`
     cross-origin; it has none today, like Issue 6's gaps), that row is recorded as met, and the
     design revision below is approved.

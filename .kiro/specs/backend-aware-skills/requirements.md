@@ -502,7 +502,10 @@ rules, so that the channel that does not pass through the Platform is still guar
 
 What this repository needs from elsewhere before a criterion can hold. Statuses are the Platform
 and infrastructure documents' as read on 13 October 2026, brought up to date on 15 October 2026 for
-the decisions settled that day, in both batches; `SP-n` rows are found here.
+the decisions settled that day, in both batches; `SP-n` rows are found here. On 23 October 2026,
+at the maintainer's request, row PP-29 was recorded as met and row PP-28 was added, met, from
+`buildpad-daas-go` `8966049b` (Engine 0.1.0-dev.7); no criterion changed (design, Engine-fact
+corrections, 23 October 2026).
 
 | ID | Owner | What it is | Needed by | Status when read |
 |---|---|---|---|---|
@@ -513,7 +516,8 @@ the decisions settled that day, in both batches; `SP-n` rows are found here.
 | Decision H | Platform | Whether the Engine's data API accepts a static token, and what a worker presents | 3.2, 5.7 | Settled 15 October 2026, option (b): a worker presents its own Worker_Token, never the Service_Token. Unmet: PP-30, the Engine accepting the Worker_Token on its data API; today every route but the MCP endpoint refuses a static token |
 | Decision M, PP-21 | Platform, `buildpad-ui` | Browser calls by the consumer SDK that the Engine accepts | 3.1, 5.5 | Decision M settled 15 October 2026, option (b): the Engine answers no credentialed request, and the SDK is to send none. Unmet: the last clause of PP-21; the SDK sends credentialed requests that a browser refuses against the Engine's answer |
 | Decision P | Platform, infrastructure | Whether an Engine_Project runs the Engine's scheduler | 3.10, 3.14, 4.7 | Settled 15 October 2026, option (a): the scheduler runs, so the scheduled-job Skills may state that a job fires (3.14). Unmet until a creation path runs it (the infrastructure's Requirement 2 criterion 14); until then Requirement 4 criterion 7 applies |
-| PP-29 | Engine | The data-service MCP tools the Skills name: cron, services, extensions, cors-settings, smtp-settings and module access keys | 3.1, 3.6, 4.7 | Unmet. The Engine serves none of the six |
+| PP-29 | Engine | The data-service MCP tools the Skills name: cron, services, extensions, cors-settings, smtp-settings and module access keys | 3.1, 3.6, 4.7 | Met 23 October 2026: the Engine serves all six from 0.1.0-dev.4, to an administrator only. Before 23 October 2026: unmet, the Engine served none of the six |
+| PP-28 | Engine | The Engine allowing `X-Tenant-Id` from another origin, so that a browser may name the tenant | 3.8, 3.11 | Added and met 23 October 2026: from 0.1.0-dev.3 the Engine always allows `X-Tenant-Id` cross-origin, from any origin and without credentials |
 | PP-36 | `buildpad-ui` | Command-line templates that generate nothing an Engine_Project cannot use | 3.1, 5.4 | Unmet. The tool generates a service-role client and a remote-procedure permission check whatever a Skill says |
 | PP-34 | `buildpad-ui` | An SDK and templates that read the Tenant_Variable and name the tenant on a request without a session | 3.8 | Unmet |
 | Decision O, PP-37 | Platform, `buildpad-ui` | What happens to a user who holds no role in the Project_Tenant | 3.5, 3.7, 3.16, 3.17 | Settled 15 October 2026, option (a): a Generated_App's password sign-in carries `X-Tenant-Id`, and the Engine refuses an account with no role in the Project_Tenant. Unmet: PP-37 in its first form, owner `buildpad-ui` |
