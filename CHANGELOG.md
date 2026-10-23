@@ -14,6 +14,49 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## Unreleased
+
+Two Engine statements were out of date. The release that carries this is a MAJOR release, because
+four of the changed sentences stand in text that a Supabase project's agent also reads (see
+**Supabase projects** below). No skill is added, removed or renamed, and the "Establish the
+backend first" procedure stays at version 1.
+
+- **The Engine's MCP server serves cron jobs, hooks, custom services and settings.** From Engine
+  0.1.0-dev.4 it serves the tools `cron`, `services`, `extensions`, `cors-settings`,
+  `smtp-settings` and `module_access_keys`, to an administrator only. The token in a project's MCP
+  configuration is an administrator's, so the agent can use them. The skills said that there is no
+  MCP tool for any of them. `add-cron`, `add-microapp`, `context-engineering`, `create-cron`,
+  `create-rbac`, `create-service`, `daas-platform`, `grant-module-access` and `hooks-extensions`
+  now name each tool, with its actions. The Studio and the REST routes stay, for an Engine older
+  than 0.1.0-dev.4. There is still no MCP tool for the application log, for a file's content or
+  for the utilities.
+- **A browser can send `X-Tenant-Id` to the Engine.** From Engine 0.1.0-dev.3 the Engine allows
+  that header from any origin, without cookies or credentials. The skills said that a browser
+  cannot send it. The Engine statements ES-4 and ES-11 in [CONTRIBUTING](CONTRIBUTING.md) are
+  reworded, and every folder that carries them has the new text. The recommendation does not
+  change: the sign-in is made by the application's own server route, and a file shown in a browser
+  is loaded through a signed URL. `add-buildpad`, `authentication-proxy`, `create-project` and
+  `debugging-and-error-recovery` say the same.
+- The agent still changes no cross-origin setting (ES-15). The skills name the `cors-settings`
+  tool only to say so.
+- `tools/repo-check` no longer refuses the `cron`, `services` and `extensions` MCP tools in Engine
+  text (its `x-pp29-tool` patterns are removed). The shared contract `backend-contract.json` does
+  not change.
+
+The changes are recorded in `.kiro/specs/backend-aware-skills/design.md` (Engine-fact corrections,
+23 October 2026), and tasks 10.4 and 10.5 are done.
+
+### Supabase projects
+
+The Supabase steps, routes and guidance do not change. These files change because a sentence that
+names an Engine project stands in text that both kinds of project read. Each change, with its
+reason:
+
+- `authentication-proxy/SKILL.md` (text): The Engine-project sentences (ES-4) now say that a browser can send X-Tenant-Id to the Engine from another origin, without credentials, and that the sign-in still goes through the application's own server route; the Supabase routes are unchanged.
+- `authentication-proxy/references/authentication-proxy.instructions.md` (text): The Engine-project cross-origin sentence now says that a browser may send X-Tenant-Id to the Engine, without credentials, and that the sign-in is still made by the app's own server route; the Supabase text is unchanged.
+- `buildpad-reference/SKILL.md` (text): The Engine-project file sentence (ES-11) no longer says a browser cannot name the tenant; it says a file shown in a browser is loaded through a signed URL because an img element or a link sends no X-Tenant-Id. The Supabase text is unchanged.
+- `context-engineering/SKILL.md` (text): The extensions line of the MCP tool tree drops its note that the Engine's MCP server has no extensions tool, which the Engine now serves to administrators; it reads as it did in v1.0.0.
+
 ## v4.0.0
 
 The identity provider that the skills called **My Apps** is now named **XAppHub**. Install it with
