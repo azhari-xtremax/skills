@@ -287,7 +287,7 @@ On an Engine project the MCP server is the Engine's own, at `<Engine_URL>/api/mc
 | `mcp_daas_policies`      | Policies (CRUD — create/read/update/delete)                             |
 | `mcp_daas_permissions`   | Permission rules (CRUD — create/read/update/delete)                     |
 | `mcp_daas_access`        | Attach a policy to a role or a user, read or revoke the attachment (admin) |
-| `mcp_daas_scope`         | Assign a role to a user at a scope (`action: "assign_user_role"`) — nothing else (admin) |
+| `mcp_daas_scope`         | Assign a role to a user at a scope (`action: "assign_user_role"`), or register a collection as tenanted (`action: "create_config"`) (admin) |
 
 The Engine also serves one tool per operation, for clients that already call them: `daas_read_items`, `daas_create_item`, `daas_update_item`, `daas_delete_item`, `daas_list_collections`, `daas_get_schema`, `daas_create_collection`, `daas_list_files`, `daas_list_workflows` and `daas_trigger_transition`. Prefer the tools in the table.
 

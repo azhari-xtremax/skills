@@ -14,6 +14,28 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## Unreleased
+
+One Engine statement was wrong. It stands only in text for Engine projects, so this is a MINOR
+release.
+
+- **The Engine's MCP `scope` tool has two actions.** Besides `assign_user_role`, it serves
+  `create_config`, which registers a collection as tenanted: it takes the body of
+  `POST /api/scope/collection-config` under `config_data`, with that route's checks, to an
+  administrator only. Every Engine release has served it. The skills said that the tool only
+  assigns a role. The Engine statement ES-9 in [CONTRIBUTING](CONTRIBUTING.md) is reworded, and
+  every folder that carries it has the new text. `daas-platform` (the MCP tool table and the
+  `scope` section of `daas-mcp-tools`, with a `create_config` example) and `create-rbac` say the
+  same. The tool still reads and edits no scope type or item: those stay on the `/api/scope`
+  routes.
+
+The change is recorded in `.kiro/specs/backend-aware-skills/design.md` (Engine-fact corrections,
+23 October 2026, H5).
+
+### Supabase projects
+
+No file that a Supabase project's agent reads changes.
+
 ## v5.1.0
 
 The Organisation Platform connector's guide is now part of the skills. Install it with

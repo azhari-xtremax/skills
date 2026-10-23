@@ -1782,9 +1782,9 @@ On an Engine project an administrator manages hooks with the MCP tool `extension
 
 ## Tool: `scope` (Admin Only)
 
-On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool only assigns a role to a user at a scope (`assign_user_role`).
+On an Engine project the project is one tenant. Every scope hierarchy begins below the project's tenant node: create no scope type without a parent and no scope item without a parent. Scope types, items and collection settings are managed through `/api/scope/types`, `/api/scope/items` and `/api/scope/collection-config` with an administrator's session; the MCP `scope` tool, served to an administrator only, assigns a role to a user at a scope (`assign_user_role`) and registers a collection as tenanted (`create_config`, the body of `POST /api/scope/collection-config`).
 
-On an Engine project the MCP `scope` tool has one action, `assign_user_role`, and takes its arguments under `assignment`. It applies the same checks as `POST /api/users/:id/roles`: a role whose scope rules do not allow the scope is refused (`ROLE_SCOPE_MISMATCH`, `ROLE_SCOPE_LOCKED`). See the `/manage-scope` skill for the complete setup.
+On an Engine project the MCP `scope` tool has two actions. `assign_user_role` takes its arguments under `assignment` and applies the same checks as `POST /api/users/:id/roles`: a role whose scope rules do not allow the scope is refused (`ROLE_SCOPE_MISMATCH`, `ROLE_SCOPE_LOCKED`). `create_config` takes the body of `POST /api/scope/collection-config` under `config_data` and applies that route's checks: `collection` is required, and `field_name` (default `resource_uri`) must be a column of it. `add_fk` is accepted and ignored: the Engine makes no foreign key for a tenant column. The tool reads and edits no scope type or item; use the routes above. See the `/manage-scope` skill for the complete setup.
 
 ```json
 // Assign a user to a scoped role
@@ -1799,6 +1799,19 @@ On an Engine project the MCP `scope` tool has one action, `assign_user_role`, an
 ```
 
 Omit `resource_uri` for a role binding that is not limited to one scope.
+
+```json
+// Register a collection as tenanted
+{ "name": "scope", "arguments": {
+  "action": "create_config",
+  "config_data": {
+    "collection": "orders",
+    "field_name": "resource_uri",
+    "inheritance_mode": "exact",
+    "missing_uri_mode": "reject"
+  }
+}}
+```
 <!-- /buildpad-backend -->
 
 ---
