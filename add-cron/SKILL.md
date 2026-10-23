@@ -50,7 +50,7 @@ A row of either history opens the run log (`CronRunLogModal`).
 This module is the admin UI. What a job is, how its code runs, and how to create one through the API or the MCP tool is [create-cron](../create-cron/SKILL.md).
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
-This module is the admin UI. What a job is, how its code runs, and how to create one through the Studio's Cron module or the Engine's API is [create-cron](../create-cron/SKILL.md). On an Engine project there is no MCP tool for cron jobs.
+This module is the admin UI. What a job is, how its code runs, and how to create one through the Studio's Cron module or the Engine's API is [create-cron](../create-cron/SKILL.md). On an Engine project an administrator's agent can also manage cron jobs with the Engine's MCP tool `cron`.
 <!-- /buildpad-backend -->
 
 ## CRITICAL: Never Create These Manually

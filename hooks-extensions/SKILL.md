@@ -272,7 +272,7 @@ On an Engine project stored code (hooks, cron jobs, custom services) runs in the
 
 ### Creating Extensions
 
-On an Engine project create and change extensions in the Studio's Extensions module, or through the Engine's REST API `/api/extensions` with an administrator's access token. Only an administrator may create, change, activate, deactivate, clone or delete an extension. There is no MCP tool for extensions on an Engine project.
+On an Engine project create and change extensions in the Studio's Extensions module, or through the Engine's REST API `/api/extensions` with an administrator's access token. Only an administrator may create, change, activate, deactivate, clone or delete an extension. An administrator's agent can also use the Engine's MCP tool `extensions`, which is listed and served to an administrator only: its `action` is `list`, `read`, `create`, `update`, `delete`, `activate`, `deactivate` or `clone`, the extension's fields (`name`, `event`, `type`, `code`, `sort`, `status`, `timeout_ms`) and `id` stand at the top level of `arguments`, and a `delete` is refused while the project's MCP deletes are off. If the tool is not listed, the project's Engine is older than 0.1.0-dev.4: use the Studio or the REST API.
 
 On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
 

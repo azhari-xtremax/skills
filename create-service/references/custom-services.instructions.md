@@ -271,7 +271,7 @@ const siteUrl = env.NEXT_PUBLIC_SITE_URL;
 <!-- buildpad-backend: engine -->
 ## MCP Tool
 
-On an Engine project there is no MCP tool for custom services. Manage them in the Studio's Custom Services module or through the REST API above, with an administrator's access token (a user whose role holds the matching permission on `daas_custom_services` may list, create, update and delete them too; only an administrator runs tests). Never send the token in the project's MCP configuration to these routes: it is accepted only on the MCP endpoint `/api/mcp`.
+On an Engine project the MCP tool `services` manages custom services. It is listed and served to an administrator only, so the agent can use it when the project's MCP configuration carries an administrator's token. Its `action` is `list`, `read`, `create`, `update`, `delete`, `run_tests`, `activate` or `deactivate`; the service's fields and `id` stand at the top level of `arguments`, and a change takes effect as the REST write of the same body does. A `delete` is refused while the project's MCP deletes are off. If the tool is not listed, the project's Engine is older than 0.1.0-dev.4. Without the tool, manage services in the Studio's Custom Services module or through the REST API above, with an administrator's access token (a user whose role holds the matching permission on `daas_custom_services` may list, create, update and delete them too; only an administrator runs tests). Never send the token in the project's MCP configuration to these routes: it is accepted only on the MCP endpoint `/api/mcp`.
 
 ## Service Code Structure
 

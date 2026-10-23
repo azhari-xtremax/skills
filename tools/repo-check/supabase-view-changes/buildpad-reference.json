@@ -10,5 +10,11 @@
     "kind": "text",
     "reason": "The DaaSProvider examples take the address from NEXT_PUBLIC_BUILDPAD_DAAS_URL instead of a sample host, and the token rule is stated for both kinds of project (a static token on a Supabase project, a signed-in user's access token on an Engine project, ES-2).",
     "release": "v2.0.0"
+  },
+  {
+    "path": "buildpad-reference/SKILL.md",
+    "kind": "text",
+    "reason": "The Engine-project file sentence (ES-11) no longer says a browser cannot name the tenant; it says a file shown in a browser is loaded through a signed URL because an img element or a link sends no X-Tenant-Id. The Supabase text is unchanged.",
+    "release": "unreleased"
   }
 ]

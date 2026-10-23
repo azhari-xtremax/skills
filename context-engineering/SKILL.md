@@ -58,7 +58,7 @@ DaaS MCP Server (the Engine's MCP on an Engine project):
   ├── schema → Live collection/field definitions
   ├── items → Real data operations
   ├── permissions → Current RBAC state
-  └── extensions → Runtime hooks (Supabase projects; the Engine's MCP has no extensions tool)
+  └── extensions → Runtime hooks
   
 Buildpad MCP Server:
   ├── list_components → Available components

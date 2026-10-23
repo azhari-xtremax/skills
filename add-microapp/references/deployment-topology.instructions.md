@@ -346,7 +346,7 @@ users-app/ code change
 **Note:** DaaS schema and configuration changes (collections, fields, permissions, hooks) are managed via the DaaS admin UI or MCP tools — they don't require app redeployment.
 <!-- /buildpad-backend -->
 <!-- buildpad-backend: engine -->
-**Note:** Engine schema and configuration changes (collections, fields, permissions, hooks) are made through the Studio, the Engine's API or its MCP tools — they don't require app redeployment. Hooks are stored through `POST /api/extensions` with an administrator's session; the Engine has no MCP tool for them.
+**Note:** Engine schema and configuration changes (collections, fields, permissions, hooks) are made through the Studio, the Engine's API or its MCP tools — they don't require app redeployment. Hooks are stored through `POST /api/extensions` with an administrator's session, or by an administrator with the MCP tool `extensions`.
 <!-- /buildpad-backend -->
 
 ## Health Checks

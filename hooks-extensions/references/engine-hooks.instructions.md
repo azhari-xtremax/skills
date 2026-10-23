@@ -38,7 +38,7 @@ something is not available, tell the developer so and stop: do not build a subst
 
 # Hooks and Runtime Extensions (Engine project)
 
-This guide covers the event hooks and runtime extensions of an Engine project: JavaScript stored in the Engine and run on item events. Manage them in the Studio's Extensions module or through the Engine's REST API with an administrator's access token. There is no MCP tool for extensions on an Engine project, and the Engine loads no extension from files.
+This guide covers the event hooks and runtime extensions of an Engine project: JavaScript stored in the Engine and run on item events. Manage them in the Studio's Extensions module, through the Engine's REST API with an administrator's access token, or through the Engine's MCP tool `extensions`, which is listed and served to an administrator only. The Engine loads no extension from files.
 
 On an Engine project stored code (hooks, cron jobs, custom services) runs in the Engine's runtime, which provides only what the Engine runtime table in the [hooks-extensions skill](../SKILL.md) lists; for each interface it lacks, the table says what replaces it.
 

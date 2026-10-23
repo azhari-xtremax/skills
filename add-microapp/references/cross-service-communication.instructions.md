@@ -237,7 +237,7 @@ Use an action hook stored in the Engine to trigger cross-domain side effects. On
 The hook below is an `action` hook on the event `invoices.items.create`. Store it with
 `POST /api/extensions` and an administrator's session, giving `name`, `event`,
 `type: "action"`, `code` (the body below) and `status: "active"` (an omitted status stores
-`inactive`). The Engine has no MCP tool for hooks. `code` is the body of a function that
+`inactive`), or with the Engine's MCP tool `extensions` (administrators only). `code` is the body of a function that
 receives `meta`, `context` and `services`:
 
 ```javascript

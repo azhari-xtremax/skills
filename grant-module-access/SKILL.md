@@ -97,7 +97,7 @@ Use the MCP `module_access_keys` tool (or the **Module Access Keys** page at `/m
 <!-- buildpad-backend: engine -->
 ## Step 1: Register the Key(s)
 
-On an Engine project register keys with the MCP `items` tool on the collection `daas_module_access_keys`; there is no dedicated key tool.
+On an Engine project register keys with the MCP `items` tool on the collection `daas_module_access_keys`, as below. An administrator's agent may instead use the MCP tool `module_access_keys` (`create`, `read`, `update`, `delete`), which is listed and served to an administrator only.
 
 ### Create a folder group (optional)
 

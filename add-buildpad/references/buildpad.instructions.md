@@ -326,7 +326,7 @@ your-project/
 
 On an Engine project the services and hooks call the Engine with the signed-in user's access token, as "DaaS API Utilities" below says.
 
-On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`: a browser cannot name the tenant on an anonymous read yet. Set no storage bucket option: the Engine stores files on its own disk or in S3.
+On an Engine project files are stored and served by the Engine: `/api/files`, `/api/folders`, `/api/files/signed-url`, and file content at `/api/files/assets/:id` (with a session or a signed token). A file shown in a browser, a public one included, is loaded through a signed URL from `/api/files/signed-url`, not by an anonymous read: an `<img>` element or a link sends no `X-Tenant-Id`. Set no storage bucket option: the Engine stores files on its own disk or in S3.
 <!-- /buildpad-backend -->
 
 ## Import Transformation
@@ -1060,7 +1060,7 @@ pnpm storybook:form
 
 On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere.
 
-On an Engine project `STORYBOOK_DAAS_TOKEN` holds a session token: the access token of a user signed in to the project, never the project's MCP token or another administrator token. Get it from a sign-in made through the application: a browser cannot send `X-Tenant-Id` to the Engine yet, so a sign-in made from a Storybook page does not reach the project. When the token expires, sign in again and restart Storybook with the new token.
+On an Engine project `STORYBOOK_DAAS_TOKEN` holds a session token: the access token of a user signed in to the project, never the project's MCP token or another administrator token. Get it from a sign-in made through the application's own sign-in route, which names the project's tenant; do not add a sign-in to a Storybook page. When the token expires, sign in again and restart Storybook with the new token.
 
 **Playground Features:**
 

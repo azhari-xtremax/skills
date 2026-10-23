@@ -4,5 +4,11 @@
     "kind": "text",
     "reason": "Qualified so each line is true for both kinds of project: the architecture, the MCP server (the Engine's has no extensions tool) and the environment file name the Engine project's one address for data and sign-in; the Supabase guidance is unchanged.",
     "release": "v2.0.0"
+  },
+  {
+    "path": "context-engineering/SKILL.md",
+    "kind": "text",
+    "reason": "The extensions line of the MCP tool tree drops its note that the Engine's MCP server has no extensions tool, which the Engine now serves to administrators; it reads as it did in v1.0.0.",
+    "release": "unreleased"
   }
 ]

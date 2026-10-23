@@ -338,7 +338,7 @@ applyTo: "**/*.{ts,tsx}"
 
 # Cron REST API Routes
 
-On an Engine project the Engine provides a complete REST API for managing cron jobs, at `<Engine_URL>/api/cron`. Each route is decided by the caller's grant on the collection `daas_cron_jobs`; an administrator passes every check. A grant on `daas_cron_history` opens nothing. The Studio's Cron module uses the same routes. There is no MCP tool for cron jobs on an Engine project.
+On an Engine project the Engine provides a complete REST API for managing cron jobs, at `<Engine_URL>/api/cron`. Each route is decided by the caller's grant on the collection `daas_cron_jobs`; an administrator passes every check. A grant on `daas_cron_history` opens nothing. The Studio's Cron module uses the same routes. The Engine's MCP tool `cron`, listed and served to an administrator only, makes the same changes.
 
 On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
 

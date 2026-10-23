@@ -379,7 +379,7 @@ After setting up roles and policies, **always** register Module-Level Access Key
 }
 ```
 
-On an Engine project keys are registered through the `items` tool on `daas_module_access_keys`; there is no dedicated key tool.
+On an Engine project keys are registered through the `items` tool on `daas_module_access_keys`, or by an administrator with the MCP tool `module_access_keys`.
 <!-- /buildpad-backend -->
 
 Key naming convention: `<domain>:<capability>` (e.g. `tickets:approve`, `dashboard:manager_stats`, `reports:export`).
