@@ -1412,8 +1412,11 @@ renumbered; the requirements' Dependencies record both rows as met (a dated note
 - **H4. Kept.** The agent changes no cross-origin setting (ES-15): Engine text names
   `cors-settings` only to say so. The shared contract's `cors-mcp` and `missing-mcp` patterns are
   unchanged, so Engine text names `cors-settings`, `smtp-settings` and `module_access_keys` without
-  the `mcp_daas_` prefix. `missing-mcp` is now stale for both tools; changing it is a Revalidation
-  Trigger in both repositories (S8) and waits for the maintainer's decision. Module access keys
+  the `mcp_daas_` prefix. Both tools now exist, so `missing-mcp` no longer marks a
+  missing tool. **Decided 23 October 2026 by the maintainer: the pattern is kept unchanged.** It
+  refuses only the `mcp_daas_` call names and a `"name"` member naming either tool; Engine text
+  names both tools without that prefix (CONTRIBUTING, "Name an unavailable feature in plain
+  words"). No Revalidation Trigger (S8) fires in either repository. Module access keys
   keep the `items` path as the documented one.
 
 The two statements now read, and are copied verbatim (in `CONTRIBUTING.md`, in every folder that

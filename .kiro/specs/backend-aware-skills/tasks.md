@@ -1010,7 +1010,8 @@
   - Note 23 October 2026: PP-29 and PP-28 are met (`buildpad-daas-go` `8966049b`), recorded in the
     requirements' Dependencies. The design's [Engine-fact corrections, 23 October 2026](design.md#engine-fact-corrections-23-october-2026)
     word 10.4 and 10.5 (H1 to H4), and both are done on branch `docs/engine-mcp-cors-statements`.
-    The contract's `missing-mcp` pattern is stale and waits for the maintainer (H4).
+    The contract's `missing-mcp` pattern is kept unchanged, decided by the maintainer on
+    23 October 2026 (H4).
 
 - [ ] 10.1 Switch ES-13n to ES-13m once the scheduler is listed available
   - Blocked until: row Decision P is recorded as met (a creation path runs the scheduler, infra
