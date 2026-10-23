@@ -9,6 +9,6 @@
     "path": "context-engineering/SKILL.md",
     "kind": "text",
     "reason": "The extensions line of the MCP tool tree drops its note that the Engine's MCP server has no extensions tool, which the Engine now serves to administrators; it reads as it did in v1.0.0.",
-    "release": "unreleased"
+    "release": "v5.0.0"
   }
 ]

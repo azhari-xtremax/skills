@@ -39,12 +39,12 @@
     "path": "authentication-proxy/SKILL.md",
     "kind": "text",
     "reason": "The Engine-project sentences (ES-4) now say that a browser can send X-Tenant-Id to the Engine from another origin, without credentials, and that the sign-in still goes through the application's own server route; the Supabase routes are unchanged.",
-    "release": "unreleased"
+    "release": "v5.0.0"
   },
   {
     "path": "authentication-proxy/references/authentication-proxy.instructions.md",
     "kind": "text",
     "reason": "The Engine-project cross-origin sentence now says that a browser may send X-Tenant-Id to the Engine, without credentials, and that the sign-in is still made by the app's own server route; the Supabase text is unchanged.",
-    "release": "unreleased"
+    "release": "v5.0.0"
   }
 ]
