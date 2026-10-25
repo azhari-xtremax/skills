@@ -266,7 +266,7 @@ On an Engine project files are stored and served by the Engine: `/api/files`, `/
 
 The Engine stores cron jobs with cron expressions, a time zone, a JavaScript body, execution history, and manual trigger capability.
 
-On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet.
+On an Engine project an active cron job fires at its scheduled time.
 
 | What | How |
 |------|-----|
@@ -549,7 +549,7 @@ See the [hooks-extensions skill](../../hooks-extensions/SKILL.md) for complete e
 | "Add draft/published states" | NO — use workflows | `create-workflow` skill |
 | "Add versioning/drafts" | NO — use versions | `POST /api/versions` |
 | "Upload files" | NO — use the Engine's files | `mcp_daas_files` + Buildpad components |
-| "Schedule a job" | NO — use cron jobs | [create-cron](../../create-cron/SKILL.md); scheduled runs are not available on an Engine project yet |
+| "Schedule a job" | NO — use cron jobs | [create-cron](../../create-cron/SKILL.md) |
 | "Add role-based access" | NO — use RBAC | `create-rbac` skill |
 | "Add multi-tenancy" | NO — use scopes | `manage-scope` skill |
 | "Import CSV data" | NO — use the import utility | `POST /api/utils/import/:collection` |

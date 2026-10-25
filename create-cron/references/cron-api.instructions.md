@@ -407,7 +407,7 @@ Only include fields you want to change:
 
 Only the fields sent are written; a known field with a value its column cannot hold is refused, not dropped. `{ "status": "active" }` activates a job and `{ "status": "inactive" }` deactivates it.
 
-On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet.
+On an Engine project an active cron job fires at its scheduled time. `POST /api/cron/:id/run` runs a job by hand at any time.
 
 ---
 

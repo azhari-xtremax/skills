@@ -308,7 +308,7 @@ On an Engine project the MCP server serves the tools `cron`, `services`, `extens
 | Cross-origin settings | `cors-settings` exists: change nothing through it                                              | Change nothing: see the cross-origin rule below                                                            |
 | Mail settings         | `smtp-settings`: `get`, `update`, `test`                                                       | `GET`/`PATCH <Engine_URL>/api/settings/smtp` with an administrator's session                               |
 
-On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet.
+On an Engine project an active cron job fires at its scheduled time. The `cron` tool's `run_now`, or `POST /api/cron/:id/run`, runs a job by hand at any time.
 
 > **All MCP tools** take their parameters at the top level of `arguments` (`action`, `collection`, `keys`, `query`, `data`) — do NOT wrap them in a `data` object. `data` holds only the field values of a create or an update.
 >
@@ -379,7 +379,7 @@ Before writing any API route or page that queries a collection:
 | Audit / change tracking        | **Automatic** — `daas_activity` + `GET /api/activity` | Custom audit tables, logging hooks                   |
 | Validation before save         | Hooks: filter hooks ([hooks-extensions](../hooks-extensions/SKILL.md)) | Next.js API middleware validation |
 | Side effects after save        | Hooks: action hooks ([hooks-extensions](../hooks-extensions/SKILL.md)) | Custom webhook dispatchers        |
-| Scheduled tasks                | Cron jobs ([create-cron](../create-cron/SKILL.md)); the scheduler does not run yet (see DaaS MCP Tools above) | `setInterval`, Next.js cron, external schedulers |
+| Scheduled tasks                | Cron jobs ([create-cron](../create-cron/SKILL.md)) | `setInterval`, Next.js cron, external schedulers |
 | Shared reusable code           | Custom services (`services.custom()`, `create-service` skill) | Shared utility files for server-side logic  |
 | Auto timestamps                | Special fields: `date-created`, `date-updated`       | Manual `new Date()` in API routes                    |
 | Auto user tracking             | Special fields: `user-created`, `user-updated`       | Manual `req.user.id` assignment                      |

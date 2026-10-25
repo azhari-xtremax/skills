@@ -4,5 +4,11 @@
     "kind": "text",
     "reason": "The stack is named as Next.js and the project's Buildpad backend (DaaS and Supabase, or the Buildpad Engine), and the cron and scope rows say how they differ on an Engine project.",
     "release": "v2.0.0"
+  },
+  {
+    "path": "idea-refine/SKILL.md",
+    "kind": "text",
+    "reason": "The cron row drops its note that an Engine project's cron jobs run only when run by hand, because an Engine project now runs its scheduler; it reads as it did in v1.0.0.",
+    "release": "unreleased"
   }
 ]

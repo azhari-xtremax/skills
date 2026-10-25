@@ -49,7 +49,7 @@ Cron jobs are stored in the Engine (`daas_cron_jobs`) and executed by the Engine
 
 On an Engine project every data call carries the signed-in user's access token as `Authorization: Bearer <access token>`, from the application's own server route or from the SDK. The Engine accepts no cookie session on its data API. The token in the project's MCP configuration is accepted only on the MCP endpoint `/api/mcp`: never send it, or any other administrator token, to the data API.
 
-On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet.
+On an Engine project an active cron job fires at its scheduled time. A job can also be run by hand at any time (`POST /api/cron/:id/run`).
 <!-- /buildpad-backend -->
 
 **Key properties:**
@@ -170,7 +170,7 @@ curl -X PATCH "$ENGINE_URL/api/cron/<job-id>" \
   -d '{ "status": "active" }'
 ```
 
-On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. Activating a job stores its status; until scheduled runs are available, run it by hand as in step 2 (or from the Studio's Cron module) whenever it has to run.
+On an Engine project an active cron job fires at its scheduled time. Activating the job starts its scheduled runs; to run it once at another time, run it by hand as in step 2 (or from the Studio's Cron module).
 <!-- /buildpad-backend -->
 
 ## Cron Expressions

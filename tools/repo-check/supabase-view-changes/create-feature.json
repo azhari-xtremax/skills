@@ -22,5 +22,11 @@
     "kind": "text",
     "reason": "Engine statement ES-16 names the identity provider product XAppHub (formerly My Apps); the module names and the Supabase guidance are unchanged.",
     "release": "v4.0.0"
+  },
+  {
+    "path": "create-feature/SKILL.md",
+    "kind": "text",
+    "reason": "The Engine-project sentence about cron jobs (ES-13n, retired) now says that an active cron job fires at its scheduled time (ES-13m); the Supabase guidance is unchanged.",
+    "release": "unreleased"
   }
 ]
