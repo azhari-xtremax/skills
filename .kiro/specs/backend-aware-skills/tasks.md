@@ -1012,8 +1012,12 @@
     word 10.4 and 10.5 (H1 to H4), and both are done on branch `docs/engine-mcp-cors-statements`.
     The contract's `missing-mcp` pattern is kept unchanged, decided by the maintainer on
     23 October 2026 (H4).
+  - Note 25 October 2026: Decision P is met, recorded in the requirements' Dependencies. The
+    design's [Engine-fact corrections, 25 October 2026](design.md#engine-fact-corrections-25-october-2026)
+    retire ES-13n (I1), and 10.1 is done on branch `fix/engine-scheduler-runs`, in every folder
+    that carried ES-13n (C6), not only `add-cron` and `create-cron`.
 
-- [ ] 10.1 Switch ES-13n to ES-13m once the scheduler is listed available
+- [x] 10.1 Switch ES-13n to ES-13m once the scheduler is listed available
   - Blocked until: row Decision P is recorded as met (a creation path runs the scheduler, infra
     Requirement 2 criterion 14). No design revision needed: ES-13m is worded.
   - In `add-cron` and `create-cron`, replace each ES-13n with ES-13m verbatim, and remove "run by
