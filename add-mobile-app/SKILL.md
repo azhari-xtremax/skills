@@ -258,9 +258,7 @@ path**. Mobile microapps follow the generated starter instead.
     and cannot `require` or `import` a library. Keep the sender in the server app
     (sign the Google OAuth JWT with `jose` — no Firebase SDK needed) and let the
     scheduled job just POST to a secret-guarded route, through whatever outbound
-    request its runtime allows. On an Engine project the scheduler does not run yet:
-    a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled
-    runs are not available on an Engine project yet.
+    request its runtime allows.
 20. **Testing push on an emulator: delivery can lag by minutes after the app has
     been idle in the background.** Observed: instant right after backgrounding, but
     ~2m20s late after a 4-minute idle (FCM returned 200 both times; the standby

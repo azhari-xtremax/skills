@@ -14,6 +14,35 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## Unreleased
+
+One Engine statement was out of date. The release that carries this is a MAJOR release, because
+three of the changed sentences stand in text that a Supabase project's agent also reads (see
+**Supabase projects** below). No skill is added, removed or renamed, and the "Establish the
+backend first" procedure stays at version 1.
+
+- **Cron jobs run on their schedule on an Engine project.** Every Engine project runs the Engine's
+  scheduler next to its data API, so an active cron job fires at its scheduled time. The skills
+  said that the scheduler does not run yet and that a job runs only when it is run by hand. The
+  Engine statement ES-13n in [CONTRIBUTING](CONTRIBUTING.md) is retired, and every folder that
+  carried it has ES-13m in its place, or no sentence where it only warned: `add-cron`,
+  `add-mobile-app`, `create-cron`, `create-feature`, `daas-platform`, `hooks-extensions` and
+  `idea-refine`. A job can still be run by hand at any time (`POST /api/cron/:id/run`, the MCP
+  `cron` tool's `run_now`, or `services.cron.trigger`).
+
+The change is recorded in `.kiro/specs/backend-aware-skills/design.md` (Engine-fact corrections,
+25 October 2026, I1), and task 10.1 is done.
+
+### Supabase projects
+
+The Supabase steps, routes and guidance do not change. These files change because a sentence that
+names an Engine project stands in text that both kinds of project read. Each change, with its
+reason:
+
+- `add-mobile-app/SKILL.md` (text): Rule 19 drops its last sentence, which said that on an Engine project a cron job runs only when run by hand; an Engine project now runs its scheduler. The Supabase guidance is unchanged.
+- `create-feature/SKILL.md` (text): The Engine-project sentence about cron jobs (ES-13n, retired) now says that an active cron job fires at its scheduled time (ES-13m); the Supabase guidance is unchanged.
+- `idea-refine/SKILL.md` (text): The cron row drops its note that an Engine project's cron jobs run only when run by hand, because an Engine project now runs its scheduler; it reads as it did in v1.0.0.
+
 ## v5.2.0
 
 One Engine statement was wrong. Install it with `npx skills add buildpad-ai/skills#v5.2.0`. The

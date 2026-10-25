@@ -78,7 +78,7 @@ Before refining any data-centric idea, check what DaaS provides out of the box:
 | Approval processes | Workflow state machines |
 | Content drafts | Versioning API |
 | File management | Files API |
-| Scheduled tasks | Cron jobs (on an Engine project they run only when run by hand, until its scheduler runs) |
+| Scheduled tasks | Cron jobs |
 | Access control | RBAC (roles, policies, permissions) |
 | Data partitioning | Scope system (multi-tenancy; on an Engine project the project is one tenant and its scopes sit below it) |
 | Data import/export | Utils API |

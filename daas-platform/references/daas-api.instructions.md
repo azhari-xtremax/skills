@@ -959,7 +959,7 @@ On an Engine project there is no route that tests a hook's code: activate the ho
 | POST   | `/api/cron/:id/clone`    | Clone a cron job                |
 | GET    | `/api/cron/:id/history`  | Run history of one job          |
 
-On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. See the [create-cron skill](../../create-cron/SKILL.md).
+On an Engine project an active cron job fires at its scheduled time. `POST /api/cron/:id/run` runs a job by hand at any time. See the [create-cron skill](../../create-cron/SKILL.md).
 
 ### Custom Services
 

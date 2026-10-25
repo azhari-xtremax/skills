@@ -605,7 +605,7 @@ Common timezones:
 - `Europe/London`
 - `Australia/Sydney`
 
-On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. Write the schedule now; it takes effect once scheduled runs are available.
+On an Engine project an active cron job fires at its scheduled time.
 
 ---
 

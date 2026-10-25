@@ -355,7 +355,7 @@ Trigger, list, or inspect cron jobs from any stored code. `services.cron` is a n
 
 A job is the API's snake_case fields without `code`: `id`, `name`, `description`, `schedule`, `timezone`, `status`, `timeout_ms`, `memory_limit_mb`, `running`, `running_since`, `last_run_at`, `last_run_status`, `next_run_at`, `created_at`, `updated_at`, `created_by`, `updated_by`. A missing value is `null`; a time is an ISO-8601 string in UTC.
 
-On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. `services.cron.trigger` is such a run by hand.
+On an Engine project an active cron job fires at its scheduled time. `services.cron.trigger` runs a job by hand, at once, as `POST /api/cron/:id/run` does.
 
 ### Example: Trigger a cron job from an extension
 

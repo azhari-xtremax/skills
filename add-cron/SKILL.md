@@ -82,7 +82,7 @@ On an Engine project the data API's address is the Engine_URL, which both `NEXT_
 
 **Leave the cross-origin settings as they are.** On an Engine project the data API accepts requests from any origin and never with cookies, as the project is provisioned. Change no cross-origin setting, and do not add the application's origin anywhere. The module's calls carry the signed-in user's access token as `Authorization: Bearer`, never a cookie, so nothing needs configuring before you mount it.
 
-The hooks absorb the Engine's list and error shapes. On an Engine project the scheduler does not run yet: a cron job runs only when it is run by hand (`POST /api/cron/:id/run`). Scheduled runs are not available on an Engine project yet. In this module that means Run Now is the only way a job runs: Activate stores the job's status, but nothing fires on the job's schedule.
+The hooks absorb the Engine's list and error shapes. On an Engine project an active cron job fires at its scheduled time. In this module Activate makes a job fire on its schedule, and Run Now runs a job once, straight away (`POST /api/cron/:id/run`).
 <!-- /buildpad-backend -->
 
 ## Installation

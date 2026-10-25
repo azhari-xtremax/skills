@@ -1449,6 +1449,45 @@ and `context-engineering/SKILL.md`. So the next release is MAJOR.
 `8966049b` also has a `create_config` action, which ES-9 does not name; that is a separate
 correction.
 
+## Engine-fact corrections, 25 October 2026
+
+Written on 25 October 2026, at the maintainer's request. Decision P is met: every Engine_Project
+runs the Engine's scheduler.
+
+- **Decision P** (infrastructure Requirement 2 criterion 14). The data service of every Engine_Project
+  runs `buildpad-daas cron worker`, the Engine's scheduler, as a service next to the Engine's
+  server, from the same Engine image. Every creation path has run it since the first one
+  (16 October 2026), so no Engine_Project lacks it, and a version update recreates it with the
+  server. It was seen running on a live Engine_Project on 25 October 2026. A scheduled run gets the
+  same services as the API server (the Engine's README, `cron worker`), and a job created or changed
+  through the API is picked up without a restart.
+
+The text above is left as it was approved. No criterion is added, reworded, withdrawn or
+renumbered; the requirements' Dependencies record row Decision P as met (a dated note there).
+
+**Corrections**:
+
+- **I1. ES-13n is retired; ES-13m stands** (task 10.1). In every folder that carried ES-13n (C6:
+  `add-cron`, `create-cron`, `create-feature`, `daas-platform`, `hooks-extensions`, `idea-refine`,
+  and `add-mobile-app`, added later), ES-13n is replaced by ES-13m verbatim, or removed where it
+  only warned (the `daas-platform` pattern table, the `builtin-features` "Should I Build This?"
+  table, `idea-refine`'s cron row and the last sentences of `add-mobile-app`'s rule 19). The
+  sentences that followed ES-13n and depended on it (`add-cron`'s Run Now, `create-cron`'s
+  activation step, the `cron-sandbox` time-zone note) are reworded or dropped. Where a run by hand
+  is still useful, the Engine text adds that `POST /api/cron/:id/run` (the MCP `cron` tool's
+  `run_now`, `services.cron.trigger`) runs a job at once. `CONTRIBUTING.md` marks ES-13n
+  retired, and `test/guard.test.mjs` no longer holds it (18 ES texts).
+
+ES-13m reads as the table above gives it, copied verbatim:
+
+| Id | Text |
+|---|---|
+| ES-13m | On an Engine project an active cron job fires at its scheduled time. |
+
+Three Supabase views change, each in a shared sentence that names the Engine, with an `unreleased`
+change-file entry: `add-mobile-app/SKILL.md`, `create-feature/SKILL.md` and `idea-refine/SKILL.md`
+(which reads as it did in `v1.0.0`). So the next release is MAJOR.
+
 ## Design review gate
 Run on the revision of 16 October 2026; the second pass found nothing to repair.
 - **Traceability (mechanical):** 66 live ids extracted from `requirements.md`; 66 rows above, one
