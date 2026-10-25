@@ -27,6 +27,6 @@
     "path": "create-feature/SKILL.md",
     "kind": "text",
     "reason": "The Engine-project sentence about cron jobs (ES-13n, retired) now says that an active cron job fires at its scheduled time (ES-13m); the Supabase guidance is unchanged.",
-    "release": "unreleased"
+    "release": "v6.0.0"
   }
 ]

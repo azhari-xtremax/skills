@@ -45,6 +45,6 @@
     "path": "add-mobile-app/SKILL.md",
     "kind": "text",
     "reason": "Rule 19 drops its last sentence, which said that on an Engine project a cron job runs only when run by hand; an Engine project now runs its scheduler. The Supabase guidance is unchanged.",
-    "release": "unreleased"
+    "release": "v6.0.0"
   }
 ]

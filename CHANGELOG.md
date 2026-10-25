@@ -14,12 +14,12 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
-## Unreleased
+## v6.0.0
 
-One Engine statement was out of date. The release that carries this is a MAJOR release, because
-three of the changed sentences stand in text that a Supabase project's agent also reads (see
-**Supabase projects** below). No skill is added, removed or renamed, and the "Establish the
-backend first" procedure stays at version 1.
+One Engine statement was out of date. Install it with `npx skills add buildpad-ai/skills#v6.0.0`.
+It is a MAJOR release, because three of the changed sentences stand in text that a Supabase
+project's agent also reads (see **Supabase projects** below). No skill is added, removed or
+renamed, and the "Establish the backend first" procedure stays at version 1.
 
 - **Cron jobs run on their schedule on an Engine project.** Every Engine project runs the Engine's
   scheduler next to its data API, so an active cron job fires at its scheduled time. The skills
