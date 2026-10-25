@@ -9,6 +9,6 @@
     "path": "idea-refine/SKILL.md",
     "kind": "text",
     "reason": "The cron row drops its note that an Engine project's cron jobs run only when run by hand, because an Engine project now runs its scheduler; it reads as it did in v1.0.0.",
-    "release": "unreleased"
+    "release": "v6.0.0"
   }
 ]
