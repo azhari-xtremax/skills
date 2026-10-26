@@ -123,9 +123,10 @@ names), then hooks, then cron jobs: hooks and jobs call services by name.
    scratch item, read the answer and the log, delete the item) and switch it off again. Before you
    switch on a hook that sends mail or calls an outside system, ask the developer: it acts for real.
 7. **Leave it switched off until cut-over**, so the old and the new project never both run it. At
-   cut-over the migration tool switches on only the items **it** copied; it does not switch on the
-   items you rewrote. Give the developer the list of rewritten items whose `was_active` is `true`,
-   to switch on at cut-over. On an Engine project an active cron job fires at its scheduled time.
+   cut-over the migration tool switches on the items it copied and the items you rewrote: it finds
+   a rewritten item by its kind and its **name**, and switches it on when the original's
+   `was_active` is `true`. So keep each rewritten item's original name. An item it cannot find is
+   reported as still to rewrite. On an Engine project an active cron job fires at its scheduled time.
 
 ### Engine runtime
 
