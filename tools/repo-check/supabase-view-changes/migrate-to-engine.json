@@ -1,0 +1,8 @@
+[
+  {
+    "path": "migrate-to-engine/SKILL.md",
+    "kind": "new-file",
+    "reason": "New skill migrate-to-engine: on a Supabase project it says the skill applies after the move to the Buildpad Engine, points to the public guide, and stops.",
+    "release": "unreleased"
+  }
+]
