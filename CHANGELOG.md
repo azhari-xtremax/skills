@@ -14,6 +14,32 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## Unreleased
+
+One skill is added. No existing file changes, so this is a MINOR release.
+
+- New skill `migrate-to-engine`: finishes moving a project from Supabase to the Buildpad Engine.
+  Part A rewrites each hook, cron job and custom service that the move listed in
+  `engine-plan/automation-to-review.json` for the Engine's JavaScript runtime: it explains each
+  finding (`require`, `import`, `process`, `fetch`, timers, Node globals, the Supabase service),
+  rewrites the body with the Engine's services (`services.env` for operator-exposed keys,
+  `services.fetch` for allowed hosts, `services.items` for data), and creates it switched off in the
+  Studio or with the Engine's MCP tools `extensions`, `cron` and `services`, to be switched on at
+  cut-over. Part B is a checklist for the app's code: environment, password sign-in through a server
+  route, data calls with `Authorization: Bearer`, files through the Engine's file routes and signed
+  URLs, administrator code, schema and access rules, database functions, cross-origin settings,
+  then build and tests. It also tells the agent to show the owner every copied permission rule
+  whose dynamic variable resolved to `null` on Supabase and resolves on the Engine. Its references
+  `automation-rewrites.instructions.md` and `app-code.instructions.md` hold the before-and-after
+  code, for Engine projects only.
+
+### Supabase projects
+
+No existing file changes. This file is new:
+
+- `migrate-to-engine/SKILL.md` (new-file): on a Supabase project it says that the skill applies
+  after the move to the Buildpad Engine, points to the public guide, and stops.
+
 ## v6.0.0
 
 One Engine statement was out of date. Install it with `npx skills add buildpad-ai/skills#v6.0.0`.
