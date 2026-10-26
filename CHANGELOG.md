@@ -14,6 +14,17 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
+## v6.2.0
+
+One Engine statement in the new skill was out of date. Install it with
+`npx skills add buildpad-ai/skills#v6.2.0`. It stands only in text for Engine projects, so this is a
+MINOR release.
+
+- **`migrate-to-engine`, Part A step 7:** the migration tool now switches on, at cut-over, the
+  items you rewrote as well as the items it copied. It finds a rewritten item by its kind and its
+  name, so the step now says to keep each item's original name. It said before that rewritten items
+  had to be switched on by hand.
+
 ## v6.1.0
 
 One skill is added. Install it with `npx skills add buildpad-ai/skills#v6.1.0`. No existing
