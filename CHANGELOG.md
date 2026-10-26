@@ -14,9 +14,10 @@ Versions follow these rules:
 From `v2.0.0` on, each section has a subsection **Supabase projects** that lists every change to
 what a Supabase project's agent reads, with its reason.
 
-## Unreleased
+## v6.1.0
 
-One skill is added. No existing file changes, so this is a MINOR release.
+One skill is added. Install it with `npx skills add buildpad-ai/skills#v6.1.0`. No existing
+file changes, so this is a MINOR release.
 
 - New skill `migrate-to-engine`: finishes moving a project from Supabase to the Buildpad Engine.
   Part A rewrites each hook, cron job and custom service that the move listed in
